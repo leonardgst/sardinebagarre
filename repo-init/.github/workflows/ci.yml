@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: ["t-*"]
+  pull_request:
+  workflow_call: # réutilisé par deploy.yml avant toute publication
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      # check = types + lint + tests unitaires + contrôle de confidentialité (scripts/verifier-confidentialite.mjs)
+      - run: npm run check
+      - run: npm run build
+      - name: Tests de bout en bout (WebKit)
+        run: |
+          npx playwright install --with-deps webkit
+          npm run e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: rapport-playwright
+          path: playwright-report/
+          retention-days: 7

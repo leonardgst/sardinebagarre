@@ -1,0 +1,17 @@
+# ⚠️ Contenu personnel : photos, tête de Sardine, aboiement, messages privés. JAMAIS commité.
+prive/
+
+node_modules/
+dist/
+dev-dist/
+coverage/
+test-results/
+playwright-report/
+.env
+.env.*
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+# réglages Claude Code personnels (non partagés)
+.claude/settings.local.json

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "opus",
+  "permissions": {
+    "allow": [
+      "Bash(npm run check*)",
+      "Bash(npm run test*)",
+      "Bash(npm run e2e*)",
+      "Bash(npm run screens*)",
+      "Bash(npm run build*)",
+      "Bash(npm run preview*)",
+      "Bash(npm run dev*)",
+      "Bash(npm test*)",
+      "Bash(npx vitest *)",
+      "Bash(npx playwright *)",
+      "Bash(npx biome *)",
+      "Bash(npx tsc *)",
+      "Bash(node scripts/verifier-confidentialite.mjs*)",
+      "Bash(node scripts/pack-de-test.mjs*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git branch*)",
+      "Bash(git switch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git stash*)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(npm install *)",
+      "Bash(npm uninstall *)"
+    ],
+    "deny": [
+      "Read(./prive/**)",
+      "Edit(./prive/**)",
+      "Bash(npm run pack*)",
+      "Bash(node scripts/pack.mjs*)",
+      "Bash(git add prive*)",
+      "Bash(git add -f *)",
+      "Bash(git add --force *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf *)",
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/format-fichier.mjs"],
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/verifier-fin.mjs"],
+            "timeout": 300
+          }
+        ]
+      }
+    ]
+  }
+}
