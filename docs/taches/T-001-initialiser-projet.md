@@ -159,5 +159,51 @@ _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 Fait le 2026-11-10 par codeur. Projet initialisé : package.json (scripts exacts), vite.config.ts, tsconfig.json, biome.json (règles d architecture prouvées : noRestrictedImports et noRestrictedGlobals sont dans le groupe `style` de Biome 2.6), playwright.config.ts, index.html, robots.txt, main.ts, script de confidentialité et ses 16 tests + 4 tests index.html (20 Vitest), 2 specs Playwright.
 Vérifié : check OK, build OK (base /sardinebagarre/ dans dist), e2e 3 passed, screens 3 captures, dev et dev:https répondent. Écarts : `biome migrate` a remplacé `recommended: true` par `preset: "recommended"` (Biome 2.6). Versions installées : TypeScript 7, Vite 8, Vitest 5. Aucune question.
 
+### Compte rendu — corrections après relecture
+Fait le 2026-11-10 par codeur. C1 : script indépendant du dossier courant (racine calculée depuis le script, cwd git, lectures via join), vérifié depuis src/ui/ et la racine. C2 : .dng bloqué, .svgz bloqué partout (+2 tests). C3 : globalThis, self, Date ajoutés à noRestrictedGlobals ; tests/architecture.test.ts (+10 tests) ; essai Date.now() : Vitest et Biome échouent, puis repassent après suppression. C4 : reporter Playwright html en CI. Vérifié : check OK (32 tests), e2e 3 passed. Aucune question.
+
+## Corrections après relecture
+_Validées par l'humain le 2026-11-10. À faire sur la même branche, dans un nouveau commit `fix(projet): corrections après relecture de T-001`. Ne rien changer d'autre._
+
+### C1 — Script de confidentialité indépendant du dossier courant
+- `scripts/verifier-confidentialite.mjs` : calculer la racine du dépôt à partir du script (`fileURLToPath(new URL('..', import.meta.url))`), passer `cwd: racine` à l'appel `git`, et lire `public/pack/pack.bin` et les SVG avec `join(racine, chemin)`. `findViolations` ne change pas de signature.
+- **Critère** : avec `src/essai.png` présent (créé par `node -e`), lancer le script **depuis `src/ui/`** (`node ../../scripts/verifier-confidentialite.mjs`) → code 1 et message citant `src/essai.png` ; supprimer le fichier → code 0 depuis `src/ui/` et depuis la racine.
+
+### C2 — `.dng` et `.svgz` bloqués
+- Ajouter `dng` aux images bloquées hors de `public/icons/` et `src/ui/art/`.
+- `svgz` (SVG compressé, contenu non vérifiable) est bloqué **partout**, dossiers autorisés compris.
+- **Tests** (dans `tests/scripts/verifier-confidentialite.test.ts`) :
+  | Nom du test | Entrée | Attendu |
+  |---|---|---|
+  | `R-127 photo ProRAW .dng bloquée` | `['src/IMG_0002.DNG']`, `null` | 1 message contenant `src/IMG_0002.DNG` |
+  | `R-127 SVG compressé .svgz bloqué même dans src/ui/art/` | `['src/ui/art/logo.svgz']`, `null` | 1 message ; `readText` jamais appelée |
+
+### C3 — Pureté de `src/logic/` vérifiée par Biome et par un test d'architecture
+- `biome.json`, surcharge `src/logic/**` : ajouter `globalThis`, `self` et `Date` à `noRestrictedGlobals`.
+- Créer `tests/architecture.test.ts` :
+  - une fonction `findForbiddenUsages(source: string): string[]` (dans le fichier de test) qui **retire d'abord les commentaires** (`//…` et `/*…*/`), puis signale chaque occurrence de : `window`, `document`, `localStorage`, `crypto`, `Date.now`, `Math.random`, `globalThis` (mots entiers, `\b`), et tout import ou `export … from` dont le chemin vise `ui` (`../ui`, `../ui/…`, `../../ui/…`) ;
+  - un parcours **récursif** de tous les `.ts` de `src/logic/` (dossier absent ou vide → aucun fichier, test vert), chemins construits avec `node:path`.
+- **Tests** :
+  | Nom du test | Entrée | Attendu |
+  |---|---|---|
+  | `ADR-006 aucun fichier de src/logic/ n'utilise d'API interdite` | contenu réel de `src/logic/**/*.ts` | aucune violation (le message d'échec cite fichier et usage) |
+  | `ADR-006 détecteur : <usage> est repéré` (`it.each`, 8 cas) | `window.innerWidth`, `document.title`, `localStorage.getItem("k")`, `crypto.getRandomValues(a)`, `Date.now()`, `Math.random()`, `globalThis.x`, `import { a } from "../ui/main";` | 1 violation chacun |
+  | `ADR-006 détecteur : code pur et commentaires acceptés` | `export const add = (a: number, b: number) => a + b; // Math.random et window interdits ici` + `/* document */` + `const documentCount = 1;` | 0 violation |
+- **Critère** : créer temporairement `src/logic/essai-interdit.ts` contenant `export const t = Date.now();` → `npm test` échoue sur le test d'architecture **et** `npx biome lint src/logic` échoue (`noRestrictedGlobals`) ; supprimer le fichier → les deux repassent.
+
+### C4 — Rapport Playwright en CI
+- `playwright.config.ts` : `reporter: process.env.CI ? [['dot'], ['html', { open: 'never' }]] : 'list'`.
+- **Critère** : la ligne est présente ; `npm run e2e` → 3 passed.
+
+### Critère global
+- `npm run check` → code 0, avec **32** tests Vitest (20 + 2 pour C2 + 10 pour C3) ; `npm run e2e` → 3 passed ; `git status` avant commit : uniquement les 5 fichiers ci-dessus (script, test du script, `biome.json`, `tests/architecture.test.ts`, `playwright.config.ts`), la fiche et `docs/journal.md`.
+
 ## Relecture
-_(verdict du relecteur, avec la date)_
+**2026-11-10 — relecteur — ⚠️ approuvé avec réserves mineures** (aucun point bloquant ni important).
+Vérifié par exécution : `npm run check` (20/20), build, e2e (3 passed), 3 captures ouvertes, `dev:https` → 200, surcharge Biome prouvée dans un dépôt d'essai (5 formes d'import vers `ui` et 6 globales refusées, sans faux positif), script R-127 testé en réel (non suivi, SVG `<Image` dans `src/ui/art/`, pack court, hors Git).
+
+Réserves mineures :
+1. `scripts/verifier-confidentialite.mjs` dépend du dossier courant : lancé depuis un sous-dossier, il conclut « OK » à tort. Correction : `cwd` = racine du dépôt (`fileURLToPath(new URL('..', import.meta.url))`) pour `git` et les lectures.
+2. `.dng` (ProRAW iPhone) et `.svgz` ne sont pas bloqués.
+3. `biome.json` : `globalThis`, `self`, `Date` non interdits dans `src/logic/` ; `Math.random` hors de portée de Biome → test d'architecture à prévoir avant l'étape 1.
+4. `playwright.config.ts` : pas de reporter `html` en CI, donc l'artefact `playwright-report/` de `ci.yml` sera vide en cas d'échec.

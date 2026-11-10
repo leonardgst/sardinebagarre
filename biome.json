@@ -52,7 +52,10 @@
                   "localStorage": "Interdit dans src/logic (pur).",
                   "sessionStorage": "Interdit dans src/logic (pur).",
                   "navigator": "Interdit dans src/logic (pur).",
-                  "crypto": "Interdit dans src/logic (pur)."
+                  "crypto": "Interdit dans src/logic (pur).",
+                  "globalThis": "Interdit dans src/logic (pur).",
+                  "self": "Interdit dans src/logic (pur).",
+                  "Date": "Interdit dans src/logic (pur) : l'heure est injectée."
                 }
               }
             }

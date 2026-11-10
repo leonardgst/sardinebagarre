@@ -106,4 +106,17 @@ describe('verifier-confidentialite', () => {
   it('R-127 pack trop court → violation', () => {
     expect(findViolations(['public/pack/pack.bin'], octets('SB'), svgSain)).toHaveLength(1);
   });
+
+  it('R-127 photo ProRAW .dng bloquée', () => {
+    const r = findViolations(['src/IMG_0002.DNG'], null, svgSain);
+    expect(r).toHaveLength(1);
+    expect(r[0]).toContain('src/IMG_0002.DNG');
+  });
+
+  it('R-127 SVG compressé .svgz bloqué même dans src/ui/art/', () => {
+    const lecture = () => {
+      throw new Error('readText ne doit pas être appelée');
+    };
+    expect(findViolations(['src/ui/art/logo.svgz'], null, lecture)).toHaveLength(1);
+  });
 });

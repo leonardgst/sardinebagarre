@@ -2,13 +2,29 @@
 // aucun fichier de prive/, pack chiffré bien formé. Ne lit jamais prive/.
 import { execFileSync } from 'node:child_process';
 import { closeSync, existsSync, openSync, readFileSync, readSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const EXTENSIONS_BLOQUEES = new Set([
-  ...['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif', 'heic', 'heif', 'bmp', 'tif', 'tiff', 'ico'],
+  ...[
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'webp',
+    'avif',
+    'heic',
+    'heif',
+    'bmp',
+    'tif',
+    'tiff',
+    'ico',
+    'dng',
+  ],
   ...['mp3', 'm4a', 'aac', 'wav', 'ogg', 'oga', 'opus', 'flac', 'caf'],
   ...['mov', 'mp4', 'm4v', 'webm'],
 ]);
+const RACINE = fileURLToPath(new URL('..', import.meta.url));
 const DOSSIERS_AUTORISES = ['public/icons/', 'src/ui/art/'];
 const CHEMIN_PACK = 'public/pack/pack.bin';
 const ENTETE_PACK = 'SBPACK1';
@@ -33,6 +49,12 @@ export function findViolations(paths, packHeader, readText) {
       continue;
     }
     const ext = extension(chemin);
+    if (ext === 'svgz') {
+      violations.push(
+        `${chemin} : SVG compressé (.svgz) — interdit, contenu non vérifiable (une photo pourrait s'y cacher)`,
+      );
+      continue;
+    }
     if (ext === 'svg') {
       const texte = readText(chemin).toLowerCase();
       if (texte.includes('data:image/') || texte.includes('<image')) {
@@ -59,8 +81,9 @@ export function findViolations(paths, packHeader, readText) {
 }
 
 function lireEntetePack() {
-  if (!existsSync(CHEMIN_PACK)) return null;
-  const fd = openSync(CHEMIN_PACK, 'r');
+  const complet = join(RACINE, CHEMIN_PACK);
+  if (!existsSync(complet)) return null;
+  const fd = openSync(complet, 'r');
   try {
     const tampon = new Uint8Array(ENTETE_PACK.length);
     const lus = readSync(fd, tampon, 0, tampon.length, 0);
@@ -76,7 +99,7 @@ function main() {
     const sortie = execFileSync(
       'git',
       ['ls-files', '-z', '--cached', '--others', '--exclude-standard'],
-      { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+      { cwd: RACINE, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
     );
     paths = [...new Set(sortie.split('\0').filter((p) => p !== ''))];
   } catch (erreur) {
@@ -84,7 +107,10 @@ function main() {
     process.exit(1);
   }
   // Un fichier listé mais supprimé du disque n'est pas lisible : on l'ignore.
-  const readText = (p) => (existsSync(p) ? readFileSync(p, 'utf8') : '');
+  const readText = (p) => {
+    const complet = join(RACINE, p);
+    return existsSync(complet) ? readFileSync(complet, 'utf8') : '';
+  };
   const violations = findViolations(paths, lireEntetePack(), readText);
   if (violations.length > 0) {
     console.error('Contrôle de confidentialité : ÉCHEC');

@@ -3,6 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: 'tests/e2e',
   outputDir: 'test-results/playwright',
+  reporter: process.env.CI ? [['dot'], ['html', { open: 'never' }]] : 'list',
   use: { baseURL: 'http://localhost:5173/sardinebagarre/' },
   projects: [
     { name: 'iphone-se', use: { ...devices['iPhone SE'] } },
