@@ -21,3 +21,25 @@ export interface ConfigEntry {
   /** MaxT : maximum **exclu** de multiplicateurs gratuits sur tout le plateau (accepté si compte < max, §4). */
   readonly maxFreeTotal: number;
 }
+
+/** Indicateur d'une ligne ou d'une colonne (R-02). */
+export interface LineHint {
+  /** Somme des valeurs (Sardine = 0). */
+  readonly sum: number;
+  /** Nombre de Sardines. */
+  readonly sardines: number;
+}
+
+/** Plateau 5×5 immuable (R-01, R-24) ; `cells[id]` avec id = ligne × 5 + colonne. */
+export interface Board {
+  readonly cells: readonly CardValue[];
+  readonly rowHints: readonly LineHint[];
+  readonly colHints: readonly LineHint[];
+}
+
+/** Comptes de multiplicateurs gratuits (R-21). */
+export interface FreeMultipliers {
+  readonly total: number;
+  readonly perRow: readonly number[];
+  readonly perCol: readonly number[];
+}
