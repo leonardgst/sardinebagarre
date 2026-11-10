@@ -73,7 +73,7 @@ Toi ──► Session principale : OPUS, effort high  (.claude/settings.json →
 **Mise en place, une seule fois :**
 1. Les fichiers `repo-init/` sont dans le dépôt (étape 0.3).
 2. Dans le dossier : `claude`, puis `/model` → vérifier « Opus » ; puis `/effort high` (enregistré pour Opus) ; `/effort status` doit afficher `high`.
-3. `/agents` : `codeur` et `relecteur` apparaissent dans la catégorie *Project*.
+3. Demande à Claude : « Quels sous-agents de projet sont disponibles ? » → `codeur` et `relecteur`. (La commande `/agents` a été retirée des versions récentes de Claude Code ; les sous-agents sont lus depuis `.claude/agents/` **au démarrage** : relancer `claude` après toute modification.)
 4. **Ne définis pas** `CLAUDE_CODE_EFFORT_LEVEL` dans ton shell : la variable écraserait l'effort `medium` du `codeur` et le `high` d'Opus.
 
 **Passer la main :**
@@ -168,7 +168,7 @@ Bon à savoir :
 - Pour appeler un sous-agent explicitement : « Utilise le sous-agent relecteur pour… », ou `@` puis choisir `relecteur (agent)`.
 - Les sous-agents lancés par Claude tournent **en arrière-plan** par défaut : tu peux continuer à discuter avec Opus pendant ce temps.
 - Un sous-agent peut en lancer d'autres (jusqu'à 3 niveaux), sauf si l'outil `Agent` lui est retiré, ce qui est le cas ici.
-- `/agents` permet de les créer et de les modifier avec un assistant ; les fichiers restent la source de vérité.
+- Pour créer ou modifier un sous-agent : édite le fichier dans `.claude/agents/`, ou demande-le à Claude (« modifie le sous-agent codeur pour… »), puis relance `claude`. L'ancien assistant `/agents` n'existe plus.
 
 ---
 
@@ -202,9 +202,9 @@ $env:CLAUDE_PROJECT_DIR = (Get-Location).Path
 ```text
 claude                         ouvrir Claude Code dans le dossier du projet
 /model  /effort status         vérifier Opus + high
-/memory                        voir les CLAUDE.md chargés
+/skills                        skills chargés (ceux du projet doivent y figurer)
 /context                       voir ce qui occupe le contexte
-/agents   /hooks   /permissions
+/hooks   /permissions   /context
 /planifier-tache 2.3a          → fiche T-XXX
 /implementer-tache T-XXX       → Sonnet code
 « Utilise le sous-agent relecteur pour relire T-XXX »

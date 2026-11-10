@@ -67,7 +67,10 @@ Avec un dépôt public et GitHub Pages, on travaille avec **deux sortes de branc
 - 📚 **Apprendre** : Git, les bases (git-scm.com/book/fr/v2, chapitres 1 à 3) : commit, branche, fusion, push.
 
 ### 0.3 Déposer les fichiers de cadrage — 🧑 — 1 h
-- Décompresse l'archive, puis copie le **contenu** de `repo-init/` à la racine du dépôt. Dans l'Explorateur : *Affichage › Afficher › Éléments masqués*, pour voir `.claude/` et `.github/`. Copie les documents de cadrage dans `docs/` (correspondance dans `03-structure-du-depot.md` §3).
+- Décompresse l'archive, puis copie le **contenu** de `repo-init/` à la racine du dépôt : `CLAUDE.md`, `.claude\`, `.github\`, `.gitignore`… doivent se retrouver **directement** dans `C:\dev\sardinebagarre\`, pas dans un sous-dossier `repo-init\`. Sinon, Claude Code ne charge rien (ni CLAUDE.md, ni skills, ni sous-agents, ni hooks), et `prive/` n'est pas ignoré par Git. Méthode sûre en PowerShell :
+  ```powershell
+  robocopy C:\chemin\vers\archive\repo-init C:\dev\sardinebagarre /E
+  ``` Dans l'Explorateur : *Affichage › Afficher › Éléments masqués*, pour voir `.claude/` et `.github/`. Copie les documents de cadrage dans `docs/` (correspondance dans `03-structure-du-depot.md` §3).
 - Crée le dossier privé et vérifie qu'il est bien ignoré :
   ```powershell
   mkdir prive ; New-Item prive\LISEZMOI.txt -Value "Dossier privé : jamais commité"
@@ -75,7 +78,12 @@ Avec un dépôt public et GitHub Pages, on travaille avec **deux sortes de branc
   git add -A ; git commit -m "docs: cadrage initial et configuration de Claude Code"
   git push -u origin main
   ```
-- Ouvre Claude Code dans le dossier : `claude`. Tape `/memory` (CLAUDE.md chargé ?), `/agents` (`codeur` et `relecteur` ?), `/` (les skills apparaissent ?), `/hooks` (deux hooks ?).
+- Ouvre Claude Code **à la racine** du dossier : `claude`. Vérifie (Claude Code ne charge ces fichiers qu'au démarrage : après toute copie, quitter puis relancer) :
+  - `/skills` : les 7 skills du projet (`planifier-tache`, `implementer-tache`, `deployer`…) apparaissent en plus de ceux synchronisés depuis claude.ai ;
+  - `/hooks` : « 2 with hooks » (PostToolUse et Stop) ;
+  - `/permissions` : les règles `deny` sur `prive/` sont présentes ;
+  - demande : « Quels sous-agents de projet sont disponibles, et que dit le CLAUDE.md du projet sur la confidentialité ? ». Réponse attendue : `codeur` et `relecteur`, plus les règles sur `prive/`.
+  - Note : la commande `/agents` a été retirée des versions récentes de Claude Code. Les sous-agents se gèrent directement dans `.claude/agents/`. De même, `/memory` ouvre le fichier mémoire pour l'éditer ; ce n'est pas un test de chargement.
 - **Prompt à Opus** :
   > Lis CLAUDE.md, docs/specification.md, docs/architecture.md et docs/questions-cadrage.md (section « Décisions retenues »). Découpe la section 8 de docs/architecture.md en fichiers docs/decisions/ADR-001…ADR-014 selon docs/decisions/_modele.md (pour les ADR remplacés, garde seulement la version à jour), et remplace la section 8 par un lien vers docs/decisions/. Puis liste-moi les incohérences que tu vois entre les documents, sans rien corriger d'autre.
 - **Vérifier** : 14 fichiers ADR, aucune incohérence bloquante (sinon, on tranche ensemble).
@@ -266,8 +274,8 @@ Ordre de priorité. On s'arrête où l'on en est le 13 au soir.
 |---|---|---|---|
 | 0.1 | Claude Code (bases) | Installer, `/help`, `/model`, `/effort` | code.claude.com/docs › Quickstart, Model configuration |
 | 0.2 | Git et GitHub | Clone, commit, push, branches | git-scm.com/book/fr/v2 (ch. 1–3) |
-| 0.3 | CLAUDE.md, réglages, permissions | `/memory`, `/permissions`, `/hooks` | docs › Memory, Settings |
-| 0.4 | Sous-agents, règles `deny` | `/agents`, premier appel au `codeur`, test du blocage de `prive/` | docs › Subagents |
+| 0.3 | CLAUDE.md, réglages, permissions | `/skills`, `/permissions`, `/hooks` | docs › Memory, Settings |
+| 0.4 | Sous-agents, règles `deny` | Premier appel au `codeur` (vérifié avec Ctrl+O), test du blocage de `prive/` | docs › Subagents |
 | 0.5 | Skills, hooks, CI, GitHub Pages | `/planifier-tache`, `/implementer-tache`, voir le hook formater, voir le déploiement | docs › Skills, Hooks ; docs.github.com › Pages |
 | 1.x | Tests (TDD), ADR | Lire les tests écrits par Sonnet, relire les verdicts | vitest.dev › Guide |
 | 2.2 | Playwright, contrôle visuel | Regarder les captures produites | playwright.dev › Docs › Screenshots |

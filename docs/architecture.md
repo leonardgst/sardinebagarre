@@ -203,48 +203,6 @@ Garde-fous automatiques :
 
 ---
 
-## 8. Décisions (ADR courts)
+## 8. Décisions (ADR)
 
-> Dans le dépôt, chaque ADR deviendra un fichier `docs/decisions/ADR-00X-titre.md` (modèle fourni dans `repo-init/docs/decisions/_modele.md`).
-
-**ADR-001 — Application web installable (PWA)**
-Contexte : 0 €, iPhone + Mac, pas de compte Apple Developer. Décision : PWA. Conséquences : installation via Safari, mode hors ligne grâce au service worker, pas de notifications ni d'App Store (inutiles ici).
-
-**ADR-002 — Dépôt GitHub public + GitHub Pages** *(remplace la version « privé + Cloudflare »)*
-Contexte : tu préfères un dépôt public (Q6), et GitHub Pages est gratuit pour les dépôts publics. Décision : publication par GitHub Actions à chaque push sur `main`, après les vérifications ; `base: '/sardinebagarre/'`. Conséquences : pas d'aperçu par branche (le site sert de terrain de test jusqu'au 20/12, puis tests locaux en HTTPS) ; obligation absolue de ne rien commiter de personnel en clair (ADR-011).
-
-**ADR-003 — TypeScript strict + Vite, sans framework d'UI**
-Contexte : petite UI, priorité à la simplicité et à la légèreté hors ligne. Décision : DOM natif, éléments créés une fois puis mis à jour. Conséquences : un peu plus de code d'affichage manuel ; aucune dépendance d'UI à maintenir. À réévaluer (Preact) si `src/ui/render` dépasse environ 800 lignes.
-
-**ADR-004 — Vitest pour la logique, Playwright WebKit pour le bout en bout et le visuel**
-Décision : chaque règle de la spec a au moins un test Vitest ; parcours clés et captures d'écran avec Playwright (WebKit, profils iPhone SE, iPhone 15, bureau). Conséquences : Claude peut vérifier son propre travail, y compris visuellement.
-
-**ADR-005 — Biome pour le lint et le formatage**
-Décision : `biome check` en CI et après chaque modification (hook). Conséquences : un seul outil ; moins de plugins qu'ESLint (acceptable ici).
-
-**ADR-006 — Cœur logique pur, hasard injecté**
-Décision : `src/logic` sans accès au navigateur ; PRNG à graine passé en paramètre. Conséquences : tests déterministes ; un paramètre de développement `?seed=` permet de rejouer un plateau précis.
-
-**ADR-007 — Ressources originales et thème Sardine**
-Décision : aucune ressource Nintendo ; carte-bombe = tête de Sardine (photo du pack) avec une tête de chien dessinée en secours ; sons synthétisés, aboiement enregistré en option ; nom « Sardinebagarre ». Conséquences : risque de propriété intellectuelle quasi nul ; dépendance à des contenus personnels fournis par toi (dates dans le plan).
-
-**ADR-008 — Sauvegarde locale du niveau, sans la partie en cours** *(décision Q9)*
-Décision : `localStorage`, une clé, JSON versionné : jetons, niveau, historique, album, réglages, stats, code. La partie en cours n'est pas sauvegardée : une partie interrompue est oubliée sans pénalité (R-68). Conséquences : code plus simple ; on peut changer de plateau en fermant l'app ; si iOS ferme l'app en arrière-plan, la partie en cours est perdue.
-
-**ADR-009 — En cas de désaccord entre sources, le code décompilé fait foi**
-Décision : hiérarchie S1 > S2 > S3 (spec §0). Conséquences : comportements parfois différents de ce que disent les wikis (niveau 8, défaite au niveau 8), documentés et testés.
-
-**ADR-010 — Placement des cartes par mélange plutôt que par tirage avec abandon**
-Décision : on garantit toujours les comptes exacts de la configuration. Conséquence : écart volontaire et invisible avec un cas rarissime de l'original (carte sautée après 100 tirages ratés).
-
-**ADR-011 — Pack personnel chiffré**
-Contexte : dépôt et site publics, mais photos de famille privées. Options : (a) dépôt privé + URL secrète (les photos restent téléchargeables par qui connaît l'URL) ; (b) photos hors du jeu ; (c) **pack chiffré AES-GCM, clé dérivée d'un code secret de 4 mots**. Décision : (c). Conséquences : une tâche de plus (script de pack + déchiffrement) ; ta sœur saisit un code une fois par appareil ; sans le code, le jeu reste jouable ; si le code fuit, il suffit de refaire le pack avec un nouveau code.
-
-**ADR-012 — Les jetons débloquent un album photo**
-Décision : album ordonné à prix croissants (spec §12) ; les thèmes visuels sont reportés en v2. Conséquences : la boucle de jeu a un but personnel ; les prix sont réglables dans le pack sans toucher au code.
-
-**ADR-013 — iPhone d'abord, Mac en version iPhone centrée**
-Contexte : Q11 (prêt à n'avoir qu'un appareil si c'est plus simple). Décision : on garde les deux ; le Mac affiche la mise en page iPhone centrée ; le clavier passe en priorité basse. Conséquences : environ 1 jour de travail en moins ; le Mac reste un bonus testé deux fois chez ton ami.
-
-**ADR-014 — Développement sous Windows**
-Décision : scripts et hooks en Node (pas de bash), hooks lancés sans shell (exec form), `.gitattributes` qui impose les fins de ligne LF, projet hors de OneDrive (par exemple `C:\dev\sardinebagarre`). Conséquences : pas de Safari local ; Playwright WebKit plus tests réguliers sur ton iPhone.
+Les décisions d'architecture sont consignées une par fichier dans [`docs/decisions/`](decisions/) : ADR-001 à ADR-014, au format de `docs/decisions/_modele.md`. Pour en ajouter ou en remplacer une : skill `consigner-decision`.
