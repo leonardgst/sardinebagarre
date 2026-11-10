@@ -1,4 +1,4 @@
-# 02 — Architecture et déploiement
+# Architecture et déploiement
 
 > ✅ **Mis à jour après tes réponses du 10/11** : dépôt **public** → hébergement **GitHub Pages** ; contenu personnel dans un **pack chiffré** ; thème Sardine ; développement sous **Windows**.
 >
@@ -24,7 +24,7 @@ Il y a deux grandes familles :
   - un **manifeste** (`manifest.webmanifest`) : nom, icône, couleurs, « s'ouvre en plein écran sans barre d'adresse » ;
   - un **service worker** : un petit script que le navigateur garde de côté et qui **met en cache** tous les fichiers du jeu. Résultat : **le jeu marche hors ligne** (en avion, dans le métro) et se lance instantanément.
 - **Installer une PWA** : sur iPhone, Safari › Partager › **« Sur l'écran d'accueil »**. Sur Mac (macOS Sonoma 14+), Safari › Fichier › **« Ajouter au Dock »**. Une icône apparaît et l'app s'ouvre dans sa propre fenêtre, sans interface de navigateur. Pour ta sœur, ça ressemble à une vraie app.
-- **Mise à jour** : quand tu publies une nouvelle version, le service worker la télécharge au prochain lancement avec du réseau et l'applique au lancement suivant. Tu peux donc corriger un bug après Noël sans qu'elle ne fasse rien.
+- **Mise à jour** : quand tu publies une nouvelle version, le service worker la télécharge en arrière-plan dès que l'app est ouverte avec du réseau. Elle n'est **jamais** appliquée pendant une partie, sinon la partie en cours serait perdue (spec R-68). Elle s'applique automatiquement (rechargement) dès que ta sœur est sur le menu, sinon au lancement suivant (spec R-104). Tu peux donc corriger un bug après Noël sans qu'elle ne fasse rien.
 
 ### 1.3 Le parcours complet, en une image
 ```
@@ -99,15 +99,15 @@ Ce qu'on perd par rapport à Cloudflare : les **aperçus par branche** (un seul 
 | Langage | **TypeScript** (mode `strict`) | Les types attrapent les erreurs avant l'exécution. Claude écrit un TypeScript excellent. |
 | Interface | **TypeScript « vanilla »** (DOM natif, sans framework) | Un plateau de 25 cartes ne justifie pas React. Moins de dépendances = moins de mises à jour et un mode hors ligne léger. Les 25 éléments de carte sont créés une fois puis mis à jour (classes CSS), ce qui convient bien aux animations CSS de retournement. *Alternative crédible : Preact (3 ko), si l'UI se complique.* |
 | Outil de build | **Vite** | Standard actuel : rapide, simple, serveur de développement avec rechargement instantané, et `vite --host` pour tester sur ton iPhone en Wi-Fi. |
-| PWA | **vite-plugin-pwa** (Workbox) | Génère le manifeste et le service worker, gère les mises à jour (`registerType: 'autoUpdate'`). |
+| PWA | **vite-plugin-pwa** (Workbox) | Génère le manifeste et le service worker. Mises à jour en `registerType: 'prompt'` : l'app choisit le moment du rechargement, jamais pendant une partie, automatiquement sur le menu (spec R-104). |
 | Tests unitaires | **Vitest** | Intégré à Vite, rapide, même syntaxe que Jest. Pour toute la logique du jeu. |
 | Tests de bout en bout + captures | **Playwright** (navigateur **WebKit**, profils iPhone) | WebKit est le moteur de Safari : c'est le plus proche de ce que verra ta sœur. Claude peut lancer les tests **et regarder les captures** pour contrôler le visuel. |
 | Lint + formatage | **Biome** | Un seul outil remplace ESLint + Prettier, configuration minimale. |
-| Hasard | PRNG à graine (`mulberry32`) dans la logique ; graine tirée avec `crypto.getRandomValues` dans l'UI | Tests reproductibles (même graine = même plateau). |
-| Sons | **Web Audio API**, sons synthétisés dans le code | Zéro fichier, zéro droit d'auteur, très léger. |
+| Hasard | PRNG à graine (`mulberry32`) dans la logique ; graine tirée avec `crypto.getRandomValues` **uniquement** dans `src/ui/seed.ts` | Tests reproductibles (même graine = même plateau). |
+| Sons | **Web Audio API**, sons synthétisés ; seule exception : l'aboiement enregistré, fourni par le pack chiffré (spec UI-50) | Aucun fichier son dans le dépôt, aucun droit d'auteur, très léger. |
 | Graphismes | **SVG + CSS** originaux | Net à toutes les tailles (écran Retina), modifiable par Claude. |
 | Intégration continue + publication | **GitHub Actions** (gratuit et illimité pour un dépôt public) | À chaque push : types, lint, tests, contrôle de confidentialité, build ; sur `main` : publication GitHub Pages. |
-| Pack personnel | Script Node `scripts/pack.mjs` avec **sharp** (redimensionnement) + **Web Crypto** (AES-GCM, PBKDF2) ; déchiffrement dans le navigateur avec la même API | Aucune photo en clair dans le dépôt public (ADR-011). Web Crypto est standard sur Safari et Node. |
+| Pack personnel | Script Node `scripts/pack.mjs` avec **sharp** (redimensionnement) + **Web Crypto** (AES-GCM, PBKDF2) ; déchiffrement dans le navigateur avec la même API (`crypto.subtle`, **uniquement** dans `src/ui/pack.ts`) | Aucune photo en clair dans le dépôt public (ADR-011). Web Crypto est standard sur Safari et Node. |
 | HTTPS en local | **@vitejs/plugin-basic-ssl** (script `dev:https`) | Web Crypto et le service worker exigent HTTPS sur un iPhone. |
 | Node.js | Version LTS en cours (22 ou plus) | Requis par Vite et Claude Code. Sous Windows : `winget install OpenJS.NodeJS.LTS`. |
 
@@ -138,9 +138,15 @@ src/
     anim.ts       séquences d'animation (promesses), « toucher pour accélérer »
     audio.ts      synthèse Web Audio
     storage.ts    adaptateur localStorage (seul fichier qui l'utilise)
-    pack.ts       déchiffrement du pack (Web Crypto) → URL blob: des photos, tête, aboiement, messages
+    pack.ts       déchiffrement du pack (crypto.subtle, seul fichier qui l'utilise) → URL blob: des photos, tête, aboiement, messages
+    seed.ts       graine du hasard (crypto.getRandomValues, seul fichier qui l'utilise)
     texts.fr.ts   tous les textes
     styles/       CSS
+    art/          dessins originaux (SVG) : tête de chien de secours, décors (seul dossier d'images avec public/icons/)
+tests/
+  logic/        Vitest : règles (R-xx, CL-xx, N1..N17)
+  e2e/          Playwright WebKit : parcours et captures (screens.spec.ts)
+  fixtures/     pack-test.bin (pack de test chiffré, code test-test-test-test)
 ```
 
 **Règle d'or** : `src/logic/` n'importe **jamais** `src/ui/`. Biome le vérifie avec une règle d'imports interdits (et un test d'architecture peut aussi le faire).

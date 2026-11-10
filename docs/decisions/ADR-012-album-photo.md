@@ -20,7 +20,8 @@ Album ordonné à prix croissants (spec §12). Les thèmes visuels sont reporté
 - La boucle de jeu a un but personnel.
 - Les prix sont réglables dans le pack, sans toucher au code.
 - L'album dépend du pack chiffré : sans code, il affiche seulement une invitation à le saisir (R-114).
-- À réévaluer : l'ordre imposé reste une question ouverte (`docs/questions-cadrage.md`, « Questions encore ouvertes ») ; c'est le choix par défaut.
+- Le plafond de 50 000 étant maintenu, la boîte pleine propose deux actions : acheter la prochaine photo ou vider la boîte (R-53). Les records (R-72) restent en v1, en priorité P2.
+- À réévaluer : l'ordre imposé (R-111) est la décision en vigueur. Il pourra être révisé si l'humain répond autrement à la question suivie dans `docs/journal.md` (« Questions ouvertes »).
 
 ## Références
-`docs/specification.md` §12 (R-110 à R-116) et R-53 ; `docs/questions-cadrage.md` Q10 ; ADR-011.
+`docs/specification.md` §12 (R-110 à R-116), R-53, R-71 et R-72 ; `docs/journal.md` (« Questions ouvertes ») ; `docs/questions-cadrage.md` Q10 ; ADR-011.

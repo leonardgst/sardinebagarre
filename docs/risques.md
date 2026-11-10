@@ -1,4 +1,4 @@
-# 06 — Risques
+# Risques
 
 > ✅ Mis à jour le 10/11 : nouvelle section **Vie privée** (dépôt public + photos de famille), risques Windows et contenus à fournir.
 >
@@ -8,10 +8,10 @@
 
 | ID | Risque | P | I | Prévention | Si ça arrive |
 |---|---|---|---|---|---|
-| R-T1 | Bug de règle subtil (niveaux, gains) que personne ne remarque avant Noël | 2 | 3 | Spec avec identifiants ; vecteurs de test N1–N17 et CL-01–CL-22 obligatoires ; relecteur qui recalcule à la main ; script de partie en console (1.6) | Correctif + test, essai en HTTPS local sur iPhone, puis publication |
+| R-T1 | Bug de règle subtil (niveaux, gains) que personne ne remarque avant Noël | 2 | 3 | Spec avec identifiants ; vecteurs de test N1–N17 et CL-01–CL-23 obligatoires ; relecteur qui recalcule à la main ; script de partie en console (1.6) | Correctif + test, essai en HTTPS local sur iPhone, puis publication |
 | R-T2 | Animations et état désynchronisés (double toucher, toucher pendant une animation) | 2 | 2 | Verrou d'entrée (CL-19), animations sous forme de promesses dans un séquenceur unique, test e2e de clics rapides | Désactiver l'animation fautive (mode réduit par défaut) |
 | R-T3 | Sauvegarde perdue | 1 | 3 | Stockage de l'app d'écran d'accueil (exempté de l'effacement de Safari après 7 jours d'inutilisation) ; test de durée de 8 jours (étape 3.4) ; lecture tolérante (CL-22) | Les jetons et le niveau se reconstituent en jouant ; prévoir en v1.1 un export par code |
-| R-T4 | Service worker qui sert une ancienne version « coincée » | 2 | 2 | `registerType: 'autoUpdate'`, version affichée dans Réglages, test de mise à jour (5.2) | Nouvelle publication ; en dernier recours, supprimer l'icône puis réinstaller (la sauvegarde est perdue : à éviter) |
+| R-T4 | Service worker qui sert une ancienne version « coincée » | 2 | 2 | `registerType: 'prompt'` avec application automatique sur le menu, jamais en pleine partie (spec R-104) ; version affichée dans Réglages ; test de mise à jour (5.2) | Nouvelle publication ; en dernier recours, supprimer l'icône puis réinstaller (la sauvegarde est perdue : à éviter) |
 | R-T5 | Dépendances qui cassent (mise à jour majeure de Vite, Playwright…) | 1 | 2 | `package-lock.json` versionné, `npm ci` en CI, aucune mise à jour majeure après le 6/12 | `git revert` du commit de mise à jour |
 | R-T6 | Écart Playwright WebKit / vrai Safari iOS (aucun Safari sous Windows) | 2 | 2 | Tests sur vrai iPhone à chaque fin de phase (2.5, 3.4, 4.8, 5.2) | Correctif ciblé avec un test e2e qui reproduit le problème si c'est possible |
 | R-T7 | Particularités Windows : fins de ligne, chemins, pare-feu, raccourcis `.cmd`, OneDrive | 2 | 2 | `.gitattributes`, hooks et scripts en Node lancés sans shell, projet dans `C:\dev`, CI sous Linux qui révèle vite les écarts | Signaler l'erreur exacte à Opus ; la CI sert de référence |
@@ -23,7 +23,7 @@
 | ID | Risque | P | I | Prévention |
 |---|---|---|---|---|
 | R-S1 | Le son ne joue pas | 3 | 1 | Déverrouiller l'`AudioContext` au premier toucher ; le bouton silencieux de l'iPhone peut couper le son Web Audio (comportement normal, à expliquer dans l'aide) ; le jeu reste entièrement jouable sans son |
-| R-S2 | Mise en page cassée par l'encoche, la barre d'accueil ou la barre Safari | 2 | 2 | `viewport-fit=cover`, `env(safe-area-inset-*)`, unités `dvh`, captures iPhone SE et iPhone 15 à chaque modification d'UI |
+| R-S2 | Mise en page cassée par l'encoche, la barre d'accueil ou la barre Safari | 2 | 2 | `viewport-fit=cover`, `env(safe-area-inset-*)`, unités `dvh`, captures sur les 5 profils (iPhone SE, iPhone 15, iPhone 15 Pro Max, iPhone 15 en paysage, Mac) à chaque modification d'UI |
 | R-S3 | Zoom involontaire, sélection de texte, menu sur appui long | 2 | 2 | `touch-action: manipulation`, `user-select: none`, `-webkit-touch-callout: none`, police ≥ 16 px dans les champs |
 | R-S4 | Ta sœur ouvre le lien dans une app (Messages, Instagram…) et non dans Safari : « Sur l'écran d'accueil » absent | 2 | 2 | QR code scanné avec l'appareil photo (ouvre Safari) ; la carte précise « dans Safari » ; le jeu détecte s'il n'est pas installé et affiche une aide d'installation (sur iOS, `navigator.standalone`) |
 | R-S5 | Elle joue d'abord dans Safari, puis installe : la progression ne suit pas | 2 | 1 | Le message d'aide invite à installer **avant** de jouer ; la carte le dit |

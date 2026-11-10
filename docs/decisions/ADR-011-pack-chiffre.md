@@ -18,9 +18,10 @@ Option 3. Le dossier `prive/` (ignoré par Git, illisible pour Claude) est chiff
 ## Conséquences
 - Une tâche de plus (script de pack + déchiffrement) ; la joueuse saisit le code une fois par appareil.
 - Sans le code, le jeu reste jouable (tête dessinée, aboiement synthétisé, messages publics).
+- L'URL GitHub Pages est devinable. La protection des photos et des messages repose **uniquement** sur ce chiffrement, jamais sur le fait que l'URL reste inconnue. `noindex` et `robots.txt` (R-129) ne sont qu'une politesse envers les moteurs de recherche.
 - Si le code fuit : refaire le pack avec un nouveau code et publier.
 - Web Crypto exige HTTPS : tests sur iPhone via `npm run dev:https` ou le site publié.
 - À surveiller : temps de déchiffrement sur iPhone (R-T8) ; garde-fous `verifier-confidentialite.mjs` et interdiction de lire `prive/` (R-V1).
 
 ## Références
-`docs/specification.md` §13 (R-120 à R-128) ; `docs/architecture.md` §6.2 ; `docs/risques.md` R-V1, R-V2, R-T8.
+`docs/specification.md` §13 (R-120 à R-129) ; `docs/architecture.md` §6.2 ; `docs/risques.md` R-V1, R-V2, R-T8.

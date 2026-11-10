@@ -32,7 +32,7 @@ Jusqu'au 20/12, le site sert de terrain de test (ma sœur n'en connaît pas l'ad
 
 ## 4. Après publication : checklist pour l'humain
 - [ ] L'URL répond et affiche la nouvelle version (Réglages › version).
-- [ ] Sur iPhone : ouvrir l'app installée **deux fois** (la 1ʳᵉ télécharge la mise à jour, la 2ᵉ l'applique) et vérifier la version.
+- [ ] Sur iPhone : ouvrir l'app installée, revenir au menu, puis vérifier la version (Réglages › version). La mise à jour s'applique sur le menu, jamais pendant une partie (spec R-104).
 - [ ] Mode avion, puis relancer l'app : elle fonctionne hors ligne, photos comprises.
 - [ ] La sauvegarde existante est toujours là (jetons, niveau, album).
 

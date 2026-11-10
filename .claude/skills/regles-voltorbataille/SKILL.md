@@ -23,8 +23,11 @@ La référence complète est `docs/specification.md`. Ce fichier résume les poi
 ## Abandon (R-40..R-42)
 - Toujours possible, avec confirmation (texte différent si gain = 0). Le gain est encaissé. Issue `QUIT`.
 
-## Encaissement (R-50..R-53)
-- `total = min(total + gain, 50 000)`. Si total ≥ 50 000 au début d'une partie : on ne peut plus jouer.
+## Encaissement et finalisation (R-50..R-55, R-71)
+- `total = min(total + gain, 50 000)`. Si total ≥ 50 000 au lancement d'une partie : pas de partie ; on peut acheter la prochaine photo de l'album (s'il en reste une) ou vider la boîte (R-53).
+- **Finalisation (R-55)** : dès que l'issue est connue, on encaisse, on ajoute la partie à l'historique, on calcule le niveau suivant, on met à jour les records et on sauvegarde, **avant** toute animation. La révélation et le défilement des jetons sont purement visuels (CL-23).
+- Le total ne change que par : encaissement (R-50), achat d'album (R-112), vider la boîte (R-53), effacer toute la progression (R-71).
+- La partie est `EN_COURS` dès l'affichage du plateau : il n'y a pas d'état « prête ».
 
 ## Niveau suivant (R-60..R-67) — port exact
 ```
@@ -58,16 +61,17 @@ N7: (10,7,2,1152,4/5,4/4) (10,4,4,1296,4/5,4/4) (13,1,6,1458,3/4,3/3) (13,9,1,15
 N8: (10,0,7,2187,3/4,3/3) (10,8,2,2304,5/6,5/5) (10,5,4,2592,4/5,4/4) (10,2,6,2916,4/5,4/4) (10,7,3,3456,5/6,5/5)
 ```
 
-## Sauvegarde et partie interrompue (R-68, R-100..R-103)
-- Sauvegardés : jetons, niveau, historique (5), album, réglages, stats, code du pack. **Pas la partie en cours.**
-- App fermée pendant une partie : partie oubliée (gain perdu, pas d'entrée d'historique, niveau inchangé) → nouvelle partie au même niveau.
+## Sauvegarde et partie interrompue (R-68, R-100..R-104)
+- Sauvegardés : jetons, niveau, historique (5), album, réglages, stats, code du pack. **Pas la partie en cours.** Écriture à chaque changement de cet état (liste exhaustive en R-100).
+- App fermée pendant une partie `EN_COURS` : partie oubliée (gain perdu, pas d'entrée d'historique, niveau inchangé) → nouvelle partie au même niveau. App fermée pendant les animations de fin : rien n'est perdu (R-55).
+- Une mise à jour de l'app n'est jamais appliquée pendant une partie `EN_COURS` (R-104).
 
 ## Album (R-110..R-116)
 - Photos débloquées **dans l'ordre**, prix fixés par le pack ; `total -= prix` ; plafond de 50 000 toujours en vigueur.
 
 ## Mémo (R-80..R-84)
-- 4 marques indépendantes (V, 1, 2, 3) par carte non retournée, combinables.
+- 4 marques indépendantes (S, 1, 2, 3) par carte non retournée, combinables.
 - En mode mémo, toucher une carte la **sélectionne** (pas de retournement) ; les boutons inversent la marque sur la carte sélectionnée.
 
 ## Vecteurs de test de référence
-Voir la spec §6.3 (N1..N17) et §9 (CL-01..CL-22). Ils doivent tous exister dans `tests/logic/`.
+Voir la spec §6.3 (N1..N17) et §9 (CL-01..CL-23). Ils doivent tous exister dans `tests/logic/`.

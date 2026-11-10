@@ -16,7 +16,7 @@ Hiérarchie S1 (code décompilé) > S2 (Bulbapedia) > S3 (Poképédia) > S4/S5 (
 
 ## Conséquences
 - Comportements parfois différents des wikis (niveau 8, défaite au niveau 8), documentés et testés (vecteurs N1 à N17, CL-15, CL-16).
-- À surveiller : la joueuse pourrait croire à un bug (R-F1 → page « Astuces ») ; la version française de la cartouche n'a pas été vérifiée (R-F2, risque accepté).
+- À surveiller : la joueuse pourrait croire à un bug (R-F1 → page d'aide « Astuces », qui explique la lecture des indicateurs et la règle du niveau 8, spec UI-03) ; la version française de la cartouche n'a pas été vérifiée (R-F2, risque accepté).
 
 ## Références
 `docs/specification.md` §0 et §6 ; `docs/risques.md` R-F1, R-F2, R-I3.

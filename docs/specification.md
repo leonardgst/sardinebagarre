@@ -1,4 +1,4 @@
-# 01 — Spécification du jeu « Sardinebagarre »
+# Spécification du jeu « Sardinebagarre »
 
 > Sardinebagarre reprend **exactement les règles** de la Voltorbataille (Pokémon HeartGold/SoulSilver). La carte-bombe est **Sardine**, la chienne de ma sœur, à la place du Voltorbe.
 > Référence unique des règles. Chaque règle porte un identifiant (`R-…`, `CL-…`, `UI-…`) que les tests et les tâches citent.
@@ -46,11 +46,11 @@ Les nombres de 2, de 3 et de Voltorbes et les gains maximum de S2 **concordent e
 | **Gain de la partie** | Jetons accumulés pendant la partie en cours, pas encore encaissés. |
 | **Jetons** (total) | Réserve du joueur, persistante, plafonnée à 50 000. |
 | **Niveau** | 1 à 8. Détermine la configuration du plateau. |
-| **Mémo** | Marques que le joueur pose sur une carte non retournée (V, 1, 2, 3). |
+| **Mémo** | Marques que le joueur pose sur une carte non retournée (S, 1, 2, 3). |
 | **Multiplicateur gratuit** | Carte 2 ou 3 située dans une ligne **ou** une colonne sans aucun Voltorbe (on peut l'obtenir sans risque). |
 
 > **Correspondance des noms** : dans les règles, « Voltorbe » (V) désigne la carte-bombe, comme dans le jeu d'origine. **À l'écran, elle s'appelle « Sardine » et sa lettre est « S »** : cases, indicateurs, marques du mémo, touche clavier. Dans le code, la valeur s'écrit `'S'` (type `CardValue = 1 | 2 | 3 | 'S'`).
-> Les autres identifiants du code sont en anglais : `Card`, `Board`, `Round`, `payout`, `coins`, `level`, `memo`.
+> Les autres identifiants du code sont en anglais : `Card`, `Board`, `RoundState`, `GameState`, `Outcome`, `payout`, `coins`, `level`, `memo`. Pour les noms de types, `docs/architecture.md` §5 fait foi.
 
 ---
 
@@ -141,15 +141,18 @@ Chaque niveau a 5 configurations, et chacune existe en deux variantes de contrai
 ### 5.1 États
 
 ```
-            ┌───────── retourner (1/2/3, pas tous les multiplicateurs) ─────┐
-            ▼                                                                │
-  [PRÊTE] ─► [EN_COURS] ──retourner V──► [PERDUE] ─┐                         │
-              │   │                                │                         │
-              │   └──retourner dernier 2/3──► [GAGNÉE] ─┤                    │
-              └──quitter + confirmer──────► [ABANDONNÉE] ─┤                  │
-                                                     ▼                         
-                                       [RÉVÉLATION] → (toucher) → partie suivante
+               ┌── retourner 1/2/3 (il reste des multiplicateurs) ───┐
+               ▼                                                     │
+  « Jouer » ─► [EN_COURS] ───────────────────────────────────────────┘
+                 │
+                 ├── retourner V ──────────────► [PERDUE] ──────┐
+                 ├── retourner le dernier 2/3 ─► [GAGNÉE] ──────┤
+                 └── quitter + confirmer ──────► [ABANDONNÉE] ──┤
+                                                                ▼
+                 finalisation (R-55) → révélation (R-52, UI-40) → (toucher) → partie suivante
 ```
+
+- La partie est `EN_COURS` dès que le plateau s'affiche après « Jouer ». Il n'y a pas d'état intermédiaire : on peut quitter sans avoir retourné de carte (CL-01).
 
 ### 5.2 Retourner une carte
 - **R-30** On ne peut retourner qu'une carte **face cachée**. Toucher une carte déjà retournée ne fait rien (petit son « refus »).
@@ -171,10 +174,11 @@ Chaque niveau a 5 configurations, et chacune existe en deux variantes de contrai
 - **R-42** « Oui » : partie **ABANDONNÉE**, le gain est encaissé (ajouté au total).
 
 ### 5.4 Encaissement et fin
-- **R-50** GAGNÉE ou ABANDONNÉE : `total = min(total + gain, 50 000)`. L'excédent au-delà de 50 000 est perdu. L'affichage fait défiler les jetons (animation, `UI-40`).
+- **R-50** GAGNÉE ou ABANDONNÉE : `total = min(total + gain, 50 000)`. L'excédent au-delà de 50 000 est perdu. L'affichage fait ensuite défiler les jetons (animation `UI-40`, purement visuelle : voir R-55).
 - **R-51** PERDUE : rien n'est ajouté.
-- **R-52** Quelle que soit l'issue, on **révèle tout le plateau** (`UI-42`), le joueur touche l'écran, puis on enregistre la partie dans l'historique et on calcule le niveau suivant (§6).
-- **R-53** Avant chaque nouvelle partie, si `total ≥ 50 000` : message « Ta boîte à jetons est pleine (50 000). Tu ne peux plus en gagner. », et pas de nouvelle partie. Seule action possible : « Vider la boîte à jetons » (réglages, avec double confirmation). Choix par défaut de Q10.
+- **R-52** Quelle que soit l'issue, on **révèle tout le plateau** (`UI-42`), puis le joueur touche l'écran pour continuer. La révélation est purement visuelle : tout a déjà été enregistré (R-55). Le message de changement de niveau (R-66, UI-43) s'affiche après ce toucher.
+- **R-53** Au lancement d'une partie, si `total ≥ 50 000` : message « Ta boîte à jetons est pleine (50 000). Tu ne peux plus en gagner. », et pas de nouvelle partie. Deux actions possibles : **acheter une photo dans l'album** (R-112), s'il en reste une à débloquer, ou **« Vider la boîte à jetons »** (réglages, avec double confirmation). Voir ADR-012.
+- **R-55 Finalisation** : la partie est **FINALISÉE** dès que son issue est connue (dernier multiplicateur retourné, Sardine retournée ou abandon confirmé). Au même moment, **avant toute animation** : encaissement du gain (R-50, R-51), ajout de la partie à l'historique (R-60), calcul du niveau suivant (§6), mise à jour des records (R-72), puis sauvegarde (R-100). La révélation (R-52, UI-42) et le défilement des jetons (UI-40) sont **purement visuels** : fermer l'app pendant ces animations ne fait rien perdre (CL-23).
 
 ---
 
@@ -228,7 +232,7 @@ Formulé simplement :
 | N16 | (LOST, 5, 5) | 5 |
 | N17 | (LOST, 0, 1) | 1 |
 
-> N11 : ces cinq victoires sont possibles alors que les niveaux 1 à 4 ont moins de 8 multiplicateurs, parce que **les 1 comptent**. Il faut retourner des 1 *avant* le dernier multiplicateur, puisque la partie s'arrête automatiquement dès qu'il est retourné.
+> N11 : ces cinq victoires sont possibles parce que **les 1 comptent**. Les niveaux 1, 2 et 3 ont au plus 5, 6 et 7 multiplicateurs, et la plupart des configurations du niveau 4 en ont moins de 8. Pour atteindre 8 cartes, il faut donc retourner des 1 **avant** le dernier multiplicateur, puisque la partie s'arrête dès qu'il est retourné.
 
 ### 6.4 Quitter la table
 - **R-67** Fidélité DS (S1) : quitter la Voltorbataille remet le niveau à 1 et vide l'historique. Ici, **fermer l'app ne le fait pas** (décision Q9 : le niveau est sauvegardé). Le menu propose « Quitter la table », qui applique R-67 après confirmation.
@@ -242,8 +246,12 @@ Formulé simplement :
 ## 7. Jetons totaux
 
 - **R-70** Valeur initiale : 0. Plafond : **50 000** (affichage sur 5 chiffres).
-- **R-71** Le total n'est modifié que par R-50 et par la réinitialisation volontaire (R-53).
-- **R-72** Records (non présents dans l'original, choix Q10) : meilleur gain en une partie, niveau maximal atteint, nombre de parties jouées, gagnées, perdues et abandonnées, nombre de fois où le niveau 8 a été atteint.
+- **R-71** Le total n'est modifié **que** par :
+  - l'encaissement d'une partie gagnée ou abandonnée (R-50) ;
+  - l'achat d'une photo dans l'album (R-112) ;
+  - « Vider la boîte à jetons » (R-53) ;
+  - « Effacer toute la progression » (UI-04).
+- **R-72** Records (absents de l'original ; voir ADR-012), inclus en v1, **priorité P2** : de simples compteurs affichés dans les Réglages (UI-04). Ils comprennent : meilleur gain en une partie, niveau maximal atteint, nombre de parties jouées, gagnées, perdues et abandonnées, nombre de fois où le niveau 8 a été atteint.
 
 ---
 
@@ -279,7 +287,7 @@ Formulé simplement :
 | CL-11 | Retourner une carte marquée | Marques effacées |
 | CL-12 | Quitter → « Non » | Retour à l'état exact précédent |
 | CL-13 | Total à 49 990, gain de 48 | Total = 50 000 (38 jetons perdus) |
-| CL-14 | Total = 50 000 au début d'une partie | Message boîte pleine, pas de partie (R-53) |
+| CL-14 | Total = 50 000 au lancement d'une partie | Message boîte pleine, pas de partie. Actions proposées : acheter la prochaine photo de l'album (s'il en reste une à débloquer) ou vider la boîte (R-53) |
 | CL-15 | Victoire au niveau 7 | Reste au niveau 7 (R-65) |
 | CL-16 | Défaite au niveau 8 après 10 cartes | Niveau 7 |
 | CL-17 | 5 parties ≥ 8 cartes sans défaite, la dernière au niveau 5 | Niveau 8 |
@@ -288,6 +296,7 @@ Formulé simplement :
 | CL-20 | Toucher pendant une animation de fin (révélation, défilement des jetons) | Accélère ou termine l'animation (fidèle à S1), ne déclenche aucune autre action |
 | CL-21 | Niveau 1 : les indicateurs d'une ligne sans Voltorbe | Toutes ses cartes sont sûres. Le jeu ne les retourne **pas** automatiquement |
 | CL-22 | Sauvegarde corrompue ou d'une version inconnue | On démarre une partie neuve, sans planter ; on garde le total de jetons s'il est lisible |
+| CL-23 | Victoire au niveau 3 avec un gain de 72 (total 100 avant la partie) ; on ferme l'app pendant la révélation de fin, puis on la rouvre | Total = 172 ; la partie figure dans l'historique ; niveau 4 ; records à jour (R-55) |
 
 ### 9.4 Message de suspense (clin d'œil S1)
 - **R-90** Au moment de retourner une carte, si sa ligne **et** sa colonne contiennent chacune au moins un Voltorbe, et si, pour la ligne **ou** la colonne, `Voltorbes de la ligne × 100 / cartes non retournées de la ligne ≥ 75` (Voltorbes **au total** de la ligne, pas restants), alors afficher un message de suspense tiré au hasard dans une liste (par défaut « Tu es sûr(e) de toi ?! ») et jouer un petit jingle de suspense avant de révéler la carte. Purement cosmétique.
@@ -301,22 +310,23 @@ Formulé simplement :
 |---|---|---|
 | UI-01 | **Accueil / menu** | Titre « Sardinebagarre », niveau courant, total de jetons. Boutons : **Jouer** (« Jouer au niveau {n} ? »), **Album** (§12), **Infos** (sous-menu : Comment jouer / Astuces / Le mémo), **Réglages**, **Quitter la table** (R-67) |
 | UI-02 | **Jeu** | Bandeau : « Niveau {n} », **Jetons de la partie** (5 chiffres), **Total** (5 chiffres). Plateau 5 × 5 + 5 indicateurs de ligne (à droite) + 5 indicateurs de colonne (en bas). Boutons : **Mémo**, **Quitter**. Zone de message (une ligne) |
-| UI-03 | **Infos** | 3 pages de texte original, inspirées des écrans d'aide de la DS (règles, lecture des indicateurs, mémo). Courtes : ma sœur connaît très bien le jeu |
-| UI-04 | **Réglages** | Son (on/off), animations réduites, **code secret** (saisir ou changer, §13), vider la boîte à jetons, effacer toute la progression, version de l'app, crédits |
+| UI-03 | **Infos** | 3 pages de texte original, inspirées des écrans d'aide de la DS : **« Comment jouer »** (règles et jetons), **« Astuces »** (lecture des indicateurs et règle du niveau 8), **« Le mémo »**. Courtes : ma sœur connaît très bien le jeu |
+| UI-04 | **Réglages** | Son (on/off) ; animations réduites (valeur par défaut : la préférence système `prefers-reduced-motion` ; dès que le joueur change ce réglage dans l'app, son choix la remplace) ; **code secret** (saisir ou changer, §13) ; records (R-72) ; vider la boîte à jetons ; effacer toute la progression ; version de l'app ; crédits |
 | UI-05 | **Bienvenue** (1ᵉʳ lancement) | « Entre le code secret de ta carte cadeau » (champ + bouton, lien « plus tard »), puis le **message personnel** contenu dans le pack (§13) et le bouton « Commencer » |
 | UI-06 | **Album** | Voir §12 |
 
 ### 10.2 Mise en page
-- **UI-10 iPhone (portrait, cible principale)** : bandeau en haut, plateau carré occupant toute la largeur utile (marges ≥ 12 px), boutons en bas, à portée du pouce. Respect des zones sûres (`env(safe-area-inset-*)`, `viewport-fit=cover`). Pas de défilement sur iPhone SE (375 × 667) ni sur iPhone 15 Pro Max (430 × 932).
+- **UI-10 iPhone (portrait, cible principale)** : bandeau en haut, plateau carré occupant toute la largeur utile (marges ≥ 12 px), boutons en bas, à portée du pouce. Respect des zones sûres (`env(safe-area-inset-*)`, `viewport-fit=cover`). Pas de défilement sur iPhone SE (375 × 667) ni sur iPhone 15 Pro Max (430 × 932). Vérifié par captures sur 5 profils : `iphone-se`, `iphone-15`, `iphone-15-pro-max`, `iphone-15-paysage`, `mac` (§15).
 - **UI-11 Mac (cible secondaire)** : **la même mise en page que sur iPhone**, centrée, largeur maximale 480 px, sur fond décoré. Pas de mise en page spécifique en v1 (décision Q11 : priorité à l'iPhone).
 - **UI-12** Cartes : cibles ≥ 44 × 44 px. Indicateurs : chaque ligne et chaque colonne a sa couleur (palette de 5 couleurs, style « classique » inspiré de la disposition du jeu d'origine), avec la somme en grand et le nombre de Sardines à côté d'une petite **tête de chien**. Les couleurs ne sont jamais la seule information.
 - **UI-13** Pas de zoom au double-toucher (`touch-action: manipulation`), pas de sélection de texte, pas de menu contextuel sur appui long.
 - **UI-14 Carte Sardine** : quand elle est révélée, la carte affiche la **tête de Sardine** (photo détourée en rond, issue du pack personnel, §13). Tant que le code secret n'a pas été saisi, une **tête de chien dessinée** (SVG original) la remplace.
+- **UI-15 Paysage** : pas de mise en page dédiée. Si le jeu s'affiche en paysage (iOS qui ignore le verrouillage d'orientation, fenêtre Mac basse), rien ne déborde et le plateau tient entièrement dans la hauteur disponible.
 
 ### 10.3 Entrées
 - **UI-20** Tactile et souris : toucher une carte = retourner (ou sélectionner, en mode mémo).
 - **UI-21** Clavier (Mac, priorité P3) : flèches = curseur ; Entrée ou Espace = retourner ; `M` = ouvrir/fermer le mémo ; `S`, `1`, `2`, `3` = marques (en mode mémo) ; `Q` = quitter ; Échap = fermer le dialogue ou le mémo.
-- **UI-22** Pendant une animation bloquante (retournement, explosion), les entrées sont ignorées (CL-19), sauf le « toucher pour accélérer » des animations de fin (CL-20).
+- **UI-22** Pendant une animation bloquante (retournement, apparition de Sardine (UI-31)), les entrées sont ignorées (CL-19), sauf le « toucher pour accélérer » des animations de fin (CL-20).
 
 ### 10.4 Animations (durées indicatives, divisées par 4 en mode « animations réduites »)
 | ID | Animation | Durée |
@@ -343,10 +353,19 @@ Exemples : « Jouer au niveau {n} ? », « {v} ! Tu gagnes {n} jeton(s) ! », «
 
 ## 11. Persistance (décision Q9 : on garde le niveau, pas la partie)
 
-- **R-100** Stockage `localStorage`, clé `sardinebagarre:save`, JSON avec `version` (entier). Écrit à chaque **fin de partie**, achat dans l'album, changement de réglage ou saisie du code.
-- **R-101** Contenu : `version`, `coins`, `level`, `history[≤5]`, `settings` (son, animations réduites), `stats` (R-72), `album` (identifiants des photos débloquées), `welcomeSeen`, `packCode` (code secret saisi, §13). **La partie en cours n'est pas sauvegardée** (R-68).
+- **R-100** Stockage `localStorage`, clé `sardinebagarre:save`, JSON avec `version` (entier). La sauvegarde est écrite à **chaque changement de l'état persistant**. Liste exhaustive :
+  - fin de partie (finalisation, R-55) ;
+  - achat dans l'album (R-112) ;
+  - changement d'un réglage (UI-04) ;
+  - saisie du code secret (R-124) ;
+  - écran de bienvenue vu (`welcomeSeen`, UI-05) ;
+  - « Quitter la table » (R-67) ;
+  - « Vider la boîte à jetons » (R-53) ;
+  - « Effacer toute la progression » (UI-04).
+- **R-101** Contenu : `version`, `coins`, `level`, `history[≤5]`, `settings` (son ; animations réduites, non renseigné tant que le joueur n'a rien choisi, voir UI-04), `stats` (R-72), `album` (identifiants des photos débloquées), `welcomeSeen`, `packCode` (code secret saisi, §13). **La partie en cours n'est pas sauvegardée** (R-68).
 - **R-102** Lecture tolérante : schéma validé, migration si `version` est ancienne, repli propre sinon (CL-22).
 - **R-103** Les données restent **sur l'appareil**. iPhone et Mac sont indépendants (Q11). Sur iPhone, l'app de l'écran d'accueil a un stockage **séparé** de l'onglet Safari.
+- **R-104 Mise à jour de l'app** : le service worker est enregistré en mode `registerType: 'prompt'` (vite-plugin-pwa). Une nouvelle version n'est **jamais** appliquée pendant une partie `EN_COURS`, puisque la partie en cours n'est pas sauvegardée (R-68). Elle est appliquée automatiquement, par un rechargement, quand le joueur est sur le menu (UI-01) : tout de suite s'il y est déjà, sinon dès qu'il y revient. Si l'app est fermée avant, la nouvelle version s'applique au lancement suivant.
 
 ---
 
@@ -375,6 +394,7 @@ Le dépôt GitHub est **public** et le site aussi. Les photos (Sardine, famille,
 - **R-126 Sans pack valide** : le jeu reste **entièrement jouable** (tête de chien dessinée, aboiement synthétisé, messages publics). Seuls l'album et le message de bienvenue attendent le code.
 - **R-127 Contrôle automatique** : un script de la CI (`scripts/verifier-confidentialite.mjs`) **échoue** si un fichier image ou audio est suivi par Git en dehors de `public/icons/` et `src/ui/art/`, si un fichier de `prive/` est suivi, ou si `public/pack/pack.bin` ne commence pas par l'en-tête `SBPACK1`.
 - **R-128** Web Crypto (`crypto.subtle`) n'est disponible qu'en **HTTPS** (ou sur `localhost`) : pour tester le pack sur iPhone, on passe par le site publié, ou par le serveur de développement en HTTPS (voir le plan, étape 3.2).
+- **R-129 Non-indexation** : `index.html` contient `<meta name="robots" content="noindex">`, et `public/robots.txt` contient `User-agent: *` / `Disallow: /`. Ce n'est qu'une politesse envers les moteurs de recherche. L'URL GitHub Pages est **devinable** : la protection des photos et des messages repose **uniquement** sur le chiffrement du pack (R-120 à R-128), jamais sur le fait que l'URL reste inconnue.
 
 ---
 
@@ -385,10 +405,10 @@ Thèmes visuels (v2), synchronisation entre appareils, mise en page Mac spécifi
 
 ## 15. Critères d'acceptation (vérifiables)
 
-1. Tous les tests de `tests/logic/` passent : table §3, vecteurs N1 à N17, cas CL-01 à CL-22 pour la partie logique, règles R-110 à R-116 (album).
+1. Tous les tests de `tests/logic/` passent : table §3, vecteurs N1 à N17, cas CL-01 à CL-23 pour la partie logique, règles R-110 à R-116 (album).
 2. Test de propriété : 1 000 plateaux par entrée de configuration, avec graines fixes → comptes exacts, contraintes R-21.5 respectées, indicateurs = sommes recalculées.
 3. Test de bout en bout (Playwright, WebKit, profil iPhone) : une partie gagnée avec une graine connue, une partie perdue, un abandon à 0 carte → niveau 1, le mémo pose et retire des marques, le niveau survit à un rechargement **mais pas la partie** (CL-18), déchiffrement d'un **pack de test** (fausses images générées, code connu) et refus d'un mauvais code.
-4. Capture d'écran sur 3 tailles (iPhone SE, iPhone 15, Mac 1280 × 800) sans débordement.
+4. Captures d'écran sur 5 profils, sans débordement : `iphone-se` (375 × 667), `iphone-15` (393 × 852), `iphone-15-pro-max` (430 × 932), `iphone-15-paysage` (852 × 393, UI-15), `mac` (1280 × 800).
 5. Le jeu fonctionne en mode avion après une première visite (service worker), pack compris.
 6. Installabilité : manifeste valide, icônes 180 px (Apple) et 512 px.
 7. `scripts/verifier-confidentialite.mjs` passe en CI (R-127).

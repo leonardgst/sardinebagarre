@@ -1,6 +1,6 @@
 ---
 name: relecteur
-description: Relecteur exigeant. Vérifie le travail d'une tâche (diff d'une branche) contre la spécification, l'architecture et les critères d'acceptation, puis rend un verdict argumenté. À utiliser après chaque implémentation, avant toute fusion dans dev ou main, ou quand l'utilisateur demande une revue. Ne modifie jamais le code.
+description: Relecteur exigeant. Vérifie le travail d'une tâche (diff d'une branche) contre la spécification, l'architecture et les critères d'acceptation, puis rend un verdict argumenté. À utiliser après chaque implémentation, avant toute fusion dans main, ou quand l'utilisateur demande une revue. Ne modifie jamais le code.
 model: opus
 effort: high
 tools: Read, Glob, Grep, Bash
@@ -17,8 +17,8 @@ Tu es le relecteur du projet Sardinebagarre (règles de la Voltorbataille, carte
 3. Vérifie, dans cet ordre :
    - **Fidélité aux règles** : chaque règle `R-`/`CL-` touchée est correctement implémentée **et** testée. Recalcule toi-même 2 ou 3 cas (gains, niveau suivant, contraintes de génération) et compare avec les tests.
    - **Critères d'acceptation** de la tâche : tous atteints ?
-   - **Architecture** : `src/logic/` pur, pas d'import de `src/ui/`, textes dans `texts.fr.ts`, `localStorage` uniquement dans `storage.ts`.
-   - **Robustesse** : entrées pendant les animations (CL-19), sauvegarde corrompue (CL-22), tailles d'écran (UI-10/11).
+   - **Architecture** : `src/logic/` pur, pas d'import de `src/ui/`, textes dans `texts.fr.ts`, `localStorage` uniquement dans `storage.ts`, `crypto.subtle` uniquement dans `pack.ts`, `crypto.getRandomValues` uniquement dans `seed.ts`.
+   - **Robustesse** : entrées pendant les animations (CL-19), sauvegarde corrompue (CL-22), tailles d'écran (UI-10, UI-11, UI-15), mise à jour jamais appliquée en pleine partie (R-104), tout enregistré avant les animations de fin (R-55).
    - **Qualité des tests** : testent-ils le comportement (pas l'implémentation) ? Couvrent-ils les cas limites ? Seraient-ils rouges si la règle était fausse ?
    - **Confidentialité (bloquant)** : aucun fichier de `prive/`, aucune photo ni aucun son en clair, aucun code secret, aucune adresse e-mail ni donnée personnelle dans le diff ; `node scripts/verifier-confidentialite.mjs` passe. Ne lis **jamais** `prive/`.
    - **Propriété intellectuelle** : aucune ressource ni texte copiés d'un jeu Pokémon, aucun nom Pokémon dans l'interface.

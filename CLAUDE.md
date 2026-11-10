@@ -28,7 +28,7 @@ TypeScript strict · Vite (`base: '/sardinebagarre/'`) · DOM natif (sans framew
 
 ## Architecture (règles strictes)
 - `src/logic/` est **pur** : pas de `window`, `document`, `localStorage`, `crypto`, `Math.random`, `Date.now`. Le hasard est injecté (`rng: () => number`).
-- `src/logic/` n'importe jamais `src/ui/`. Seul `src/ui/storage.ts` touche `localStorage` ; seul `src/ui/pack.ts` touche Web Crypto. Tous les textes sont dans `src/ui/texts.fr.ts`.
+- `src/logic/` n'importe jamais `src/ui/`. Seul `src/ui/storage.ts` touche `localStorage` ; seul `src/ui/pack.ts` utilise `crypto.subtle` ; `crypto.getRandomValues` (graine du hasard) est utilisé uniquement dans `src/ui/seed.ts`. Tous les textes sont dans `src/ui/texts.fr.ts`.
 - Fonctions d'état pures : `(état, action) → nouvel état`, sans mutation (objets en lecture seule).
 - Les 80 configurations vivent uniquement dans `src/logic/configs.ts` et doivent correspondre à la spec §3.
 - La partie en cours n'est **pas** sauvegardée (R-68) : seulement jetons, niveau, historique, album, réglages, stats, code.

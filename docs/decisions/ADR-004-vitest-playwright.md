@@ -13,7 +13,7 @@ Les règles sont nombreuses et subtiles (niveaux, gains, génération). Claude d
 3. **Seulement des tests manuels sur iPhone pour l'UI** : aucun outillage, mais aucune vérification automatique ni capture lisible par Claude.
 
 ## Décision
-Chaque règle de la spec a au moins un test Vitest. Les parcours clés et les captures d'écran passent par Playwright (WebKit, profils iPhone SE, iPhone 15 et Mac 1280 × 800).
+Chaque règle de la spec a au moins un test Vitest. Les parcours clés et les captures d'écran passent par Playwright (WebKit, 5 profils : `iphone-se`, `iphone-15`, `iphone-15-pro-max`, `iphone-15-paysage`, `mac` 1280 × 800).
 
 ## Conséquences
 - Plus facile : Claude vérifie seul son travail, y compris visuellement (skill `controle-visuel`) ; la logique se teste en millisecondes.

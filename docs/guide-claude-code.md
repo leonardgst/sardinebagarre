@@ -1,4 +1,4 @@
-# 05 — Guide Claude Code pour ce projet
+# Guide Claude Code pour ce projet
 
 > Comment fonctionnent `CLAUDE.md`, les réglages, les skills, les sous-agents et les hooks, et comment mettre en place la répartition **Opus (réflexion) / Sonnet (code)**.
 > ✅ Mis à jour le 10/11 : développement sous **Windows** (§6 et §7), interdiction de lire `prive/`.

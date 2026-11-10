@@ -1,4 +1,4 @@
-# 00 — Questions de cadrage
+# Questions de cadrage
 
 > ✅ **Tes réponses du 10/11/2026 sont intégrées** : voir la section « Décisions retenues » en fin de document. Elles remplacent les choix par défaut (★) proposés ci-dessous.
 
@@ -33,7 +33,7 @@
 ## 2. Identité visuelle et propriété intellectuelle
 
 ### Q4 🔴 Style graphique : fidèle au jeu ou original ?
-- **Pourquoi** : c'est la question qui pèse le plus sur la propriété intellectuelle (voir `02`, section 6) et sur le temps de travail. Les sprites, la police, les sons et la musique de HeartGold/SoulSilver appartiennent à Nintendo / Game Freak / The Pokémon Company. Les **règles** d'un jeu, elles, ne sont pas protégées par le droit d'auteur.
+- **Pourquoi** : c'est la question qui pèse le plus sur la propriété intellectuelle (voir `docs/architecture.md`, section 6) et sur le temps de travail. Les sprites, la police, les sons et la musique de HeartGold/SoulSilver appartiennent à Nintendo / Game Freak / The Pokémon Company. Les **règles** d'un jeu, elles, ne sont pas protégées par le droit d'auteur.
 - **Options** :
   - (a) ressources extraites du jeu (sprites, sons) : rendu identique, mais illégal à diffuser, et Claude refusera de redessiner le personnage ;
   - (b) **look « hommage » original** : même disposition (grille 5×5, indicateurs en bout de ligne et de colonne, cartes ×1/×2/×3), mais graphismes, créature-bombe, couleurs et sons créés pour le projet ;
@@ -82,14 +82,14 @@
 ### Q12 Sons et musique ?
 - **Options** : aucun ; effets sonores synthétisés ; effets + petite musique originale.
 - ★ **Défaut** : **effets sonores synthétisés** (retournement, tic des jetons, explosion, victoire, montée/descente de niveau), avec un bouton muet mémorisé. Pas de musique en v1.
-- **À savoir** : sur iPhone, le son ne démarre qu'après un premier toucher, et le bouton silencieux peut le couper. C'est normal (voir `06-risques`).
+- **À savoir** : sur iPhone, le son ne démarre qu'après un premier toucher, et le bouton silencieux peut le couper. C'est normal (voir `docs/risques.md`).
 
 ### Q13 Mémo : interaction fidèle ou améliorée ?
 - **Pourquoi** : sur DS, on ouvre le mémo, on sélectionne une case, puis on touche les boutons de marque (Voltorbe, 1, 2, 3) pour les activer ou désactiver. **On ne peut pas retourner de carte tant que le mémo est ouvert.**
 - ★ **Défaut** : fidèle. Un réglage optionnel « appui long = mémo » pourra venir en phase 4.
 
 ### Q14 Détails « clin d'œil » du jeu d'origine ?
-- Message de suspense (« Tu es sûr(e) de toi ?! ») quand on touche une case très risquée (règle exacte dans `01`, §9.4). Messages de montée et de descente de niveau. Révélation de tout le plateau en fin de partie.
+- Message de suspense (« Tu es sûr(e) de toi ?! ») quand on touche une case très risquée (règle exacte dans `docs/specification.md`, §9.4). Messages de montée et de descente de niveau. Révélation de tout le plateau en fin de partie.
 - ★ **Défaut** : oui, tous (ils sont peu coûteux et font « vrai »).
 
 ### Q15 Personnalisation pour ta sœur ?
@@ -125,7 +125,7 @@
 
 ## Décisions retenues (réponses du 10/11/2026)
 
-> Ces décisions **remplacent** les choix par défaut ci-dessus. Les documents 01 à 06 et `repo-init/` ont été mis à jour en conséquence.
+> Ces décisions **remplacent** les choix par défaut ci-dessus. Les documents de `docs/` (`specification.md`, `architecture.md`, `plan.md`, `guide-claude-code.md`, `risques.md`), `CLAUDE.md` et `.claude/` ont été mis à jour en conséquence.
 
 | Q | Décision | Conséquences principales |
 |---|---|---|
@@ -163,6 +163,4 @@ Le dépôt et le site sont publics, mais tes photos ne doivent pas l'être. Les 
 | Enregistrement de l'aboiement (facultatif) | M4A/MP3, 1 à 2 s, sans bruit autour | ven. 11/12 |
 | Le code secret (4 mots) | à garder pour toi : jamais dans un fichier ni dans une conversation avec Claude | avant l'étape 3.3 |
 
-### Questions encore ouvertes
-1. **Photos de Sardine seule** : sont-elles aussi privées ? Par prudence, je les traite comme les autres (dans le pack chiffré), tête de la carte-bombe comprise. Si une photo de Sardine seule peut être publique, la tête pourrait être visible même sans code, ce qui simplifie un peu.
-2. **Ordre de l'album imposé** (prochaine photo seulement) ou **libre** (n'importe quelle photo si on a assez de jetons) ? Par défaut : dans l'ordre (une surprise à chaque déblocage).
+Les questions encore ouvertes sont suivies dans `docs/journal.md`, section « Questions ouvertes ».
