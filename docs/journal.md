@@ -7,7 +7,7 @@
 | Tâche | Titre | Statut |
 |---|---|---|
 | T-001 | Initialiser le projet (Vite, TypeScript, Vitest, Biome, Playwright, contrôle de confidentialité) | terminée |
-| T-002 | Créer les types de base, la table des configurations et le hasard à graine | planifiée |
+| T-002 | Créer les types de base, la table des configurations et le hasard à graine | terminée |
 
 ## Questions ouvertes
 _(aucune)_

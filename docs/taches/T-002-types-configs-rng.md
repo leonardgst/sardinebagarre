@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | à relire |
+| Statut | terminée |
 | Étape du plan | 1.1 |
 | Branche | `t-002-types-configs-rng` |
 | Estimation | S (< 1 h) |
@@ -109,3 +109,9 @@ Fait : types.ts, configs.ts (80 entrées gelées, entriesForLevel, maxPayout), r
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
+
+**2026-11-10 — relecteur — ✅ approuvé** (aucun point bloquant ni important).
+Vérifié : `npm run check` (203 tests) ; les 80 entrées de `CONFIGS` comparées à la spec §3 par un script indépendant (identiques) et les pièges contrôlés à la main (4/3 en N3-C5 A et N4-C1 A, 13 Sardines en N7-C3/C4, 3456 en N8-C5) ; vecteurs `mulberry32` recalculés avec une implémentation de référence distincte ; contre-épreuve rejouée (4 tests rouges, puis restauration).
+Remarques mineures, reportées à T-003 :
+1. Test « R-11 la table est gelée » : ne contrôle que `CONFIGS[0]` → vérifier les 80 entrées.
+2. `tests/architecture.test.ts` (hérité de T-001) : passe sans rien vérifier si `src/logic/` est absent → exiger au moins un fichier.
