@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | implémentée |
+| Statut | approuvée (à fusionner) |
 | Étape du plan | 0.5 |
 | Branche | `t-001-initialiser-projet` |
 | Estimation | M (1–3 h) |
@@ -207,3 +207,6 @@ Réserves mineures :
 2. `.dng` (ProRAW iPhone) et `.svgz` ne sont pas bloqués.
 3. `biome.json` : `globalThis`, `self`, `Date` non interdits dans `src/logic/` ; `Math.random` hors de portée de Biome → test d'architecture à prévoir avant l'étape 1.
 4. `playwright.config.ts` : pas de reporter `html` en CI, donc l'artefact `playwright-report/` de `ci.yml` sera vide en cas d'échec.
+**2026-11-10 — relecteur (relecture limitée à C1–C4, commit `cc5af52`) — ✅ approuvé.**
+Prouvé par exécution : C1 (script lancé depuis `src/ui/` et `C:\Windows`, SVG lus via la racine), C3 (`Date.now()` et `export * from '../../ui/main'` dans un sous-dossier de `src/logic/` refusés par le test et par Biome). `npm run check` 32/32, e2e 3 passed, commit limité aux 7 fichiers prévus.
+Remarques mineures, non bloquantes : le détecteur de `tests/architecture.test.ts` ignore `import('../ui/…')`, `Date . now()` et un usage placé après `//` dans une chaîne, et signale à tort « document » ou « window » dans une chaîne. Biome rattrape les angles morts ; seul le faux positif pourrait gêner un jour.

@@ -6,7 +6,7 @@
 ## Index des tâches
 | Tâche | Titre | Statut |
 |---|---|---|
-| T-001 | Initialiser le projet (Vite, TypeScript, Vitest, Biome, Playwright, contrôle de confidentialité) | implémentée |
+| T-001 | Initialiser le projet (Vite, TypeScript, Vitest, Biome, Playwright, contrôle de confidentialité) | approuvée (à fusionner) |
 
 ## Questions ouvertes
 - Les photos de Sardine seule sont-elles privées (pack chiffré) ou publiables ? Par défaut : privées.
