@@ -1,0 +1,28 @@
+{
+  "name": "sardinebagarre",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:https": "vite --mode https",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "check": "tsc --noEmit && biome check && vitest run && node scripts/verifier-confidentialite.mjs",
+    "e2e": "playwright test --grep-invert @screens",
+    "screens": "playwright test --grep @screens"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.6",
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^26.6.6",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.7",
+    "vitest": "^5.1.0"
+  }
+}
