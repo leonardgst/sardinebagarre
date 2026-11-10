@@ -1,4 +1,4 @@
-# Plan pas à pas
+# 04 — Plan pas à pas
 
 > ✅ Mis à jour le 10/11 avec tes réponses : **Sardinebagarre**, dépôt **public** + **GitHub Pages**, **pack chiffré** pour les photos, **album**, **Windows**, sauvegarde du niveau sans la partie en cours, iPhone d'abord.
 >
@@ -70,7 +70,8 @@ Avec un dépôt public et GitHub Pages, on travaille avec **deux sortes de branc
 - Décompresse l'archive, puis copie le **contenu** de `repo-init/` à la racine du dépôt : `CLAUDE.md`, `.claude\`, `.github\`, `.gitignore`… doivent se retrouver **directement** dans `C:\dev\sardinebagarre\`, pas dans un sous-dossier `repo-init\`. Sinon, Claude Code ne charge rien (ni CLAUDE.md, ni skills, ni sous-agents, ni hooks), et `prive/` n'est pas ignoré par Git. Méthode sûre en PowerShell :
   ```powershell
   robocopy C:\chemin\vers\archive\repo-init C:\dev\sardinebagarre /E
-  ``` Dans l'Explorateur : *Affichage › Afficher › Éléments masqués*, pour voir `.claude/` et `.github/`. Copie les documents de cadrage dans `docs/` (correspondance dans `03-structure-du-depot.md` §3).
+  ```
+- Dans l'Explorateur : *Affichage › Afficher › Éléments masqués*, pour voir `.claude/` et `.github/`. Copie les documents de cadrage dans `docs/` (correspondance dans `03-structure-du-depot.md` §3).
 - Crée le dossier privé et vérifie qu'il est bien ignoré :
   ```powershell
   mkdir prive ; New-Item prive\LISEZMOI.txt -Value "Dossier privé : jamais commité"
@@ -101,7 +102,7 @@ Avec un dépôt public et GitHub Pages, on travaille avec **deux sortes de branc
 
 ### 0.5 Initialiser le projet (première vraie tâche) — 🟣 → 🟢 → 🔍 — ton temps : 2 h
 - **Prompt** :
-  > /planifier-tache Initialiser le projet : Vite + TypeScript strict (sans framework) avec base '/sardinebagarre/', Vitest, Biome (règle qui interdit à src/logic d'importer src/ui), Playwright (WebKit, 5 profils : iphone-se, iphone-15, iphone-15-pro-max, iphone-15-paysage, mac 1280x800), @vitejs/plugin-basic-ssl pour un script dev:https. Scripts npm : dev, dev:https, build, preview, test, check (tsc --noEmit + biome check + vitest run + node scripts/verifier-confidentialite.mjs), e2e, screens. Créer scripts/verifier-confidentialite.mjs (spec R-127). Une page index.html minimale « Sardinebagarre » en français avec meta viewport-fit=cover et noindex, un test Vitest trivial et un test Playwright qui vérifie le titre. Pas encore de PWA. Tout doit fonctionner sous Windows.
+  > /planifier-tache Initialiser le projet : Vite + TypeScript strict (sans framework) avec base '/sardinebagarre/', Vitest, Biome (règle qui interdit à src/logic d'importer src/ui), Playwright (WebKit, profils iPhone SE, iPhone 15, Mac 1280x800), @vitejs/plugin-basic-ssl pour un script dev:https. Scripts npm : dev, dev:https, build, preview, test, check (tsc --noEmit + biome check + vitest run + node scripts/verifier-confidentialite.mjs), e2e, screens. Créer scripts/verifier-confidentialite.mjs (spec R-127). Une page index.html minimale « Sardinebagarre » en français avec meta viewport-fit=cover et noindex, un test Vitest trivial et un test Playwright qui vérifie le titre. Pas encore de PWA. Tout doit fonctionner sous Windows.
 - Puis `/implementer-tache T-001`, puis : « Utilise le sous-agent relecteur pour relire T-001 ».
 - **Vérifier (toi)** : `npm install`, `npm run check` vert, `npm run dev` affiche la page, `npx playwright install webkit` puis `npm run e2e` vert. Fusionne dans `main` et pousse : l'onglet *Actions* montre la CI verte **et** le déploiement ; `https://<ton-pseudo>.github.io/sardinebagarre/` affiche « Sardinebagarre ».
 - **Test du garde-fou de confidentialité** : copie une image quelconque dans `src/`, lance `npm run check` → échec attendu. Supprime l'image.
@@ -132,7 +133,7 @@ Avec un dépôt public et GitHub Pages, on travaille avec **deux sortes de branc
 > Étape 1.4 : src/logic/levels.ts : pickEntry(level, rng) (uniforme sur les 10 entrées) et nextLevel(history) selon le pseudo-code de la spec §6.2. Tests : les 17 vecteurs N1..N17, plus un test statistique de pickEntry (10 000 tirages, chaque entrée entre 8 % et 12 %).
 
 ### 1.5 Enchaînement, album, sauvegarde (logique) — M — 1 h 30
-> Étape 1.5 : src/logic/game.ts (nouvelle partie, encaissement avec plafond 50 000 R-50..R-53, finalisation avant les animations R-55, historique de 5, partie interrompue R-68, quitter la table R-67, stats R-72), src/logic/album.ts (R-110..R-116) et src/logic/save.ts (serialize/deserialize/validate/migrate R-100..R-102 : la partie en cours n'est PAS sauvegardée, CL-22). Tests : CL-13, CL-14, CL-17, CL-18 (logique), CL-22, CL-23, achats d'album (ordre, solde insuffisant, débit exact), aller-retour serialize → deserialize identique.
+> Étape 1.5 : src/logic/game.ts (nouvelle partie, encaissement avec plafond 50 000 R-50..R-53, historique de 5, partie interrompue R-68, quitter la table R-67, stats R-72), src/logic/album.ts (R-110..R-116) et src/logic/save.ts (serialize/deserialize/validate/migrate R-100..R-102 : la partie en cours n'est PAS sauvegardée, CL-22). Tests : CL-13, CL-14, CL-17, CL-18 (logique), CL-22, achats d'album (ordre, solde insuffisant, débit exact), aller-retour serialize → deserialize identique.
 
 ### 1.6 Revue de la logique — 🔍 + 🧑 — 2 h
 - **Prompt** :
@@ -173,10 +174,10 @@ Avec un dépôt public et GitHub Pages, on travaille avec **deux sortes de branc
 ## Phase 3 — Sauvegarde, PWA, pack, publication (30/11 → 6/12)
 
 ### 3.1 Sauvegarde — S — 45 min
-> Étape 3.1 : src/ui/storage.ts + branchement du contrôleur : sauvegarde à chaque changement de l'état persistant (liste exhaustive R-100), restauration au lancement (R-100..R-103). Tests e2e : recharger la page en pleine partie → nouvelle partie au même niveau, total inchangé (CL-18) ; une sauvegarde corrompue ne plante pas (CL-22).
+> Étape 3.1 : src/ui/storage.ts + branchement du contrôleur : sauvegarde à chaque fin de partie, achat ou réglage, restauration au lancement (R-100..R-103). Tests e2e : recharger la page en pleine partie → nouvelle partie au même niveau, total inchangé (CL-18) ; une sauvegarde corrompue ne plante pas (CL-22).
 
 ### 3.2 PWA + test HTTPS — M — 1 h 30
-> Étape 3.2 : vite-plugin-pwa (registerType prompt : nouvelle version jamais appliquée pendant une partie EN_COURS, rechargement automatique sur le menu, sinon au lancement suivant, R-104 ; précache de tout le jeu y compris public/pack/pack.bin, scope et start_url sous /sardinebagarre/), manifeste (name et short_name « Sardinebagarre », display standalone, orientation portrait, couleurs), icônes dessinées (192, 512, maskable, apple-touch-icon 180) à partir d'un SVG du projet, balises Apple (apple-mobile-web-app-capable, status-bar-style, title), robots.txt Disallow et meta noindex (R-129). Afficher la version de l'app dans Réglages. Test e2e : le service worker est enregistré en mode preview et la page fonctionne hors ligne (context.setOffline).
+> Étape 3.2 : vite-plugin-pwa (registerType autoUpdate, précache de tout le jeu y compris public/pack/pack.bin, scope et start_url sous /sardinebagarre/), manifeste (name et short_name « Sardinebagarre », display standalone, orientation portrait, couleurs), icônes dessinées (192, 512, maskable, apple-touch-icon 180) à partir d'un SVG du projet, balises Apple (apple-mobile-web-app-capable, status-bar-style, title), robots.txt Disallow et meta noindex. Afficher la version de l'app dans Réglages. Test e2e : le service worker est enregistré en mode preview et la page fonctionne hors ligne (context.setOffline).
 - 🧑 Test HTTPS local : `npm run dev:https -- --host`, puis sur l'iPhone `https://192.168.x.x:5173/sardinebagarre/` › « Afficher les détails » › « consulter ce site web » (certificat de test). C'est la méthode pour tester le pack sur iPhone **sans publier**.
 - 📚 **Apprendre** : MDN, « Progressive web apps » (developer.mozilla.org/fr/docs/Web/Progressive_web_apps) et la doc de vite-plugin-pwa (vite-pwa-org.netlify.app).
 
@@ -214,7 +215,7 @@ Ordre de priorité. On s'arrête où l'on en est le 13 au soir.
 
 ### 4.8 Revue générale et version candidate — 🔍 + 🧑 — 3 h
 - **Prompt** :
-  > Utilise le sous-agent relecteur pour une revue complète du projet (npm run check, npm run e2e, contrôle visuel sur les 5 profils, vérification de confidentialité). Puis liste les problèmes par priorité.
+  > Utilise le sous-agent relecteur pour une revue complète du projet (npm run check, npm run e2e, contrôle visuel sur les 3 profils, vérification de confidentialité). Puis liste les problèmes par priorité.
 - Corrections, puis `/deployer` → **v1.0.0-rc.1** le dimanche 13/12.
 - 🧑 Joue 30 min sur iPhone.
 - **Jalon : GEL.** À partir de maintenant, uniquement des corrections.
