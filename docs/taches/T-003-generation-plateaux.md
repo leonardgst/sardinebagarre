@@ -137,3 +137,39 @@ Plateaux (createBoard, countFreeMultipliers, isAccepted, placeCards, generateBoa
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
+
+**2026-11-10 — relecteur — 🟡 approuvé avec réserves** (aucun point bloquant).
+Vérifié : `npm run check` (220 tests), `board.test.ts` 17/17 en 1,55 s ; algorithme R-21 et immuabilité R-24 conformes ; contre-épreuves `<=`, indicateurs faussés et mélange biaisé détectées.
+Réserves importantes (trous dans les tests, prouvés par contre-épreuve : 17/17 restent verts) :
+1. Le test du repli R-21.6 ne vérifie pas que c'est le **dernier** plateau qui est gardé.
+2. Aucun test ne couvre un multiplicateur à la croisée d'une ligne **et** d'une colonne sans Sardine (doit compter une seule fois) ; la vérification des contraintes du test de propriété rappelle le code testé.
+Mineures : liste d'écarts potentiellement énorme en cas d'échec ; `console.info` à chaque `npm run check`.
+Maximum de 24 tentatives : cohérent statistiquement (p ≈ 5,9 % sur 80 000 plateaux ; entrée la plus contrainte N2 (7,3,2) B, p ≈ 0,35 par tentative) ; le « 21 » de R-23 est un maximum d'échantillon, pas une règle.
+
+## Corrections après relecture
+_Validées par l'humain le 2026-11-10. Même branche, un nouveau commit `fix(logic): corrections après relecture de T-003`. Ne rien changer d'autre (pas de modification de `src/logic/board.ts`, sauf si un nouveau test révèle un vrai défaut : le signaler alors dans le compte rendu)._
+
+### C1 — Le repli garde bien le **dernier** plateau (R-21.6)
+- Test `R-21 repli après 1 000 tentatives : on garde le dernier plateau` : en plus des vérifications actuelles, rejouer la même graine et comparer :
+  `const rng = mulberry32(5); let dernier: CardValue[] = []; for (let k = 0; k < MAX_ATTEMPTS; k++) dernier = placeCards(entree, rng);` puis `expect(r.board.cells).toEqual(dernier)`.
+- **Contre-épreuve** : faire garder temporairement le **premier** plateau dans `generateBoardDetailed` → ce test échoue ; restaurer → vert.
+
+### C2 — Un multiplicateur gratuit par sa ligne **et** sa colonne compte une seule fois (R-21.4)
+- Nouveau test `R-21 un multiplicateur à la croisée d'une ligne et d'une colonne sans Sardine compte une seule fois` : `PLATEAU_MAIN` avec la case (2,1) (id 11) mise à `2`, soit la ligne 2 = `2 2 1 1 1`. Attendu (recalculé par Opus) : `countFreeMultipliers` = `{ total: 4, perRow: [0, 1, 2, 0, 1], perCol: [1, 3, 0, 0, 0] }`.
+- Test de propriété §15.2 : remplacer l'appel à `isAccepted(countFreeMultipliers(...))` par un **recalcul indépendant** dans le test (Sardines par ligne/colonne, gratuité « ligne OU colonne sans S », comptes par ligne, colonne et total, comparaisons strictes avec `maxFreePerLine` / `maxFreeTotal`), sans appeler `board.ts`.
+- **Contre-épreuve** : dans `countFreeMultipliers`, remplacer temporairement `total++` par un double comptage (`total += (ligneSansS ? 1 : 0) + (colonneSansS ? 1 : 0)`) → le nouveau test **et** le test de propriété échouent ; restaurer → vert.
+
+### C3 — Sortie des tests de propriété
+- Si des écarts sont trouvés, n'afficher que les **20 premiers** (`problemes.slice(0, 20)`) en plus de leur nombre ; le test échoue si `problemes.length > 0`.
+- Supprimer le `console.info` des statistiques de tentatives (les valeurs sont dans le compte rendu et dans R-23).
+
+### C4 — Reformulation de R-23 (faite par Opus dans `docs/specification.md`)
+- Rien à faire pour le codeur : inclure la modification de la spec dans le commit.
+
+### Critère global
+- `npm run check` → code 0, **221** tests (220 + 1) ; `npx vitest run tests/logic/board.test.ts` < 5 s ; `npm run check` n'affiche plus de statistiques de tentatives.
+- `git status` avant commit : uniquement `tests/logic/board.test.ts`, `docs/specification.md`, la fiche et `docs/journal.md`.
+
+### Compte rendu — Corrections après relecture
+C1 (assertion sur le dernier plateau rejoué), C2 (nouveau test de la croisée ligne+colonne ; contraintes du test de propriété recalculées indépendamment), C3 (20 premiers écarts + nombre ; `console.info` supprimé), C4 (spec, par Opus). `src/logic/board.ts` inchangé. check OK, 221 tests, board.test.ts ~1,6 s. Tentatives sur 80 000 plateaux inchangées : moyenne 1,472, maximum 24.
+Contre-épreuves : C1 (garder le premier plateau) → le test de repli échoue (et la propriété aussi, effet de bord de ma mutation) ; C2 (double comptage) → le nouveau test échoue. Écart : le test de propriété ne échoue PAS avec le double comptage, car celui-ci rend le code plus strict que le recalcul indépendant (les plateaux acceptés respectent encore les vraies contraintes, aucun repli n'apparaît). Le nouveau test ciblé suffit à détecter ce défaut.

@@ -5,6 +5,7 @@ import {
   generateBoard,
   generateBoardDetailed,
   isAccepted,
+  MAX_ATTEMPTS,
   placeCards,
 } from '../../src/logic/board';
 import { CONFIGS } from '../../src/logic/configs';
@@ -64,6 +65,16 @@ describe('plateau', () => {
       total: 3,
       perRow: [0, 1, 1, 0, 1],
       perCol: [1, 2, 0, 0, 0],
+    });
+  });
+
+  it("R-21 un multiplicateur à la croisée d'une ligne et d'une colonne sans Sardine compte une seule fois", () => {
+    const cells = [...PLATEAU_MAIN.cells];
+    cells[11] = 2;
+    expect(countFreeMultipliers(cells)).toEqual({
+      total: 4,
+      perRow: [0, 1, 2, 0, 1],
+      perCol: [1, 3, 0, 0, 0],
     });
   });
 
@@ -149,6 +160,10 @@ describe('génération', () => {
     expect(r.accepted).toBe(false);
     expect(compter(r.board.cells, 2)).toBe(1);
     expect(compter(r.board.cells, 1)).toBe(24);
+    const rng = mulberry32(5);
+    let dernier: CardValue[] = [];
+    for (let k = 0; k < MAX_ATTEMPTS; k++) dernier = placeCards(e, rng);
+    expect(r.board.cells).toEqual(dernier);
   });
 });
 
@@ -159,6 +174,40 @@ interface Resultat {
   readonly cols: readonly LineHint[];
   readonly attempts: number;
   readonly accepted: boolean;
+}
+
+const incr = (a: number[], i: number): void => {
+  a[i] = (a[i] ?? 0) + 1;
+};
+
+/** Recalcul indépendant de R-21.3–5 (sans appeler board.ts). */
+function contraintesRespectees(cells: readonly CardValue[], e: ConfigEntry): boolean {
+  const sRow = [0, 0, 0, 0, 0];
+  const sCol = [0, 0, 0, 0, 0];
+  cells.forEach((c, id) => {
+    if (c === 'S') {
+      incr(sRow, Math.floor(id / 5));
+      incr(sCol, id % 5);
+    }
+  });
+  const gRow = [0, 0, 0, 0, 0];
+  const gCol = [0, 0, 0, 0, 0];
+  let total = 0;
+  cells.forEach((c, id) => {
+    if (c !== 2 && c !== 3) return;
+    const l = Math.floor(id / 5);
+    const k = id % 5;
+    if (sRow[l] === 0 || sCol[k] === 0) {
+      total++;
+      incr(gRow, l);
+      incr(gCol, k);
+    }
+  });
+  return (
+    total < e.maxFreeTotal &&
+    gRow.every((n) => n < e.maxFreePerLine) &&
+    gCol.every((n) => n < e.maxFreePerLine)
+  );
 }
 
 describe('propriétés sur 80 000 plateaux', () => {
@@ -196,7 +245,7 @@ describe('propriétés sur 80 000 plateaux', () => {
       verifier(compter(r.cells, 2) === e.twos, `#${n} comptes 2`);
       verifier(compter(r.cells, 3) === e.threes, `#${n} comptes 3`);
       verifier(compter(r.cells, 1) === 25 - e.sardines - e.twos - e.threes, `#${n} comptes 1`);
-      verifier(isAccepted(countFreeMultipliers(r.cells), e), `#${n} contraintes R-21.5`);
+      verifier(contraintesRespectees(r.cells, e), `#${n} contraintes R-21.5`);
       for (let i = 0; i < 5; i++) {
         const ligne = r.cells.slice(i * 5, i * 5 + 5);
         const colonne = [0, 1, 2, 3, 4].map((l) => r.cells[l * 5 + i] as CardValue);
@@ -218,14 +267,15 @@ describe('propriétés sur 80 000 plateaux', () => {
         );
       }
     });
-    expect(problemes).toEqual([]);
+    expect({ nombre: problemes.length, premiers: problemes.slice(0, 20) }).toEqual({
+      nombre: 0,
+      premiers: [],
+    });
   });
 
   it('R-23 propriété : 1 à 3 tentatives en moyenne, jamais de repli', () => {
     const total = resultats.reduce((a, r) => a + r.attempts, 0);
-    const max = resultats.reduce((a, r) => Math.max(a, r.attempts), 0);
     const moyenne = total / resultats.length;
-    console.info(`tentatives : moyenne ${moyenne.toFixed(3)}, maximum ${max}`);
     expect(moyenne).toBeGreaterThanOrEqual(1);
     expect(moyenne).toBeLessThanOrEqual(3);
     expect(resultats.every((r) => r.accepted)).toBe(true);
