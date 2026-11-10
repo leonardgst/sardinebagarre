@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | approuvée (à fusionner) |
+| Statut | terminée |
 | Étape du plan | 0.5 |
 | Branche | `t-001-initialiser-projet` |
 | Estimation | M (1–3 h) |
