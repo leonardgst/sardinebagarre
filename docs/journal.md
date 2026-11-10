@@ -8,7 +8,7 @@
 |---|---|---|
 | T-001 | Initialiser le projet (Vite, TypeScript, Vitest, Biome, Playwright, contrôle de confidentialité) | terminée |
 | T-002 | Créer les types de base, la table des configurations et le hasard à graine | terminée |
-| T-003 | Générer les plateaux et calculer les indicateurs (+ 2 corrections de relecture T-002) | implémentée |
+| T-003 | Générer les plateaux et calculer les indicateurs (+ 2 corrections de relecture T-002) | terminée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -19,7 +19,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Étape 1.2 du plan : génération des plateaux (T-003).
+- Étape 1.3 du plan : une partie (retourner, gagner, perdre, quitter, mémo).
 
 ## Historique
 - 2026-11-10 — Opus (cadrage) — Spécification, architecture, plan et fichiers de pilotage de Claude Code rédigés.

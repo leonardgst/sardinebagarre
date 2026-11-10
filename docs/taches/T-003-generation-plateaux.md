@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | implémentée |
+| Statut | terminée |
 | Étape du plan | 1.2 (+ 2 corrections issues de la relecture de T-002) |
 | Branche | `t-003-generation-plateaux` |
 | Estimation | M (1–3 h) |
@@ -173,3 +173,6 @@ _Validées par l'humain le 2026-11-10. Même branche, un nouveau commit `fix(log
 ### Compte rendu — Corrections après relecture
 C1 (assertion sur le dernier plateau rejoué), C2 (nouveau test de la croisée ligne+colonne ; contraintes du test de propriété recalculées indépendamment), C3 (20 premiers écarts + nombre ; `console.info` supprimé), C4 (spec, par Opus). `src/logic/board.ts` inchangé. check OK, 221 tests, board.test.ts ~1,6 s. Tentatives sur 80 000 plateaux inchangées : moyenne 1,472, maximum 24.
 Contre-épreuves : C1 (garder le premier plateau) → le test de repli échoue (et la propriété aussi, effet de bord de ma mutation) ; C2 (double comptage) → le nouveau test échoue. Écart : le test de propriété ne échoue PAS avec le double comptage, car celui-ci rend le code plus strict que le recalcul indépendant (les plateaux acceptés respectent encore les vraies contraintes, aucun repli n'apparaît). Le nouveau test ciblé suffit à détecter ce défaut.
+
+**2026-11-10 — relecteur (relecture limitée à C1–C4, commit `313a5a8`) — ✅ approuvé.**
+Contre-épreuves rejouées : repli sur le premier plateau → rouge ; double comptage à la croisée → nouveau test rouge (le §15.2 reste vert, l'acceptation devenant plus stricte : raisonnement du codeur confirmé) ; `<=` sur le total ou sur `perRow` → §15.2 rouge (le recalcul indépendant comble le trou du test unitaire sur les lignes). R-23 cohérente, aucune règle modifiée. 221 tests, `board.test.ts` en 1,6 s.
