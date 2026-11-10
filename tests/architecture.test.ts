@@ -46,7 +46,9 @@ function listerTs(dossier: string): string[] {
 
 describe('architecture', () => {
   it("ADR-006 aucun fichier de src/logic/ n'utilise d'API interdite", () => {
-    const problemes = listerTs(RACINE_LOGIC).flatMap((f) =>
+    const fichiers = listerTs(RACINE_LOGIC);
+    expect(fichiers.length).toBeGreaterThan(0);
+    const problemes = fichiers.flatMap((f) =>
       findForbiddenUsages(readFileSync(f, 'utf8')).map((u) => `${f} : ${u}`),
     );
     expect(problemes).toEqual([]);

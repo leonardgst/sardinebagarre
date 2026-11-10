@@ -136,6 +136,6 @@ describe('table des configurations', () => {
 
   it('R-11 la table est gelée', () => {
     expect(Object.isFrozen(CONFIGS)).toBe(true);
-    expect(Object.isFrozen(CONFIGS[0])).toBe(true);
+    expect(CONFIGS.every((e) => Object.isFrozen(e))).toBe(true);
   });
 });

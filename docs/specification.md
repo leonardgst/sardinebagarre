@@ -131,7 +131,7 @@ Chaque niveau a 5 configurations, et chacune existe en deux variantes de contrai
   5. **Accepter** le plateau si total < MaxT **et** si, pour chaque ligne et chaque colonne, le compte < MaxLC. Sinon, recommencer.
   6. Si aucune des 1 000 tentatives n'est acceptée, garder le dernier plateau généré (cas jamais observé : voir R-23).
 - **R-22** Écart volontaire avec S1 (ADR-010) : dans l'original, si une carte ne trouve pas de case libre en 100 tirages, elle est **sautée**, ce qui donne un plateau avec une carte en moins (extrêmement rare). Nous garantissons toujours les comptes exacts (placement par mélange de Fisher-Yates, même distribution).
-- **R-23** Propriétés vérifiées par simulation (3 000 plateaux pour chacune des 80 entrées) : acceptation en **1 à 3 tentatives en moyenne, 21 au maximum**, jamais de repli. Les tests de propriété (§15) doivent retrouver : comptes exacts, contraintes respectées, indicateurs cohérents.
+- **R-23** Propriétés vérifiées par simulation : acceptation en **1,47 tentative en moyenne** (de 1 à 2,9 selon l'entrée ; la plus contrainte, niveau 2 (7, 3, 2) variante B, est acceptée avec une probabilité d'environ 0,35 par tentative). Le maximum observé dépend de l'échantillon : 21 sur 240 000 plateaux (simulation initiale), 24 sur 80 000 avec `mulberry32` (T-003) ; ce n'est pas une règle. Probabilité de repli de l'ordre de 10^-186 : jamais observé. Les tests de propriété (§15) doivent retrouver : comptes exacts, contraintes respectées, indicateurs cohérents, moyenne de tentatives entre 1 et 3, aucun repli.
 - **R-24** Un plateau généré est **immuable**. Les informations de partie (retournées, mémo) sont stockées à part.
 
 ---
