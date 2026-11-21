@@ -16,7 +16,7 @@
 _(aucune)_
 
 ## Contenus à fournir par l'humain (dans prive/, jamais commités)
-- [ ] Tête de Sardine — avant le 29/11
+- [x] Tête de Sardine — fournie le 21/11
 - [ ] Photos de l'album, légendes, prix, messages — avant le 6/12
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
