@@ -12,7 +12,7 @@
 | T-004 | Jouer une partie : retourner, gagner, perdre, quitter, mémo | terminée |
 | T-005 | Calculer le niveau suivant et tirer la configuration d'un niveau | terminée |
 | T-006 | Enchaîner les parties, encaisser et débloquer l'album | terminée |
-| T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | planifiée |
+| T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | terminée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -43,3 +43,5 @@ _(aucune)_
 - 2026-11-21 — codeur — T-006 : `game.ts` (finalisation R-55, plafond, records ADR-017, quitter la table, vider la boîte, effacer) et `album.ts` (achat dans l'ordre), 32 tests, contre-épreuves a à e faites ; check OK (324 tests). Reste : relecture, puis T-007 (sauvegarde).
 - 2026-11-21 — codeur — T-006 : corrections après relecture (C1 à C6 : tests renforcés, `freezeGame` exporté et utilisé par `buyNextPhoto`) ; check OK (325 tests). Reste : nouvelle relecture, puis T-007.
 - 2026-11-21 — Opus — T-006 fusionnée ; T-007 planifiée (save.ts : sérialisation, validation champ par champ, CL-22 ; son actif par défaut d'après §10.5).
+- 2026-11-21 — codeur — T-007 : `save.ts` (sérialisation versionnée, lecture tolérante champ par champ, CL-22, gel profond, effacer la progression ADR-017), 45 tests, contre-épreuves a à f faites ; check OK (370 tests). Reste : relecture, puis étape 2.
+- 2026-11-21 — codeur — T-007 : corrections après relecture (C1 à C6 : historique de 5, 7 compteurs, robustesse variée, bornes, clés imbriquées, `new Date` interdit), tests seulement ; check OK (390 tests). Reste : nouvelle relecture.
