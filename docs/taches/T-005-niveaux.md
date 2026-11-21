@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | terminée (en relecture) |
+| Statut | terminée |
 | Étape du plan | 1.4 |
 | Branche | `t-005-niveaux` (créée depuis `main` **après la fusion de T-004**, qui ajoute le type `Outcome`) |
 | Estimation | S (< 1 h) |
@@ -151,3 +151,8 @@ Contre-épreuves : (a) sans `L >= 5` → N14 et « série valide mais niveau 4 �
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
+
+**2026-11-21 — relecteur — ✅ approuvé.** `npm run check` OK (292 tests, confidentialité OK). `nextLevel` reprend le pseudo-code §6.2 ligne à ligne, dans le même ordre (victoire au niveau 8, série, boucle de n = 7 à 2, puis 1). Le test d'accord recalcule R-62 et R-63 sans passer par le code (600 cas). N1..N17, CL-01..04 et CL-15..17 présents et justes (recalculés à la main : N5, N13, N15, CL-15, CL-17, « dernier niveau 4 »). `levels.ts` est pur, hasard injecté (ADR-006). Seuls les fichiers prévus sont modifiés.
+Contre-épreuves rejouées sur une copie isolée : (a) à (d) confirmées, et 15 autres mutants détectés (série à 4 parties, `appendHistory` qui garde les plus anciennes, `pickEntry` biaisé fort ou léger ~14 %, lecture de tout l'historique, abandon qui casse la série, série vérifiée sur la dernière partie seulement, boucle avant la série, `L > 5`, `k > n`, victoire sans +1, boucle à partir de 8, enregistrement non gelé, double appel à `rng`, règle « victoire au niveau 8 » supprimée) : 19 sur 19.
+Tests écrits en même temps que le code, sans état rouge : écart à la méthode TDD, sans effet sur la valeur des tests ici ; à rappeler pour les prochaines tâches.
+Mineur : coquille « l historique » dans `types.ts:75` (corrigée par Opus). Pour l'étape 1.5 : `appendHistory` ne gèle que le nouvel enregistrement, donc `save.ts` devra geler l'historique qu'il relit.

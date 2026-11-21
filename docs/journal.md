@@ -9,8 +9,8 @@
 | T-001 | Initialiser le projet (Vite, TypeScript, Vitest, Biome, Playwright, contrôle de confidentialité) | terminée |
 | T-002 | Créer les types de base, la table des configurations et le hasard à graine | terminée |
 | T-003 | Générer les plateaux et calculer les indicateurs (+ 2 corrections de relecture T-002) | terminée |
-| T-004 | Jouer une partie : retourner, gagner, perdre, quitter, mémo | implémentée |
-| T-005 | Calculer le niveau suivant et tirer la configuration d'un niveau | planifiée |
+| T-004 | Jouer une partie : retourner, gagner, perdre, quitter, mémo | terminée |
+| T-005 | Calculer le niveau suivant et tirer la configuration d'un niveau | terminée |
 
 ## Questions ouvertes
 _(aucune)_

@@ -72,7 +72,7 @@ export interface RoundState {
   readonly status: RoundStatus;
 }
 
-/** Une partie terminée, telle que gardée dans l historique (R-60). */
+/** Une partie terminée, telle que gardée dans l'historique (R-60). */
 export interface RoundRecord {
   readonly outcome: Outcome;
   /** k : cartes chiffrées retournées (les 1 comptent). */
