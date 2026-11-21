@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | implémentée (relecture à faire) |
+| Statut | terminée |
 | Étape du plan | 1.5 (2ᵉ partie : `save.ts` ; la 1ʳᵉ partie était T-006) |
 | Branche | `t-007-sauvegarde-logique` |
 | Estimation | M (1–3 h) |

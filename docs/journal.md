@@ -12,7 +12,7 @@
 | T-004 | Jouer une partie : retourner, gagner, perdre, quitter, mémo | terminée |
 | T-005 | Calculer le niveau suivant et tirer la configuration d'un niveau | terminée |
 | T-006 | Enchaîner les parties, encaisser et débloquer l'album | terminée |
-| T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | planifiée |
+| T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | terminée |
 
 ## Questions ouvertes
 _(aucune)_
