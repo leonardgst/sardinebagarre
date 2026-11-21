@@ -136,7 +136,11 @@ describe('partie', () => {
   });
 
   it('R-30 identifiant invalide → RangeError', () => {
-    for (const id of [-1, 25, 2.5]) expect(() => flip(neuve(), id)).toThrow(RangeError);
+    for (const id of [-1, 25, 2.5]) {
+      expect(() => flip(neuve(), id)).toThrow(RangeError);
+      expect(() => toggleMemo(neuve(), id, 'S')).toThrow(RangeError);
+      expect(() => hasMark(neuve(), id, 'S')).toThrow(RangeError);
+    }
   });
 
   it('R-32 le gain est plafonné à 50 000', () => {
@@ -193,6 +197,7 @@ describe('mémo', () => {
     expect([a.payout, a.status]).toEqual([1, 'PLAYING']);
     const b = flip(toggleMemo(neuve(), 0, 1), 0);
     expect(b.status).toBe('LOST');
+    expect(b.memos[0]).toBe(0);
   });
 
   it('R-84 marquer ne change ni le gain ni les compteurs', () => {

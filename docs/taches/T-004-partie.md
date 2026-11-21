@@ -174,3 +174,26 @@ Contre-épreuves : (1) Sardine comptée dans k -> CL-02, CL-03, CL-04, R-34 roug
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
+
+**2026-11-21 — relecteur — 🟡 approuvé avec réserves.** `npm run check` OK (251 tests). Code conforme à R-04, R-30..R-34, R-40..R-42, R-80..R-84, CL-01..CL-12 et ADR-006 (états gelés, refus = même objet, aucune mutation). Les 30 noms de tests correspondent à la fiche ; `round.test.ts` tourne en 0,3 s. Contre-épreuves rejouées : premier gain 0 × valeur → 11 rouges ; refus renvoyant une copie (flip / toggleMemo / quit) → CL-09, R-30, CL-10, R-81, R-40 rouges ; mémo après fin → R-81 rouge. Réserves : (1, important) le mémo non effacé sur une Sardine retournée n'est détecté par aucun test ; (2, mineur) identifiant invalide non testé pour `toggleMemo` et `hasMark` (une borne `> 25` passerait) ; (3, mineur) le journal annonce T-005 alors que sa fiche n'est pas commitée.
+
+## Corrections après relecture
+_Planifiées par Opus le 2026-11-21. Même branche, un nouveau commit `test(logic): corrections après relecture de T-004`. Ne pas modifier `src/logic/` (sauf si un nouveau test révèle un vrai défaut : le signaler alors dans le compte rendu)._
+
+### C1 — Le mémo d'une Sardine retournée est effacé (R-31, R-83)
+- Dans le test `R-84 le mémo n'a aucun effet sur les règles`, après le retournement de la Sardine marquée (id `0`), ajouter `expect(<état>.memos[0]).toBe(0)`.
+- **Contre-épreuve** : dans `round.ts`, branche Sardine de `flip`, ne pas effacer `memos` → ce test échoue ; restaurer → vert.
+
+### C2 — Identifiant invalide pour toutes les fonctions (R-30)
+- Dans `R-30 identifiant invalide → RangeError`, vérifier `-1`, `25` et `2.5` aussi pour `toggleMemo(…, id, 'S')` et `hasMark(…, id, 'S')`.
+- **Contre-épreuve** : borne de `checkId` passée de `>= 25` à `> 25` → ce test échoue ; restaurer → vert.
+
+### C3 — Fiche T-005 commitée
+- Ajouter `docs/taches/T-005-niveaux.md` **tel quel** (écrit par Opus, ne pas le modifier) au même commit, pour que l'index du journal ne renvoie pas à un fichier absent.
+
+### Critère global
+- `npm run check` → code 0, **251** tests (aucun ajouté : on renforce deux tests existants).
+- `git status` avant commit : uniquement `tests/logic/round.test.ts`, `docs/taches/T-004-partie.md`, `docs/taches/T-005-niveaux.md` et `docs/journal.md` (ligne d'historique).
+
+### Compte rendu — Corrections après relecture
+C1 : assertion `memos[0] === 0` ajoutée dans le test R-84 ; contre-épreuve (Sardine sans effacement du mémo) -> ce test rouge, restauré -> vert. C2 : `toggleMemo` et `hasMark` vérifiés pour -1, 25 et 2.5 dans le test R-30 ; contre-épreuve (`> 25` au lieu de `>= 25`) -> rouge, restauré -> vert. C3 : fiche T-005 commitée telle quelle. `src/logic/` non modifié. `npm run check` : 251 tests, OK.
