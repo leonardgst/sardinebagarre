@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | implémentée (relecture en attente) |
 | Étape du plan | 1.5 (1ʳᵉ partie : `game.ts` et `album.ts` ; la sauvegarde `save.ts` sera T-007) |
 | Branche | `t-006-enchainement-album` |
 | Estimation | M (1–3 h) |
@@ -145,11 +145,11 @@
 | `R-112 buyNextPhoto ne modifie pas l'état reçu et renvoie un état gelé` | `structuredClone` avant | entrée inchangée ; sortie et `album` gelés |
 
 ## Critères d'acceptation
-- [ ] **TDD réel** (rappel de la relecture de T-005) : écrire d'abord les deux fichiers de tests, lancer `npx vitest run tests/logic/game.test.ts tests/logic/album.test.ts` et constater l'échec (rouge), **le noter dans le compte rendu**, puis écrire le code.
-- [ ] `npm run check` → code 0 ; tous les tests précédents (292) passent toujours.
-- [ ] Les tests listés existent avec ces noms (identifiant de règle en tête).
-- [ ] Contre-épreuves (notées dans le compte rendu) : (a) encaisser aussi les défaites → R-51 rouge ; (b) oublier le plafond → CL-13 rouge ; (c) calculer le niveau avant d'ajouter la partie à l'historique → CL-23 ou CL-17 rouge ; (d) compter `level8Reached` à chaque partie finie au niveau 8 → test ADR-017 niveau 8 rouge ; (e) `buyNextPhoto` qui renvoie une copie en cas de refus → R-112 solde insuffisant rouge.
-- [ ] `git status` avant commit : uniquement les fichiers du tableau « Fichiers » ; fichiers ajoutés un par un.
+- [x] **TDD réel** (rappel de la relecture de T-005) : écrire d'abord les deux fichiers de tests, lancer `npx vitest run tests/logic/game.test.ts tests/logic/album.test.ts` et constater l'échec (rouge), **le noter dans le compte rendu**, puis écrire le code.
+- [x] `npm run check` → code 0 ; tous les tests précédents (292) passent toujours.
+- [x] Les tests listés existent avec ces noms (identifiant de règle en tête).
+- [x] Contre-épreuves (notées dans le compte rendu) : (a) encaisser aussi les défaites → R-51 rouge ; (b) oublier le plafond → CL-13 rouge ; (c) calculer le niveau avant d'ajouter la partie à l'historique → CL-23 ou CL-17 rouge ; (d) compter `level8Reached` à chaque partie finie au niveau 8 → test ADR-017 niveau 8 rouge ; (e) `buyNextPhoto` qui renvoie une copie en cas de refus → R-112 solde insuffisant rouge.
+- [x] `git status` avant commit : uniquement les fichiers du tableau « Fichiers » ; fichiers ajoutés un par un.
 
 ## Pièges connus
 - L'ordre de R-55 compte : historique **puis** `nextLevel(history)` (sinon la série du niveau 8 et CL-23 sont faux).
@@ -167,7 +167,13 @@
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+**Fait** : `Stats`, `GameState`, `AlbumPhoto` (types.ts) ; `game.ts` (initialGame, canStartRound, startRound, finalizeRound, leaveTable, emptyBox, resetProgress) ; `album.ts` (nextPhoto, missingCoins, buyNextPhoto). 32 tests ajoutés ; `npm run check` OK (324 tests).
+
+**TDD réel** : les deux fichiers de tests écrits d'abord ; `npx vitest run` des deux fichiers -> rouge (modules `game`/`album` introuvables, 2 fichiers en échec, 0 test exécuté) ; puis code ; vert (32/32).
+
+**Contre-épreuves** : (a) retrait du cas LOST : le test R-51 de la fiche (`ended('LOST', 0, 2)`) restait VERT car la défaite a payout 0 ; test renforcé avec `ended('LOST', 40, 2)` (écart assumé, nom inchangé), puis rouge confirmé. (b) sans plafond : CL-13 rouge. (c) `nextLevel(game.history)` : 6 tests rouges (CL-23, CL-17, ADR-017...). (d) `level === 8` : test ADR-017 niveau 8 rouge. (e) copie au refus : 2 tests rouges (solde insuffisant, album complet). Code restauré après chaque essai.
+
+**Écart** : R-51 testé avec payout 40 au lieu de 0 (voir (a)). `buyNextPhoto` gèle le résultat et l'album mais réutilise `history`/`stats` de l'entrée (gelés quand ils viennent de `game.ts`, cf. piège de la fiche).
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
