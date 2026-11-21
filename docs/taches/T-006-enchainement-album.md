@@ -177,3 +177,49 @@ _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
+
+**2026-11-21 — relecteur — 🟡 approuvé avec réserves.** `npm run check` OK (324 tests) ; e2e et captures non concernés.
+Code conforme à R-50..R-55, R-60, R-61, R-67, R-68, R-70..R-72, R-110..R-116, CL-13, CL-14, CL-17, CL-18, CL-23, ADR-017 et ADR-006 : ordre de R-55 respecté (encaissement → historique avec `game.level` → `nextLevel` sur l'historique complété → records) ; `level8Reached` seulement sur une montée ; `maxLevel` = niveau obtenu ; état gelé en profondeur, entrée jamais modifiée ; refus de `buyNextPhoto` = même objet. Calculs refaits à la main : CL-23, R-51, R-42, CL-13, CL-17, séquence ADR-017 du niveau 8, `maxLevel`, R-116.
+Écart R-51 (`ended('LOST', 40, 2)`) : accepté (avec un gain de 0, la contre-épreuve (a) ne peut pas échouer ; le test fixe une garantie propre à `finalizeRound`), à commenter.
+Contre-épreuves du relecteur : 29 erreurs introduites sur une copie ; 25 rouges, 4 vertes (réserves 1 à 4).
+Réserves (tests seulement) : (1) `bestPayout` calculé sur le gain plafonné non détecté (CL-13) ; (2) remise à zéro des records par `leaveTable` / `emptyBox` non détectée ; (3) finalisation qui vide l'album non détectée ; (4) `nextPhoto` « la moins chère » non détecté (prix croissants dans les tests). Mineur : (5) `buyNextPhoto` n'utilise pas `freezeGame` ; (6) commenter l'état impossible du test R-51.
+
+## Corrections après relecture
+_Planifiées par Opus le 2026-11-21. Même branche, un nouveau commit `test(logic): corrections après relecture de T-006`. Seule modification de code autorisée : C5._
+
+### C1 — Meilleur gain avant plafond (R-72)
+- Test `CL-13 …` : ajouter `expect(g.stats.bestPayout).toBe(48)`.
+- **Contre-épreuve** : `bestPayout` calculé avec `coins − game.coins` → CL-13 rouge.
+
+### C2 — Quitter la table et vider la boîte conservent les records (R-67, R-53)
+- Dans les tests `R-67 quitter la table …` et `R-53 vider la boîte …`, partir de `stats: { ...initialGame().stats, played: 3, won: 1, bestPayout: 72, maxLevel: 6 }` et vérifier `after.stats` `toEqual` ces records.
+- **Contre-épreuve** : `leaveTable` puis `emptyBox` qui remettent `stats` à `initialGame().stats` → chaque test rouge.
+
+### C3 — La finalisation conserve l'album (R-113)
+- Test `CL-23 …` : partir aussi de `album: ['p1']` et vérifier `g.album` `toEqual(['p1'])`.
+- **Contre-épreuve** : `finalizeRound` qui renvoie `album: []` → CL-23 rouge.
+
+### C4 — L'ordre du pack prime sur le prix (R-111, ADR-016)
+- Nouveau test `R-111 l'ordre du pack prime sur le prix` dans `album.test.ts` : `photos = [{ id: 'a', price: 300 }, { id: 'b', price: 100 }]`, album `[]`, `coins 150` → `nextPhoto` = `a` ; `buyNextPhoto` renvoie le même objet (`toBe`) ; `missingCoins === 150`.
+- **Contre-épreuve** : `nextPhoto` qui choisit la photo non débloquée la moins chère → ce test rouge.
+
+### C5 — `buyNextPhoto` gèle en profondeur (ADR-006)
+- Exporter `freezeGame` depuis `src/logic/game.ts` (avec un commentaire de documentation) et l'utiliser dans `buyNextPhoto`.
+- Dans `R-112 buyNextPhoto ne modifie pas l'état reçu et renvoie un état gelé`, partir d'un état **non gelé** (`game({...})`) et vérifier que `history` et `stats` du résultat sont gelés.
+- **Contre-épreuve** : revenir au gel partiel → ce test rouge.
+
+### C6 — Commentaire du test R-51
+- Au-dessus de `ended('LOST', 40, 2)` : `// État impossible en jeu (R-34 met le gain à 0) : on vérifie que finalizeRound ignore le gain d'une défaite.`
+
+### Critère global
+- `npm run check` → code 0, **325** tests (324 + C4).
+- `git status` avant commit : uniquement `src/logic/game.ts`, `src/logic/album.ts`, `tests/logic/game.test.ts`, `tests/logic/album.test.ts`, la fiche et `docs/journal.md` ; fichiers ajoutés un par un.
+
+### Compte rendu — Corrections après relecture
+Tests renforcés d'abord, contre-épreuves faites une par une (code restauré ensuite) ; `npm run check` OK, 325 tests.
+- C1 : `bestPayout` calculé sur `coins - game.coins` -> CL-13 rouge.
+- C2 : `leaveTable` / `emptyBox` qui remettent les stats à zéro -> les deux tests rouges.
+- C3 : `finalizeRound` qui vide l'album -> CL-23 rouge.
+- C4 : `nextPhoto` « la moins chère » -> nouveau test « l'ordre du pack prime sur le prix » rouge.
+- C5 : test à partir d'un état non gelé, rouge avec le gel partiel ; puis `freezeGame` exporté (documenté) et utilisé dans `buyNextPhoto` -> vert.
+- C6 : commentaire ajouté au test R-51.

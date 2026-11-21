@@ -34,6 +34,17 @@ describe('album : prochaine photo', () => {
 });
 
 describe('album : achat', () => {
+  it("R-111 l'ordre du pack prime sur le prix", () => {
+    const photos: readonly AlbumPhoto[] = [
+      { id: 'a', price: 300 },
+      { id: 'b', price: 100 },
+    ];
+    const g = game({ coins: 150 });
+    expect(nextPhoto(photos, [])?.id).toBe('a');
+    expect(buyNextPhoto(g, photos)).toBe(g);
+    expect(missingCoins(g, photos)).toBe(150);
+  });
+
   it('R-112 acheter débite le prix et ajoute la photo', () => {
     const g = buyNextPhoto(game({ coins: 250 }), PHOTOS);
     expect(g.coins).toBe(150);
@@ -78,7 +89,9 @@ describe('album : achat', () => {
   });
 
   it("R-112 buyNextPhoto ne modifie pas l'état reçu et renvoie un état gelé", () => {
-    const g = game({ coins: 250 });
+    const g = game({ coins: 250, history: [], stats: { ...initialGame().stats }, album: [] });
+    expect(Object.isFrozen(g.history)).toBe(false);
+    expect(Object.isFrozen(g.stats)).toBe(false);
     const copy = structuredClone(g);
     const after = buyNextPhoto(g, PHOTOS);
     expect(g).toEqual(copy);

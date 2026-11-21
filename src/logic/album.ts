@@ -1,3 +1,4 @@
+import { freezeGame } from './game';
 import type { AlbumPhoto, GameState } from './types';
 
 /** R-111 : première photo du pack pas encore débloquée (ordre du pack). */
@@ -18,9 +19,9 @@ export function missingCoins(game: GameState, photos: readonly AlbumPhoto[]): nu
 export function buyNextPhoto(game: GameState, photos: readonly AlbumPhoto[]): GameState {
   const photo = nextPhoto(photos, game.album);
   if (photo === null || game.coins < photo.price) return game;
-  return Object.freeze({
+  return freezeGame({
     ...game,
     coins: game.coins - photo.price,
-    album: Object.freeze([...game.album, photo.id]),
+    album: [...game.album, photo.id],
   });
 }

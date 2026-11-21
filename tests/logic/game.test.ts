@@ -71,7 +71,8 @@ describe('état initial', () => {
 
 describe('finalizeRound', () => {
   it('CL-23 R-55 victoire au niveau 3, gain 72, total 100 → 172, historique, niveau 4, records', () => {
-    const g = finalizeRound(game({ coins: 100, level: 3 }), ended('WON', 72, 5));
+    const g = finalizeRound(game({ coins: 100, level: 3, album: ['p1'] }), ended('WON', 72, 5));
+    expect(g.album).toEqual(['p1']);
     expect(g.coins).toBe(172);
     expect(g.history).toEqual([r('WON', 5, 3)]);
     expect(g.level).toBe(4);
@@ -82,6 +83,7 @@ describe('finalizeRound', () => {
   });
 
   it("R-51 défaite : rien n'est encaissé", () => {
+    // État impossible en jeu (R-34 met le gain à 0) : on vérifie que finalizeRound ignore le gain d'une défaite.
     const g = finalizeRound(game({ coins: 500, level: 4 }), ended('LOST', 40, 2));
     expect(g.coins).toBe(500);
     expect(g.history).toEqual([r('LOST', 2, 4)]);
@@ -108,6 +110,7 @@ describe('finalizeRound', () => {
   it('CL-13 R-50 total 49 990 + gain 48 → 50 000', () => {
     const g = finalizeRound(game({ coins: 49_990 }), ended('QUIT', 48, 3));
     expect(g.coins).toBe(50_000);
+    expect(g.stats.bestPayout).toBe(48);
   });
 
   it('R-55 finaliser une partie en cours est une erreur', () => {
@@ -261,7 +264,13 @@ describe('startRound', () => {
 
 describe('états du joueur', () => {
   it('R-67 quitter la table : niveau 1 et historique vide', () => {
-    const g = game({ coins: 700, level: 6, history: [r('WON', 6, 5)], album: ['p1'] });
+    const g = game({
+      coins: 700,
+      level: 6,
+      history: [r('WON', 6, 5)],
+      album: ['p1'],
+      stats: { ...initialGame().stats, played: 3, won: 1, bestPayout: 72, maxLevel: 6 },
+    });
     const after = leaveTable(g);
     expect(after.level).toBe(1);
     expect(after.history).toEqual([]);
@@ -272,7 +281,13 @@ describe('états du joueur', () => {
   });
 
   it('R-53 vider la boîte : jetons à 0, le reste inchangé', () => {
-    const g = game({ coins: 50_000, level: 4, history: [r('WON', 5, 3)], album: ['p1'] });
+    const g = game({
+      coins: 50_000,
+      level: 4,
+      history: [r('WON', 5, 3)],
+      album: ['p1'],
+      stats: { ...initialGame().stats, played: 3, won: 1, bestPayout: 72, maxLevel: 6 },
+    });
     const after = emptyBox(g);
     expect(after.coins).toBe(0);
     expect(after.level).toBe(4);

@@ -4,8 +4,8 @@ import { appendHistory, nextLevel, pickEntry } from './levels';
 import { newRound } from './round';
 import type { ConfigEntry, GameState, Level, Rng, RoundState, Stats } from './types';
 
-/** Fabrique un état gelé en profondeur (objet, historique, records, album). */
-function freezeGame(state: GameState): GameState {
+/** Renvoie une copie de l'état gelée en profondeur (objet, historique, records, album). */
+export function freezeGame(state: GameState): GameState {
   return Object.freeze({
     ...state,
     history: Object.freeze([...state.history]),
