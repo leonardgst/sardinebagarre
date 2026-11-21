@@ -9,7 +9,10 @@ export function nextPhoto(
   return photos.find((p) => !album.includes(p.id)) ?? null;
 }
 
-/** R-112 : jetons manquants pour la prochaine photo (0 si achetable ou s'il n'en reste aucune). */
+/**
+ * R-112 : jetons manquants pour la prochaine photo (0 si la photo est achetable, s'il n'en reste
+ * aucune ou si son prix est invalide ; l'interface se fie au refus de `buyNextPhoto`).
+ */
 export function missingCoins(game: GameState, photos: readonly AlbumPhoto[]): number {
   const photo = nextPhoto(photos, game.album);
   return photo === null || !validPrice(photo.price) ? 0 : Math.max(0, photo.price - game.coins);

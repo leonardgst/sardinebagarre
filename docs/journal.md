@@ -33,6 +33,7 @@ _(aucune)_
 - Après la fin de partie, les touchers vont à l'accélération des animations (CL-20), jamais à `flip` (qui renverrait un « refus »).
 - Identifiants de carte toujours 0..24 (`RangeError` sinon) ; `missingCoins` vaut 0 aussi quand l'album est complet : tester `nextPhoto(...) === null` d'abord.
 - Exporter la clé `sardinebagarre:save` en constante dans `storage.ts` (étape 3.1) ; prix par défaut R-115 et validation des prix dans le modèle du pack (étape 3.3).
+- Étape 3.3 : refuser un pack dont un prix n'est pas un entier ≥ 0 (un prix invalide bloque toutes les photos suivantes).
 
 ## Historique
 - 2026-11-10 — Opus (cadrage) — Spécification, architecture, plan et fichiers de pilotage de Claude Code rédigés.
@@ -58,3 +59,4 @@ _(aucune)_
 - 2026-11-21 — Opus — Script `scripts/partie-console.ts` ; architecture.md et spec (R-90, R-102, `CardValue`) mis en cohérence ; T-008 planifiée ; contraintes pour la phase 2 consignées.
 - 2026-11-21 — codeur — T-008 : `isSuspense` (R-90), garde des prix d'album (R-110/R-116), `performance` interdit dans src/logic, tests R-03, R-64, CL-21, CL-23 ; contre-épreuves a à f faites ; check OK (406 tests). Reste : relecture.
 - 2026-11-21 — codeur — T-008 : les plateaux R-90 de la fiche déclenchaient une victoire automatique (aucun 2 caché) ; un « 2 » a été ajouté hors ligne/colonne visées dans les trois plateaux.
+- 2026-11-21 — codeur — T-008 : corrections après relecture (C1 statut testé, C2 ligne sans Sardine, C3 documentation) ; contre-épreuves faites ; check OK (407 tests).

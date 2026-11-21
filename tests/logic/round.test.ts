@@ -358,10 +358,16 @@ describe('suspense (R-90)', () => {
     expect(isSuspense(flip(s, 0), 20)).toBe(true);
   });
 
+  it("R-90 pas de suspense si la ligne de la carte n'a aucune Sardine", () => {
+    const b = boardFromRows(['1 1 1 1 1', 'S 1 2 1 1', 'S 1 1 1 1', 'S 1 1 1 1', '1 1 1 1 1']);
+    expect(isSuspense(flip(newRound(b), 0), 20)).toBe(false);
+  });
+
   it('R-90 aucun suspense sur une carte retournée ou une partie finie', () => {
     const s = flip(newRound(SUSPENSE), 3);
     expect(isSuspense(s, 3)).toBe(false);
-    expect(isSuspense(quit(newRound(SUSPENSE)), 5)).toBe(false);
+    expect(isSuspense(quit(flip(newRound(SUSPENSE), 4)), 3)).toBe(false);
+    expect(isSuspense(flip(newRound(SUSPENSE), 0), 3)).toBe(false);
   });
 
   it('R-90 identifiant invalide → RangeError', () => {

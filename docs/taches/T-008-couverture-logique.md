@@ -72,11 +72,11 @@ Tout le code existant est juste ; trois mutants survivent et trois règles n'ont
 | save | `CL-23 R-55 finalisation puis sauvegarde : rien n'est perdu pendant la révélation` | `finalizeRound(game({ coins: 100, level: 3 }), ended('WON', 72, 5))`, puis `serialize`, puis `deserialize` (dans une `SaveData` construite avec `initialSave()`) | `coins 172`, `level 4`, `history [(WON,5,3)]`, `stats.won 1`, statut `'ok'` |
 | architecture | témoin `performance.now()` | — | détecté comme interdit |
 
-**Plateaux R-90** (vérifiés par Opus) :
+**Plateaux R-90** (tels que dans les tests ; un 2 caché évite la victoire automatique) :
 ```
 SUSPENSE                SUSPENSE_SANS_COLONNE
 S S S 1 2               S S S 1 2
-1 1 1 1 1               1 1 1 1 1
+1 2 1 1 1               1 2 1 1 1
 1 1 1 1 1               1 1 1 1 1
 1 1 1 1 1               1 1 1 1 1
 1 1 1 S S               1 1 1 1 S
@@ -84,7 +84,7 @@ S S S 1 2               S S S 1 2
 `COLONNE` (carte visée : id `20`, ligne 4, colonne 0) :
 ```
 1 1 1 1 1
-S 1 1 1 1
+S 1 2 1 1
 S 1 1 1 1
 S 1 1 1 1
 1 1 1 1 S
@@ -116,3 +116,32 @@ _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
+
+**2026-11-21 — relecteur — 🟡 approuvé avec réserves.** `npm run check` OK (406 tests). `isSuspense` conforme à R-90 (Sardines totales, carte touchée comptée, `>= 75`, ligne ET colonne ≥ 1, ligne OU colonne). Garde des prix (entier ≥ 0, refus = même objet) conforme. `performance` refusé par Biome et par le test d'architecture. Écart des plateaux (un 2 en id 6/7) justifié, pourcentages exacts. Contre-épreuves rejouées : `> 75`, `hr-1`, « et », dénominateur fixe, `hr`/`hc` échangés, `checkId` retiré, gardes de prix : toutes rouges. « Sardines restantes » est un mutant équivalent (une Sardine retournée termine la partie). Mutants R-03, R-64 et CL-21 de la revue 1.6 tués. **Jalon 1.6 atteint.**
+Réserves (non bloquantes) : (1) le cas « partie finie » du test R-90 ne vérifie rien (id 5 sur une ligne sans Sardine) ; (2) aucun test « ligne sans Sardine, colonne ≥ 75 % » ; (3) mineur : JSDoc de `missingCoins`, validation des prix du pack à l'étape 3.3, schémas des plateaux R-90 de la fiche à aligner.
+
+## Corrections après relecture
+_Planifiées par Opus le 2026-11-21. Même branche, un nouveau commit `test(logic): corrections après relecture de T-008`._
+
+### C1 — Partie finie : le contrôle du statut est vraiment testé (R-90)
+- Dans `R-90 aucun suspense sur une carte retournée ou une partie finie`, remplacer le cas « partie quittée, carte 5 » par `expect(isSuspense(flip(newRound(SUSPENSE), 0), 3)).toBe(false)` (Sardine id 0 → partie perdue ; sans le contrôle du statut, ligne 0 = 3 × 100 / 4 = 75 % et colonne 3 avec une Sardine → `true`). Garder aussi un cas « partie quittée » sur la carte 3 : `isSuspense(quit(flip(newRound(SUSPENSE), 4)), 3)` → `false`.
+- **Contre-épreuve** : retirer `state.status !== 'PLAYING'` → ce test rouge.
+
+### C2 — Ligne sans Sardine (R-90)
+- Nouveau test `R-90 pas de suspense si la ligne de la carte n'a aucune Sardine` : plateau `COLONNE` des tests avec la case 24 mise à `1` (ligne 4 sans Sardine) ; `isSuspense(flip(newRound(b), 0), 20)` → `false` (colonne 0 à 75 %).
+- **Contre-épreuve** : garde réduite à `sc === 0` → ce test rouge.
+
+### C3 — Documentation
+- `src/logic/album.ts` : JSDoc de `missingCoins` : « 0 si la photo est achetable, s'il n'en reste aucune ou si son prix est invalide ; l'interface se fie au refus de `buyNextPhoto` ».
+- Fiche : aligner les schémas des plateaux R-90 (section « Tests à écrire ») sur ceux des tests (2 en id 6 ou 7).
+- `docs/journal.md`, section « Contraintes pour la phase 2 » : ajouter « Étape 3.3 : refuser un pack dont un prix n'est pas un entier ≥ 0 (un prix invalide bloque toutes les photos suivantes). »
+
+### Critère global
+- `npm run check` → code 0, 407 tests (406 + C2).
+- `git status` avant commit : uniquement `tests/logic/round.test.ts`, `src/logic/album.ts`, la fiche et `docs/journal.md` ; ajoutés un par un.
+
+### Compte rendu — Corrections après relecture
+- C1 : cas « partie finie » remplacé par `flip(..., 0)` (Sardine) et `quit(flip(..., 4))` sur la carte 3. Contre-épreuve : sans le contrôle du statut, ce test est rouge.
+- C2 : test « ligne sans Sardine » ajouté (case 24 à 1). Contre-épreuve : garde réduite à `sc === 0` -> ce test est rouge.
+- C3 : JSDoc de `missingCoins`, schémas de la fiche alignés, contrainte « étape 3.3 » ajoutée au journal.
+- `npm run check` OK, 407 tests ; code restauré après chaque contre-épreuve.
