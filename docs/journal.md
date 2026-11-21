@@ -13,7 +13,7 @@
 | T-005 | Calculer le niveau suivant et tirer la configuration d'un niveau | terminée |
 | T-006 | Enchaîner les parties, encaisser et débloquer l'album | terminée |
 | T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | terminée |
-| T-008 | Compléter la couverture de la logique (revue 1.6) | planifiée |
+| T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
 
 ## Questions ouvertes
 _(aucune)_

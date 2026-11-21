@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | à relire |
+| Statut | terminée |
 | Étape du plan | 1.6 (suite de la revue complète du 2026-11-21) |
 | Branche | `t-008-couverture-logique` |
 | Estimation | S (< 1 h) |
