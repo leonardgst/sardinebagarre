@@ -43,3 +43,31 @@ export interface FreeMultipliers {
   readonly perRow: readonly number[];
   readonly perCol: readonly number[];
 }
+
+/** Issue d'une partie terminée (R-60). */
+export type Outcome = 'WON' | 'LOST' | 'QUIT';
+
+/** État d'une partie : en cours ou terminée avec son issue. */
+export type RoundStatus = 'PLAYING' | Outcome;
+
+/** Marque de mémo (R-80) : Sardine, 1, 2 ou 3. */
+export type MemoMark = 'S' | 1 | 2 | 3;
+
+/** État immuable d'une partie (R-04, R-30..R-34, R-80). */
+export interface RoundState {
+  readonly board: Board;
+  /** 25 valeurs, index = id (R-01). */
+  readonly flipped: readonly boolean[];
+  /** 25 masques de bits (voir MEMO_BITS). */
+  readonly memos: readonly number[];
+  /** Gain de la partie. */
+  readonly payout: number;
+  /** Cartes chiffrées retournées (les 1 comptent, la Sardine non). */
+  readonly cardsFlipped: number;
+  readonly multipliersFlipped: number;
+  /** Nombre de 2 et de 3 du plateau. */
+  readonly multipliersTotal: number;
+  /** min(produit des 2 et 3 du plateau, COIN_CAP). */
+  readonly maxPayout: number;
+  readonly status: RoundStatus;
+}
