@@ -36,3 +36,4 @@ _(aucune)_
 - 2026-11-10 — codeur — T-003 : corrections après relecture (C1 à C3) : repli sur le dernier plateau vérifié, cas croisée ligne+colonne, recalcul indépendant des contraintes, sortie allégée ; check OK (221 tests). Reste : nouvelle relecture, puis étape 1.3.
 - 2026-11-21 — codeur — T-004 : état de partie pur (`round.ts` : newRound, flip, toggleMemo, quit), 30 tests, check OK (251). Reste : relecture, puis étape 1.4 (niveau suivant).
 - 2026-11-21 — codeur — T-004 : corrections après relecture (C1 mémo de la Sardine, C2 identifiants invalides, C3 fiche T-005) ; check OK (251 tests). Reste : nouvelle relecture, puis étape 1.4.
+- 2026-11-21 — codeur — T-005 : `levels.ts` (pickEntry, appendHistory, nextLevel) et vecteurs N1..N17, 41 tests, contre-épreuves a à d faites ; check OK (292 tests). Reste : relecture, puis étape 1.5 (déroulement des parties enchaînées).

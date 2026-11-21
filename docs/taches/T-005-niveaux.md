@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | terminée (en relecture) |
 | Étape du plan | 1.4 |
 | Branche | `t-005-niveaux` (créée depuis `main` **après la fusion de T-004**, qui ajoute le type `Outcome`) |
 | Estimation | S (< 1 h) |
@@ -125,11 +125,11 @@ Vérification des vecteurs ajoutés (faite par Opus avec le pseudo-code) :
 | `§3 pickEntry tire les 10 entrées uniformément` | pour chaque niveau, `mulberry32(1000 + level)`, 10 000 tirages | chaque entrée tirée entre 8 % et 12 % des fois (800 à 1 200) |
 
 ## Critères d'acceptation
-- [ ] `npm run check` → code 0 ; tous les tests précédents passent toujours.
-- [ ] `npx vitest run tests/logic/levels.test.ts` → tous verts, en moins de 2 s.
-- [ ] Les 17 vecteurs N1..N17 existent, chacun avec son identifiant dans le titre (`grep -c "N1[0-7]\|N[1-9]"` ou lecture du rapport Vitest).
-- [ ] Contre-épreuves (notées dans le compte rendu) : (a) supprimer la condition `d.L >= 5` de la série → `R-64 … niveau 4` rouge ; (b) remplacer `k >= 8` par `k > 8` → N11, N12 ou CL-17 rouge ; (c) faire monter une victoire au niveau 7 vers 8 → CL-15 et N8 rouges ; (d) prendre la **première** partie de l'historique au lieu de la dernière → N13 ou N15 rouge.
-- [ ] `git status` avant commit : uniquement les fichiers du tableau « Fichiers ».
+- [x] `npm run check` → code 0 ; tous les tests précédents passent toujours.
+- [x] `npx vitest run tests/logic/levels.test.ts` → tous verts, en moins de 2 s.
+- [x] Les 17 vecteurs N1..N17 existent, chacun avec son identifiant dans le titre (`grep -c "N1[0-7]\|N[1-9]"` ou lecture du rapport Vitest).
+- [x] Contre-épreuves (notées dans le compte rendu) : (a) supprimer la condition `d.L >= 5` de la série → `R-64 … niveau 4` rouge ; (b) remplacer `k >= 8` par `k > 8` → N11, N12 ou CL-17 rouge ; (c) faire monter une victoire au niveau 7 vers 8 → CL-15 et N8 rouges ; (d) prendre la **première** partie de l'historique au lieu de la dernière → N13 ou N15 rouge.
+- [x] `git status` avant commit : uniquement les fichiers du tableau « Fichiers ».
 
 ## Pièges connus
 - **Ordre de l'historique** : ancien → récent ; la « dernière partie » `d` est `history[history.length - 1]`.
@@ -145,7 +145,9 @@ Vérification des vecteurs ajoutés (faite par Opus avec le pseudo-code) :
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+Fait : `RoundRecord` dans `types.ts` ; `levels.ts` (`HISTORY_SIZE`, `pickEntry`, `appendHistory`, `nextLevel` en port littéral de §6.2) ; 41 tests dans `tests/logic/levels.test.ts` (N1..N17, CL-01..04, CL-15..17, R-60..R-65, pickEntry). `npm run check` OK (292 tests).
+Contre-épreuves : (a) sans `L >= 5` → N14 et « série valide mais niveau 4 » rouges ; (b) `k > 8` → N11, N12, CL-17 rouges ; (c) victoire au niveau 7 → 8 : N8, CL-15, test d'accord rouges ; (d) première partie au lieu de la dernière → N11, N12, N13, N15, CL-17 rouges.
+Écarts : aucun (code et tests écrits ensemble, contre-épreuves faites après). Aucune question.
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
