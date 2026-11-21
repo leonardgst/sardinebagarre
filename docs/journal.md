@@ -13,6 +13,7 @@
 | T-005 | Calculer le niveau suivant et tirer la configuration d'un niveau | terminée |
 | T-006 | Enchaîner les parties, encaisser et débloquer l'album | terminée |
 | T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | terminée |
+| T-008 | Compléter la couverture de la logique (revue 1.6) | planifiée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -23,7 +24,15 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Étape 1.3 du plan : une partie (retourner, gagner, perdre, quitter, mémo).
+- T-008 (fin de l'étape 1.6), puis 3 parties en console (`npx tsx scripts/partie-console.ts`) par l'humain, puis phase 2 (interface).
+
+## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
+- `finalizeRound` historise `game.level` : interdire « Effacer la progression », « Vider la boîte » et « Quitter la table » pendant une partie `PLAYING` (sinon la partie est historisée au mauvais niveau).
+- Deux générateurs distincts dans `seed.ts` : un pour les plateaux, un pour le décor (messages UI-60, suspense R-90), sinon les tests e2e à graine fixe deviennent fragiles.
+- R-55 : appeler `finalizeRound` puis sauvegarder dès que `flip`/`quit` renvoie un statut ≠ `PLAYING`, avant toute animation ; test e2e de rechargement pendant la révélation.
+- Après la fin de partie, les touchers vont à l'accélération des animations (CL-20), jamais à `flip` (qui renverrait un « refus »).
+- Identifiants de carte toujours 0..24 (`RangeError` sinon) ; `missingCoins` vaut 0 aussi quand l'album est complet : tester `nextPhoto(...) === null` d'abord.
+- Exporter la clé `sardinebagarre:save` en constante dans `storage.ts` (étape 3.1) ; prix par défaut R-115 et validation des prix dans le modèle du pack (étape 3.3).
 
 ## Historique
 - 2026-11-10 — Opus (cadrage) — Spécification, architecture, plan et fichiers de pilotage de Claude Code rédigés.
@@ -45,3 +54,5 @@ _(aucune)_
 - 2026-11-21 — Opus — T-006 fusionnée ; T-007 planifiée (save.ts : sérialisation, validation champ par champ, CL-22 ; son actif par défaut d'après §10.5).
 - 2026-11-21 — codeur — T-007 : `save.ts` (sérialisation versionnée, lecture tolérante champ par champ, CL-22, gel profond, effacer la progression ADR-017), 45 tests, contre-épreuves a à f faites ; check OK (370 tests). Reste : relecture, puis étape 2.
 - 2026-11-21 — codeur — T-007 : corrections après relecture (C1 à C6 : historique de 5, 7 compteurs, robustesse variée, bornes, clés imbriquées, `new Date` interdit), tests seulement ; check OK (390 tests). Reste : nouvelle relecture.
+- 2026-11-21 — relecteur — Revue complète de la logique (1.6) : 🟡, code juste ; manquent R-03, R-64 (série au niveau 8), CL-21, R-90 (non implémentée), garde des prix d'album. 40 lignes de la table §3 identiques à la spec.
+- 2026-11-21 — Opus — Script `scripts/partie-console.ts` ; architecture.md et spec (R-90, R-102, `CardValue`) mis en cohérence ; T-008 planifiée ; contraintes pour la phase 2 consignées.

@@ -50,7 +50,7 @@ Les nombres de 2, de 3 et de Voltorbes et les gains maximum de S2 **concordent e
 | **Multiplicateur gratuit** | Carte 2 ou 3 située dans une ligne **ou** une colonne sans aucun Voltorbe (on peut l'obtenir sans risque). |
 
 > **Correspondance des noms** : dans les règles, « Voltorbe » (V) désigne la carte-bombe, comme dans le jeu d'origine. **À l'écran, elle s'appelle « Sardine » et sa lettre est « S »** : cases, indicateurs, marques du mémo, touche clavier. Dans le code, la valeur s'écrit `'S'` (type `CardValue = 1 | 2 | 3 | 'S'`).
-> Les autres identifiants du code sont en anglais : `Card`, `Board`, `RoundState`, `GameState`, `Outcome`, `payout`, `coins`, `level`, `memo`. Pour les noms de types, `docs/architecture.md` §5 fait foi.
+> Les autres identifiants du code sont en anglais : `CardValue`, `Board`, `RoundState`, `GameState`, `Outcome`, `payout`, `coins`, `level`, `memo`. Pour les noms de types, `docs/architecture.md` §5 fait foi.
 
 ---
 
@@ -299,7 +299,7 @@ Formulé simplement :
 | CL-23 | Victoire au niveau 3 avec un gain de 72 (total 100 avant la partie) ; on ferme l'app pendant la révélation de fin, puis on la rouvre | Total = 172 ; la partie figure dans l'historique ; niveau 4 ; records à jour (R-55) |
 
 ### 9.4 Message de suspense (clin d'œil S1)
-- **R-90** Au moment de retourner une carte, si sa ligne **et** sa colonne contiennent chacune au moins un Voltorbe, et si, pour la ligne **ou** la colonne, `Voltorbes de la ligne × 100 / cartes non retournées de la ligne ≥ 75` (Voltorbes **au total** de la ligne, pas restants), alors afficher un message de suspense tiré au hasard dans une liste (par défaut « Tu es sûr(e) de toi ?! ») et jouer un petit jingle de suspense avant de révéler la carte. Purement cosmétique.
+- **R-90** Au moment de retourner une carte, si sa ligne **et** sa colonne contiennent chacune au moins un Voltorbe, et si, pour la ligne **ou** la colonne, `Voltorbes de la ligne × 100 / cartes non retournées de la ligne ≥ 75` (Voltorbes **au total** de la ligne, pas restants), alors afficher un message de suspense tiré au hasard dans une liste (par défaut « Tu es sûr(e) de toi ?! ») et jouer un petit jingle de suspense avant de révéler la carte. Purement cosmétique. La carte touchée, encore face cachée au moment du calcul, **compte** parmi les cartes non retournées (fonction pure `isSuspense`, T-008).
 
 ---
 
@@ -363,7 +363,7 @@ Exemples : « Jouer au niveau {n} ? », « {v} ! Tu gagnes {n} jeton(s) ! », «
   - « Vider la boîte à jetons » (R-53) ;
   - « Effacer toute la progression » (UI-04).
 - **R-101** Contenu : `version`, `coins`, `level`, `history[≤5]`, `settings` (son ; animations réduites, non renseigné tant que le joueur n'a rien choisi, voir UI-04), `stats` (R-72), `album` (identifiants des photos débloquées), `welcomeSeen`, `packCode` (code secret saisi, §13). **La partie en cours n'est pas sauvegardée** (R-68).
-- **R-102** Lecture tolérante : schéma validé, migration si `version` est ancienne, repli propre sinon (CL-22).
+- **R-102** Lecture tolérante : schéma validé, migration si `version` est ancienne, repli propre sinon (CL-22). Pour une sauvegarde de la version courante, chaque champ est validé **séparément** : un champ invalide reprend sa valeur par défaut et les autres sont gardés (tableau de validation de `docs/taches/T-007-sauvegarde-logique.md`). Pour une version inconnue, seul le total de jetons est repris.
 - **R-103** Les données restent **sur l'appareil**. iPhone et Mac sont indépendants (Q11). Sur iPhone, l'app de l'écran d'accueil a un stockage **séparé** de l'onglet Safari.
 - **R-104 Mise à jour de l'app** : le service worker est enregistré en mode `registerType: 'prompt'` (vite-plugin-pwa). Une nouvelle version n'est **jamais** appliquée pendant une partie `EN_COURS`, puisque la partie en cours n'est pas sauvegardée (R-68). Elle est appliquée automatiquement, par un rechargement, quand le joueur est sur le menu (UI-01) : tout de suite s'il y est déjà, sinon dès qu'il y revient. Si l'app est fermée avant, la nouvelle version s'applique au lancement suivant.
 

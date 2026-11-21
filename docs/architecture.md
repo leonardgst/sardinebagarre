@@ -121,12 +121,13 @@ scripts/
   verifier-confidentialite.mjs  ← CI : aucune image/son/fichier privé en clair dans Git
 src/
   logic/      ← PUR : aucune dépendance au navigateur (pas de window, document, localStorage, Date.now, Math.random)
-    types.ts      Card, Board, RoundState, GameState, Outcome…
+    types.ts      CardValue, Board, RoundState, GameState, Outcome, SaveData…
+    constants.ts  COIN_CAP (50 000)
     configs.ts    la table du §3 de la spec (80 entrées)
     rng.ts        mulberry32(seed) → () => number
     board.ts      generateBoard(config, rng) ; indicateurs
     round.ts      flip(), toggleMemo(), quit() : fonctions pures état → nouvel état
-    levels.ts     nextLevel(history), pickBoardEntry(level, rng)
+    levels.ts     nextLevel(history), pickEntry(level, rng), appendHistory()
     game.ts       enchaînement des parties, encaissement, plafond 50 000, partie interrompue (R-68)
     album.ts      achat et déblocage des photos (pur : prix, ordre, solde)
     save.ts       serialize/deserialize + validation + migration (pur)
@@ -211,4 +212,4 @@ Garde-fous automatiques :
 
 ## 8. Décisions (ADR)
 
-Les décisions d'architecture sont consignées une par fichier dans [`docs/decisions/`](decisions/) : ADR-001 à ADR-014, au format de `docs/decisions/_modele.md`. Pour en ajouter ou en remplacer une : skill `consigner-decision`.
+Les décisions d'architecture sont consignées une par fichier dans [`docs/decisions/`](decisions/) : ADR-001 et suivantes, au format de `docs/decisions/_modele.md`. Pour en ajouter ou en remplacer une : skill `consigner-decision`.
