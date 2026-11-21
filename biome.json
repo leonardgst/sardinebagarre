@@ -55,6 +55,7 @@
                   "crypto": "Interdit dans src/logic (pur).",
                   "globalThis": "Interdit dans src/logic (pur).",
                   "self": "Interdit dans src/logic (pur).",
+                  "performance": "Interdit dans src/logic (pur) : l'heure est injectée.",
                   "Date": "Interdit dans src/logic (pur) : l'heure est injectée."
                 }
               }
