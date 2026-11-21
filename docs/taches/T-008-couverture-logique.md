@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | à relire |
 | Étape du plan | 1.6 (suite de la revue complète du 2026-11-21) |
 | Branche | `t-008-couverture-logique` |
 | Estimation | S (< 1 h) |
@@ -92,10 +92,10 @@ S 1 1 1 1
 Carte visée : id `3` (ligne 0, colonne 3). `SUSPENSE` : ligne 0 = 3 Sardines, colonne 3 = 1 Sardine (id 23). `SUSPENSE_SANS_COLONNE` : colonne 3 sans Sardine.
 
 ## Critères d'acceptation
-- [ ] TDD réel : tests écrits d'abord, échec constaté (pour les tests de R-90 et des prix) et noté dans le compte rendu. Les tests de R-03, R-64, CL-21 et CL-23 passent déjà sur le code actuel : c'est attendu, leur valeur est prouvée par les contre-épreuves.
-- [ ] `npm run check` → code 0 ; 390 tests précédents toujours verts.
-- [ ] Contre-épreuves (notées) : (a) série ignorée quand la dernière partie est au niveau 8 → test R-64 rouge ; (b) `flip` qui recalcule les indicateurs → test R-03 rouge ; (c) retournement automatique d'une ligne sans Sardine → CL-21 rouge ; (d) `isSuspense` sans la carte touchée dans le compte (`hr − 1`) → un test R-90 rouge ; (e) `isSuspense` avec « et » au lieu de « ou » → test « par la colonne seule » ou « 75 % » rouge ; (f) garde de prix supprimée → test R-116 rouge.
-- [ ] `git status` avant commit : uniquement les fichiers du tableau ; ajoutés un par un.
+- [x] TDD réel : tests écrits d'abord, échec constaté (pour les tests de R-90 et des prix) et noté dans le compte rendu. Les tests de R-03, R-64, CL-21 et CL-23 passent déjà sur le code actuel : c'est attendu, leur valeur est prouvée par les contre-épreuves.
+- [x] `npm run check` → code 0 ; 390 tests précédents toujours verts.
+- [x] Contre-épreuves (notées) : (a) série ignorée quand la dernière partie est au niveau 8 → test R-64 rouge ; (b) `flip` qui recalcule les indicateurs → test R-03 rouge ; (c) retournement automatique d'une ligne sans Sardine → CL-21 rouge ; (d) `isSuspense` sans la carte touchée dans le compte (`hr − 1`) → un test R-90 rouge ; (e) `isSuspense` avec « et » au lieu de « ou » → test « par la colonne seule » ou « 75 % » rouge ; (f) garde de prix supprimée → test R-116 rouge.
+- [x] `git status` avant commit : uniquement les fichiers du tableau ; ajoutés un par un.
 
 ## Pièges connus
 - R-90 : Sardines **au total** de la ligne (indicateur), pas les Sardines restantes ; cartes **non retournées** (dont la carte touchée).
@@ -109,7 +109,10 @@ Carte visée : id `3` (ligne 0, colonne 3). `SUSPENSE` : ligne 0 = 3 Sardines, c
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+- TDD réel : avant le code, 11 tests rouges (6 R-90, 4 prix R-116 invalides, témoin `performance`) ; R-03, R-64, CL-21, CL-23 et R-110 (prix 0) passaient déjà, comme prévu.
+- Fait : `isSuspense` dans `round.ts`, `validPrice` dans `album.ts` (refus = même objet, `missingCoins` 0), `performance` dans `biome.json` et `architecture.test.ts`. 406 tests, `npm run check` OK.
+- Contre-épreuves : (a) `L < 8` dans la série -> test R-64 rouge ; (b) indicateurs recalculés dans `flip` -> R-03 rouge ; (c) retournement automatique de ligne -> CL-21 rouge ; (d) `hr - 1` -> 2 tests R-90 rouges ; (e) « et » -> 2 tests R-90 rouges ; (f) garde supprimée -> 3 tests R-116 rouges. Code restauré après chaque essai.
+- Écart : les plateaux R-90 de la fiche ne contiennent aucun 2/3 caché, donc le premier retournement gagne la partie (`flip` -> WON, `isSuspense` -> false). J'ai remplacé un « 1 » par un « 2 » hors de la ligne et de la colonne visées (id 6 pour SUSPENSE et SUSPENSE_SANS_COLONNE, id 7 pour COLONNE). Les pourcentages de la fiche restent valables.
 
 ## Relecture
 _(verdict du relecteur, avec la date)_

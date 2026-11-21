@@ -56,3 +56,5 @@ _(aucune)_
 - 2026-11-21 — codeur — T-007 : corrections après relecture (C1 à C6 : historique de 5, 7 compteurs, robustesse variée, bornes, clés imbriquées, `new Date` interdit), tests seulement ; check OK (390 tests). Reste : nouvelle relecture.
 - 2026-11-21 — relecteur — Revue complète de la logique (1.6) : 🟡, code juste ; manquent R-03, R-64 (série au niveau 8), CL-21, R-90 (non implémentée), garde des prix d'album. 40 lignes de la table §3 identiques à la spec.
 - 2026-11-21 — Opus — Script `scripts/partie-console.ts` ; architecture.md et spec (R-90, R-102, `CardValue`) mis en cohérence ; T-008 planifiée ; contraintes pour la phase 2 consignées.
+- 2026-11-21 — codeur — T-008 : `isSuspense` (R-90), garde des prix d'album (R-110/R-116), `performance` interdit dans src/logic, tests R-03, R-64, CL-21, CL-23 ; contre-épreuves a à f faites ; check OK (406 tests). Reste : relecture.
+- 2026-11-21 — codeur — T-008 : les plateaux R-90 de la fiche déclenchaient une victoire automatique (aucun 2 caché) ; un « 2 » a été ajouté hors ligne/colonne visées dans les trois plateaux.
