@@ -11,7 +11,7 @@
 | T-003 | Générer les plateaux et calculer les indicateurs (+ 2 corrections de relecture T-002) | terminée |
 | T-004 | Jouer une partie : retourner, gagner, perdre, quitter, mémo | terminée |
 | T-005 | Calculer le niveau suivant et tirer la configuration d'un niveau | terminée |
-| T-006 | Enchaîner les parties, encaisser et débloquer l'album | implémentée (relecture en attente) |
+| T-006 | Enchaîner les parties, encaisser et débloquer l'album | terminée |
 
 ## Questions ouvertes
 _(aucune)_

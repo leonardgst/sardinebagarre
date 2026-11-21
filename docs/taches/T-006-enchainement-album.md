@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | implémentée (relecture en attente) |
+| Statut | terminée |
 | Étape du plan | 1.5 (1ʳᵉ partie : `game.ts` et `album.ts` ; la sauvegarde `save.ts` sera T-007) |
 | Branche | `t-006-enchainement-album` |
 | Estimation | M (1–3 h) |
