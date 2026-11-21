@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | implémentée |
+| Statut | terminée |
 | Étape du plan | 1.3 |
 | Branche | `t-004-partie` |
 | Estimation | M (1–3 h) |
