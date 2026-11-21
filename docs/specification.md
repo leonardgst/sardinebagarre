@@ -250,8 +250,8 @@ Formulé simplement :
   - l'encaissement d'une partie gagnée ou abandonnée (R-50) ;
   - l'achat d'une photo dans l'album (R-112) ;
   - « Vider la boîte à jetons » (R-53) ;
-  - « Effacer toute la progression » (UI-04).
-- **R-72** Records (absents de l'original ; voir ADR-012), inclus en v1, **priorité P2** : de simples compteurs affichés dans les Réglages (UI-04). Ils comprennent : meilleur gain en une partie, niveau maximal atteint, nombre de parties jouées, gagnées, perdues et abandonnées, nombre de fois où le niveau 8 a été atteint.
+  - « Effacer toute la progression » (UI-04) : remet à zéro jetons, niveau (1), historique, records et album ; conserve le code secret, les réglages et `welcomeSeen` (ADR-017).
+- **R-72** Records (absents de l'original ; voir ADR-012), inclus en v1, **priorité P2** : de simples compteurs affichés dans les Réglages (UI-04). Ils comprennent : meilleur gain en une partie, niveau maximal atteint, nombre de parties jouées, gagnées, perdues et abandonnées, nombre de fois où le niveau 8 a été atteint. Précisions (ADR-017) : le niveau maximal est le plus haut niveau **obtenu** après une partie (valeur initiale 1) ; « niveau 8 atteint » augmente de 1 à chaque passage d'un niveau inférieur au niveau 8 (rester au niveau 8 ne compte pas) ; le meilleur gain est le plus grand gain de partie (`payout`) d'une partie gagnée ou abandonnée.
 
 ---
 
