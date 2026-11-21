@@ -79,3 +79,33 @@ export interface RoundRecord {
   readonly cardsFlipped: number;
   readonly level: Level;
 }
+
+/** Records (R-72, ADR-017). */
+export interface Stats {
+  /** Plus grand gain d'une partie WON ou QUIT (0 au départ). */
+  readonly bestPayout: number;
+  /** Plus haut niveau obtenu (1 au départ). */
+  readonly maxLevel: Level;
+  readonly played: number;
+  readonly won: number;
+  readonly lost: number;
+  readonly quit: number;
+  /** Passages d'un niveau < 8 au niveau 8. */
+  readonly level8Reached: number;
+}
+
+/** État durable du joueur (hors réglages, code secret et welcomeSeen : voir T-007). */
+export interface GameState {
+  readonly coins: number;
+  readonly level: Level;
+  readonly history: readonly RoundRecord[];
+  readonly stats: Stats;
+  /** Identifiants des photos débloquées, dans l'ordre d'achat. */
+  readonly album: readonly string[];
+}
+
+/** Une photo de l'album telle que décrite par le pack (R-110) ; la légende reste côté interface. */
+export interface AlbumPhoto {
+  readonly id: string;
+  readonly price: number;
+}
