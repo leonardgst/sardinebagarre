@@ -143,3 +143,44 @@ _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
+
+**2026-11-21 — relecteur — 🟡 approuvé avec réserves.** `npm run check` OK (370 tests, confidentialité OK). Code conforme à R-68, R-100..R-102, CL-18, CL-22, §10.5, UI-04, ADR-006, ADR-008, ADR-017 et au tableau de validation champ par champ : statuts corrects, aucune exception possible, objets reconstruits sans clé parasite, gel en profondeur (historique compris), fixture `raw` écrite à la main, version inconnue qui reprend les jetons, un champ invalide qui garde les autres.
+Contre-épreuves du relecteur : 21 mutants en plus de (a) à (f) ; 14 rouges, 7 verts.
+Réserves (tests seulement) : **important** (1) un historique d'exactement 5 éléments refusé n'est pas détecté (cas normal dès la 5ᵉ partie, la série du niveau 8 en dépend) ; (2) seuls `played` et `maxLevel` sont testés parmi les 7 compteurs. **Mineur** (3) le test de robustesse donne 200 fois `recovered` (troncatures toutes dans le même `catch`, aucune valeur imbriquée valide, seul `coins` vérifié) ; (4) bornes hautes des éléments de l'historique non testées ; (5) clés inconnues imbriquées non testées ; (6) le test d'architecture interdit `Date.now` mais pas `new Date`.
+
+## Corrections après relecture
+_Planifiées par Opus le 2026-11-21. Même branche, un nouveau commit `test(logic): corrections après relecture de T-007`. Aucune modification de `src/` (sauf si un nouveau test révèle un vrai défaut : le signaler alors)._
+
+### C1 — Historique de 5 éléments accepté (R-60, R-101)
+- Dans `R-102 limites valides acceptées`, ajouter un historique d'exactement 5 éléments valides : `toHaveLength(5)`, statut `'ok'`.
+- **Contre-épreuve** : `> 5` remplacé par `>= 5` → rouge.
+
+### C2 — Les 7 compteurs des records sont validés (R-72)
+- Nouveau `it.each` `R-102 chaque compteur des records est validé` : pour chacune des 7 clés de `stats`, (i) clé absente, (ii) valeur `-1` (pour `maxLevel` : `0` et `9`) → stats initiales, autres champs égaux à `SAVE_PLEINE`, `'recovered'`.
+- **Contre-épreuves** : ne plus vérifier `level8Reached` → rouge ; accepter un compteur absent → rouge.
+
+### C3 — Test de robustesse vraiment varié (R-102)
+- Ajouter aux générateurs des valeurs **valides** pour les champs imbriqués (l'historique de la fixture, les stats valides, `['p1']`, `{ sound: true, reducedMotion: null }`).
+- Remplacer la moitié des troncatures par des **remplacements d'un caractère** de `serialize(SAVE_PLEINE)` (position et caractère tirés avec `mulberry32`).
+- Vérifier en plus pour chaque résultat : `game.level` entier dans 1..8, `game.history.length ≤ 5`, `Object.isFrozen(save)` et `Object.isFrozen(save.game)`.
+- Vérifier qu'au moins **un** des 200 textes donne le statut `'ok'` et au moins un `'recovered'` (preuve de variété).
+
+### C4 — Bornes hautes des éléments de l'historique
+- Deux cas de plus dans le `it.each` des champs invalides : un élément avec `cardsFlipped: 26`, un avec `level: 9` → `history []`, `'recovered'`.
+
+### C5 — Clés inconnues imbriquées
+- Nouveau test `R-102 les clés inconnues imbriquées sont ignorées` : `settings`, un élément de `history` et `stats` portent chacun `x: 1` → `toEqual(SAVE_PLEINE)`, `'ok'`.
+- **Contre-épreuve** : recopier `settings` avec `{ ...s }` → rouge.
+
+### C6 — Test d'architecture : `new Date` interdit (ADR-006)
+- Dans `tests/architecture.test.ts`, ajouter `new Date` (motif `/\bnew\s+Date\b/`) à la liste des API interdites dans `src/logic/`, sur le modèle de `Date.now` (y compris le cas témoin qui vérifie que le motif détecte bien l'usage, s'il existe pour `Date.now`).
+
+### Critère global
+- `npm run check` → code 0 ; nombre de tests = 370 + ceux ajoutés (noter le total).
+- `git status` avant commit : uniquement `tests/logic/save.test.ts`, `tests/architecture.test.ts`, la fiche et `docs/journal.md` ; ajoutés un par un.
+
+### Compte rendu — Corrections après relecture
+**Fait** : C1 à C6 appliqués, tests seulement ; `src/` inchangé, aucun défaut révélé.
+- C1 : historique de 5 éléments accepté (dans `limites valides acceptées`). C2 : 17 cas (7 compteurs absents, `-1`, `maxLevel` 0 et 9). C3 : robustesse variée (valeurs imbriquées valides, 50 troncatures + 50 remplacements d'un caractère, niveau, historique ≤ 5, gel, au moins un `ok` et un `recovered`). C4 : `cardsFlipped 26` et `level 9`. C5 : clés inconnues imbriquées. C6 : motif `new Date` et deux témoins dans `tests/architecture.test.ts`.
+- **Contre-épreuves rouges** : C1 `>= 5` → test des limites rouge ; C2 `level8Reached` non vérifié → 2 tests rouges, compteur absent accepté → 6 tests rouges ; C5 `{ ...st }` → test rouge ; C6 sans le motif → 2 témoins rouges. Code restauré ensuite.
+- `npm run check` OK : 390 tests (370 + 20).

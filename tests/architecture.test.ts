@@ -17,6 +17,7 @@ function findForbiddenUsages(source: string): string[] {
     ['localStorage', /\blocalStorage\b/g],
     ['crypto', /\bcrypto\b/g],
     ['Date.now', /\bDate\.now\b/g],
+    ['new Date', /\bnew\s+Date\b/g],
     ['Math.random', /\bMath\.random\b/g],
     ['globalThis', /\bglobalThis\b/g],
     [
@@ -60,6 +61,8 @@ describe('architecture', () => {
     'localStorage.getItem("k")',
     'crypto.getRandomValues(a)',
     'Date.now()',
+    'new Date()',
+    'new   Date(0)',
     'Math.random()',
     'globalThis.x',
     'import { a } from "../ui/main";',

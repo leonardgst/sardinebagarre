@@ -194,6 +194,16 @@ describe('sauvegarde', () => {
       withGame(SAVE_PLEINE, { history: [] }),
     ],
     [
+      'history cardsFlipped 26',
+      { history: [{ outcome: 'WON', cardsFlipped: 26, level: 1 }] },
+      withGame(SAVE_PLEINE, { history: [] }),
+    ],
+    [
+      'history level 9',
+      { history: [{ outcome: 'WON', cardsFlipped: 3, level: 9 }] },
+      withGame(SAVE_PLEINE, { history: [] }),
+    ],
+    [
       'stats played -1',
       { stats: { ...STATS_VALIDES, played: -1 } },
       withGame(SAVE_PLEINE, { stats: initialGame().stats }),
@@ -236,6 +246,50 @@ describe('sauvegarde', () => {
     },
   );
 
+  const COMPTEURS = [
+    'bestPayout',
+    'maxLevel',
+    'played',
+    'won',
+    'lost',
+    'quit',
+    'level8Reached',
+  ] as const;
+  const casCompteurs = COMPTEURS.flatMap((cle) => {
+    const mauvaises = cle === 'maxLevel' ? [0, 9] : [-1];
+    return [
+      [`${cle} absent`, cle, undefined],
+      ...mauvaises.map((v) => [`${cle} ${v}`, cle, v] as const),
+    ] as ReadonlyArray<readonly [string, string, number | undefined]>;
+  });
+
+  it.each(casCompteurs)(
+    'R-102 chaque compteur des records est validé (%s)',
+    (_nom, cle, valeur) => {
+      const r = deserialize(raw({ stats: { ...STATS_VALIDES, [cle]: valeur } }));
+      expect(r.save).toEqual(withGame(SAVE_PLEINE, { stats: initialGame().stats }));
+      expect(r.status).toBe('recovered');
+    },
+  );
+
+  it('R-102 les clés inconnues imbriquées sont ignorées', () => {
+    const r = deserialize(
+      raw({
+        settings: { sound: false, reducedMotion: true, x: 1 },
+        history: [
+          { outcome: 'WON', cardsFlipped: 6, level: 4, x: 1 },
+          { outcome: 'QUIT', cardsFlipped: 8, level: 5, x: 1 },
+        ],
+        stats: { ...STATS_VALIDES, x: 1 },
+      }),
+    );
+    expect(r.save).toEqual(SAVE_PLEINE);
+    expect(r.status).toBe('ok');
+    expect(r.save.settings).not.toHaveProperty('x');
+    expect(r.save.game.stats).not.toHaveProperty('x');
+    expect(r.save.game.history[0]).not.toHaveProperty('x');
+  });
+
   it('R-101 reducedMotion null est valide (non renseigné)', () => {
     const r = deserialize(raw({ settings: { sound: false, reducedMotion: null } }));
     expect(r.save.settings.reducedMotion).toBeNull();
@@ -260,6 +314,9 @@ describe('sauvegarde', () => {
       expect(r.save.game.level).toBe(level);
       expect(r.status).toBe('ok');
     }
+    const cinq = deserialize(raw({ history: historiqueDe(5) }));
+    expect(cinq.save.game.history).toHaveLength(5);
+    expect(cinq.status).toBe('ok');
     const r = deserialize(raw({ history: [], album: [], packCode: null }));
     expect(r.save.game.history).toEqual([]);
     expect(r.save.game.album).toEqual([]);
@@ -314,24 +371,45 @@ describe('sauvegarde', () => {
       () => ({ sound: rng() < 0.5, reducedMotion: 'oui' }),
       () => ({ played: -1 }),
       () => ['a', 'a'],
+      // valeurs valides pour les champs imbriqués
+      () => rawObject().history,
+      () => ({ ...STATS_VALIDES }),
+      () => ['p1'],
+      () => ({ sound: true, reducedMotion: null }),
     ];
     const textes: string[] = [];
     for (let i = 0; i < 100; i++) {
       const o: Record<string, unknown> = {};
       for (const c of cles) {
-        if (rng() >= 0.7) continue;
-        o[c] = c === 'version' && rng() < 0.6 ? 1 : choix[Math.floor(rng() * choix.length)]?.();
+        if (rng() >= 0.85) continue;
+        o[c] = c === 'version' && rng() < 0.8 ? 1 : choix[Math.floor(rng() * choix.length)]?.();
       }
       textes.push(JSON.stringify(o));
     }
     const complet = serialize(SAVE_PLEINE);
-    for (let i = 0; i < 100; i++) textes.push(complet.slice(0, Math.floor(rng() * complet.length)));
+    const caracteres = '0123456789{}[]",:xtrue-';
+    for (let i = 0; i < 50; i++) textes.push(complet.slice(0, Math.floor(rng() * complet.length)));
+    for (let i = 0; i < 50; i++) {
+      const pos = Math.floor(rng() * complet.length);
+      const c = caracteres[Math.floor(rng() * caracteres.length)] ?? 'x';
+      textes.push(complet.slice(0, pos) + c + complet.slice(pos + 1));
+    }
+    const statuts = new Set<string>();
     for (const t of textes) {
       const r = deserialize(t);
+      statuts.add(r.status);
       expect(['new', 'ok', 'recovered']).toContain(r.status);
       expect(Number.isInteger(r.save.game.coins)).toBe(true);
       expect(r.save.game.coins).toBeGreaterThanOrEqual(0);
       expect(r.save.game.coins).toBeLessThanOrEqual(50_000);
+      expect(Number.isInteger(r.save.game.level)).toBe(true);
+      expect(r.save.game.level).toBeGreaterThanOrEqual(1);
+      expect(r.save.game.level).toBeLessThanOrEqual(8);
+      expect(r.save.game.history.length).toBeLessThanOrEqual(5);
+      expect(Object.isFrozen(r.save)).toBe(true);
+      expect(Object.isFrozen(r.save.game)).toBe(true);
     }
+    expect(statuts.has('ok')).toBe(true);
+    expect(statuts.has('recovered')).toBe(true);
   });
 });

@@ -44,3 +44,4 @@ _(aucune)_
 - 2026-11-21 — codeur — T-006 : corrections après relecture (C1 à C6 : tests renforcés, `freezeGame` exporté et utilisé par `buyNextPhoto`) ; check OK (325 tests). Reste : nouvelle relecture, puis T-007.
 - 2026-11-21 — Opus — T-006 fusionnée ; T-007 planifiée (save.ts : sérialisation, validation champ par champ, CL-22 ; son actif par défaut d'après §10.5).
 - 2026-11-21 — codeur — T-007 : `save.ts` (sérialisation versionnée, lecture tolérante champ par champ, CL-22, gel profond, effacer la progression ADR-017), 45 tests, contre-épreuves a à f faites ; check OK (370 tests). Reste : relecture, puis étape 2.
+- 2026-11-21 — codeur — T-007 : corrections après relecture (C1 à C6 : historique de 5, 7 compteurs, robustesse variée, bornes, clés imbriquées, `new Date` interdit), tests seulement ; check OK (390 tests). Reste : nouvelle relecture.
