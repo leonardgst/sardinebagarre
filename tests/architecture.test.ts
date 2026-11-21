@@ -20,6 +20,7 @@ function findForbiddenUsages(source: string): string[] {
     ['new Date', /\bnew\s+Date\b/g],
     ['Math.random', /\bMath\.random\b/g],
     ['globalThis', /\bglobalThis\b/g],
+    ['performance', /\bperformance\b/g],
     [
       'import de ui',
       /\b(?:import|export)\b[^;'"]*?\bfrom\s*['"](?:\.{1,2}\/)+ui(?:\/[^'"]*)?['"]|\bimport\s*['"](?:\.{1,2}\/)+ui(?:\/[^'"]*)?['"]/g,
@@ -65,6 +66,7 @@ describe('architecture', () => {
     'new   Date(0)',
     'Math.random()',
     'globalThis.x',
+    'performance.now()',
     'import { a } from "../ui/main";',
   ])('ADR-006 détecteur : %s est repéré', (code) => {
     expect(findForbiddenUsages(code)).toHaveLength(1);

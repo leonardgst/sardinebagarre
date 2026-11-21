@@ -81,6 +81,22 @@ describe('album : achat', () => {
     expect(canStartRound(after)).toBe(true);
   });
 
+  it.each([-100, 12.5, Number.NaN, Number.POSITIVE_INFINITY])(
+    'R-116 un prix invalide (%s) est refusé',
+    (price) => {
+      const g = game({ coins: 50_000 });
+      const photos: readonly AlbumPhoto[] = [{ id: 'p', price }];
+      expect(buyNextPhoto(g, photos)).toBe(g);
+      expect(missingCoins(g, photos)).toBe(0);
+    },
+  );
+
+  it('R-110 une photo à 0 jeton peut être débloquée', () => {
+    const g = buyNextPhoto(game({ coins: 0 }), [{ id: 'p', price: 0 }]);
+    expect(g.album).toEqual(['p']);
+    expect(g.coins).toBe(0);
+  });
+
   it("R-112 trois achats successifs suivent l'ordre", () => {
     let g = game({ coins: 600 });
     for (let i = 0; i < 3; i++) g = buyNextPhoto(g, PHOTOS);

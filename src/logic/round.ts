@@ -85,6 +85,28 @@ export function flip(state: RoundState, id: number): RoundState {
   });
 }
 
+/**
+ * R-90 : suspense si la ligne ET la colonne de la carte contiennent au moins une Sardine
+ * et que, pour la ligne OU la colonne, Sardines totales × 100 / cartes non retournées ≥ 75.
+ * La carte touchée (encore cachée) compte parmi les cartes non retournées.
+ */
+export function isSuspense(state: RoundState, id: number): boolean {
+  checkId(id);
+  if (state.status !== 'PLAYING' || state.flipped[id]) return false;
+  const r = Math.floor(id / 5);
+  const c = id % 5;
+  const sr = state.board.rowHints[r]?.sardines ?? 0;
+  const sc = state.board.colHints[c]?.sardines ?? 0;
+  if (sr === 0 || sc === 0) return false;
+  let hr = 0;
+  let hc = 0;
+  for (let i = 0; i < 5; i++) {
+    if (!state.flipped[r * 5 + i]) hr++;
+    if (!state.flipped[i * 5 + c]) hc++;
+  }
+  return (sr * 100) / hr >= 75 || (sc * 100) / hc >= 75;
+}
+
 /** R-80, R-81 : inverse une marque sur une carte non retournée. */
 export function toggleMemo(state: RoundState, id: number, mark: MemoMark): RoundState {
   checkId(id);

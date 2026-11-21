@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { generateBoard } from '../../src/logic/board';
 import { CONFIGS, maxPayout } from '../../src/logic/configs';
 import { mulberry32 } from '../../src/logic/rng';
-import { flip, hasMark, newRound, quit, toggleMemo } from '../../src/logic/round';
+import { flip, hasMark, isSuspense, newRound, quit, toggleMemo } from '../../src/logic/round';
 import type { MemoMark, RoundState } from '../../src/logic/types';
 import { boardFromRows } from './helpers';
 
@@ -296,5 +296,83 @@ describe('configurations', () => {
       }
     }
     expect(ecarts).toEqual([]);
+  });
+});
+
+describe('indicateurs et lignes sans Sardine', () => {
+  it('R-03 les indicateurs ne changent pas pendant la partie', () => {
+    const depart = neuve();
+    const s = quit(jouer(depart, [1, 2, 6]));
+    expect(s.board).toBe(depart.board);
+    expect(s.board.rowHints).toEqual([
+      { sum: 5, sardines: 1 },
+      { sum: 6, sardines: 1 },
+      { sum: 6, sardines: 0 },
+      { sum: 6, sardines: 1 },
+      { sum: 5, sardines: 1 },
+    ]);
+    expect(s.board.colHints).toEqual([
+      { sum: 5, sardines: 1 },
+      { sum: 8, sardines: 0 },
+      { sum: 5, sardines: 1 },
+      { sum: 4, sardines: 1 },
+      { sum: 6, sardines: 1 },
+    ]);
+  });
+
+  it('CL-21 ligne sans Sardine : retourner une carte ne retourne pas les autres', () => {
+    const s = flip(neuve(), 11);
+    expect(s.flipped.filter(Boolean)).toHaveLength(1);
+    for (const id of [10, 12, 13, 14]) expect(s.flipped[id]).toBe(false);
+    expect([s.cardsFlipped, s.status]).toEqual([1, 'PLAYING']);
+  });
+});
+
+describe('suspense (R-90)', () => {
+  // Un 2 caché (hors ligne/colonne visées) évite la victoire automatique après le premier retournement.
+  const SUSPENSE = boardFromRows(['S S S 1 2', '1 2 1 1 1', '1 1 1 1 1', '1 1 1 1 1', '1 1 1 S S']);
+  const SUSPENSE_SANS_COLONNE = boardFromRows([
+    'S S S 1 2',
+    '1 2 1 1 1',
+    '1 1 1 1 1',
+    '1 1 1 1 1',
+    '1 1 1 1 S',
+  ]);
+  const COLONNE = boardFromRows(['1 1 1 1 1', 'S 1 2 1 1', 'S 1 1 1 1', 'S 1 1 1 1', '1 1 1 1 S']);
+
+  it('R-90 pas de suspense à 3 Sardines sur 5 cartes cachées (60 %)', () => {
+    expect(isSuspense(newRound(SUSPENSE), 3)).toBe(false);
+  });
+
+  it('R-90 suspense à 75 % : 3 Sardines sur 4 cartes cachées, colonne avec une Sardine', () => {
+    expect(isSuspense(flip(newRound(SUSPENSE), 4), 3)).toBe(true);
+  });
+
+  it("R-90 pas de suspense si la colonne de la carte n'a aucune Sardine", () => {
+    expect(isSuspense(flip(newRound(SUSPENSE_SANS_COLONNE), 4), 3)).toBe(false);
+  });
+
+  it('R-90 suspense par la colonne seule', () => {
+    const s = newRound(COLONNE);
+    expect(isSuspense(s, 20)).toBe(false);
+    expect(isSuspense(flip(s, 0), 20)).toBe(true);
+  });
+
+  it("R-90 pas de suspense si la ligne de la carte n'a aucune Sardine", () => {
+    const b = boardFromRows(['1 1 1 1 1', 'S 1 2 1 1', 'S 1 1 1 1', 'S 1 1 1 1', '1 1 1 1 1']);
+    expect(isSuspense(flip(newRound(b), 0), 20)).toBe(false);
+  });
+
+  it('R-90 aucun suspense sur une carte retournée ou une partie finie', () => {
+    const s = flip(newRound(SUSPENSE), 3);
+    expect(isSuspense(s, 3)).toBe(false);
+    expect(isSuspense(quit(flip(newRound(SUSPENSE), 4)), 3)).toBe(false);
+    expect(isSuspense(flip(newRound(SUSPENSE), 0), 3)).toBe(false);
+  });
+
+  it('R-90 identifiant invalide → RangeError', () => {
+    for (const id of [-1, 25, 2.5]) {
+      expect(() => isSuspense(neuve(), id)).toThrow(RangeError);
+    }
   });
 });
