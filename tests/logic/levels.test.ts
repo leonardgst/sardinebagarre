@@ -94,6 +94,10 @@ describe('nextLevel : autres cas', () => {
     const h = [r('WON', 8, 5), r('WON', 8, 6), r('WON', 8, 7), r('WON', 8, 5), r('QUIT', 9, 4)];
     expect(nextLevel(h)).toBe(4);
   });
+  it('R-64 série complète terminée par un abandon au niveau 8 → 8 (contrairement à N7)', () => {
+    const h = [r('WON', 8, 5), r('WON', 8, 6), r('WON', 8, 7), r('WON', 9, 8), r('QUIT', 9, 8)];
+    expect(nextLevel(h)).toBe(8);
+  });
   it('R-60 au-delà de 5 parties, seules les 5 dernières comptent', () => {
     expect(nextLevel([r('LOST', 0, 1), ...N11])).toBe(8);
   });

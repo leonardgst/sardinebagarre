@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { initialGame } from '../../src/logic/game';
+import { finalizeRound, initialGame } from '../../src/logic/game';
 import { mulberry32 } from '../../src/logic/rng';
+import { newRound } from '../../src/logic/round';
 import {
   deserialize,
   initialSave,
@@ -9,6 +10,7 @@ import {
   serialize,
 } from '../../src/logic/save';
 import type { SaveData } from '../../src/logic/types';
+import { boardFromRows } from './helpers';
 
 const SAVE_PLEINE: SaveData = {
   game: {
@@ -411,5 +413,19 @@ describe('sauvegarde', () => {
     }
     expect(statuts.has('ok')).toBe(true);
     expect(statuts.has('recovered')).toBe(true);
+  });
+});
+
+describe('finalisation puis sauvegarde', () => {
+  it("CL-23 R-55 finalisation puis sauvegarde : rien n'est perdu pendant la révélation", () => {
+    const board = boardFromRows(['S 1 2 1 1', '1 3 1 1 S', '2 1 1 1 1', '1 1 S 1 3', '1 2 1 S 1']);
+    const fin = { ...newRound(board), status: 'WON' as const, payout: 72, cardsFlipped: 5 };
+    const game = finalizeRound({ ...initialGame(), coins: 100, level: 3 }, fin);
+    const { save, status } = deserialize(serialize({ ...initialSave(), game }));
+    expect(status).toBe('ok');
+    expect(save.game.coins).toBe(172);
+    expect(save.game.level).toBe(4);
+    expect(save.game.history).toEqual([{ outcome: 'WON', cardsFlipped: 5, level: 3 }]);
+    expect(save.game.stats.won).toBe(1);
   });
 });
