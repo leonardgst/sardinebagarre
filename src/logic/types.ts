@@ -109,3 +109,21 @@ export interface AlbumPhoto {
   readonly id: string;
   readonly price: number;
 }
+
+/** Réglages persistants (UI-04). */
+export interface Settings {
+  /** true par défaut (§10.5 : bouton muet). */
+  readonly sound: boolean;
+  /** null = non renseigné → préférence système (UI-04). */
+  readonly reducedMotion: boolean | null;
+}
+
+/** Tout ce qui est sauvegardé (R-101), sans la partie en cours (R-68). */
+export interface SaveData {
+  readonly game: GameState;
+  readonly settings: Settings;
+  readonly welcomeSeen: boolean;
+  readonly packCode: string | null;
+}
+
+export type LoadStatus = 'new' | 'ok' | 'recovered';

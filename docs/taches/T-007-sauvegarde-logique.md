@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | implémentée (relecture à faire) |
 | Étape du plan | 1.5 (2ᵉ partie : `save.ts` ; la 1ʳᵉ partie était T-006) |
 | Branche | `t-007-sauvegarde-logique` |
 | Estimation | M (1–3 h) |
@@ -111,12 +111,12 @@ Helper `raw(overrides)` : l'objet JSON plat **valide** correspondant à `SAVE_PL
 | `R-102 deserialize ne lève jamais d'exception` | 200 textes produits par `mulberry32(1)` : JSON valides de formes aléatoires (objets avec des clés de R-101 et des valeurs de types variés) et chaînes tronquées de `serialize(SAVE_PLEINE)` | aucune exception ; le résultat a toujours un `status` et une `save` dont `game.coins` est un entier dans [0, 50 000] |
 
 ## Critères d'acceptation
-- [ ] **TDD réel** : tests écrits d'abord, échec constaté et noté dans le compte rendu.
-- [ ] `npm run check` → code 0 ; les 325 tests précédents passent toujours.
-- [ ] Les tests listés existent avec ces noms.
-- [ ] `grep` : aucun `localStorage`, `Date`, `window` dans `src/logic/save.ts` (le test d'architecture le vérifie).
-- [ ] Contre-épreuves (notées dans le compte rendu) : (a) ne pas reprendre `coins` sur une version inconnue → CL-22 rouge ; (b) accepter `coins 50 001` → test du champ invalide rouge ; (c) rejeter toute la sauvegarde dès qu'un champ est invalide → test « les autres sont gardés » rouge ; (d) ne pas geler les éléments de `history` → test du gel rouge ; (e) `resetProgressInSave` qui efface `packCode` → test ADR-017 rouge ; (f) laisser `JSON.parse` lever une exception → CL-22 JSON illisible rouge.
-- [ ] `git status` avant commit : uniquement les fichiers du tableau « Fichiers » ; ajoutés un par un.
+- [x] **TDD réel** : tests écrits d'abord, échec constaté et noté dans le compte rendu.
+- [x] `npm run check` → code 0 ; les 325 tests précédents passent toujours.
+- [x] Les tests listés existent avec ces noms.
+- [x] `grep` : aucun `localStorage`, `Date`, `window` dans `src/logic/save.ts` (le test d'architecture le vérifie).
+- [x] Contre-épreuves (notées dans le compte rendu) : (a) ne pas reprendre `coins` sur une version inconnue → CL-22 rouge ; (b) accepter `coins 50 001` → test du champ invalide rouge ; (c) rejeter toute la sauvegarde dès qu'un champ est invalide → test « les autres sont gardés » rouge ; (d) ne pas geler les éléments de `history` → test du gel rouge ; (e) `resetProgressInSave` qui efface `packCode` → test ADR-017 rouge ; (f) laisser `JSON.parse` lever une exception → CL-22 JSON illisible rouge.
+- [x] `git status` avant commit : uniquement les fichiers du tableau « Fichiers » ; ajoutés un par un.
 
 ## Pièges connus
 - `typeof null === 'object'` et `Array.isArray` : un objet JSON valide est `typeof x === 'object' && x !== null && !Array.isArray(x)`.
@@ -133,7 +133,13 @@ Helper `raw(overrides)` : l'objet JSON plat **valide** correspondant à `SAVE_PL
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+**Fait** : types `Settings`, `SaveData`, `LoadStatus` ; `src/logic/save.ts` (`initialSave`, `serialize`, `deserialize` tolérant avec `migrate`, `resetProgressInSave`, gel en profondeur y compris `history`) ; `tests/logic/save.test.ts` (45 tests).
+
+**TDD** : tests écrits d'abord ; `vitest run tests/logic/save.test.ts` a échoué (module `save` introuvable), puis vert après le code.
+
+**Contre-épreuves** (toutes rouges comme attendu) : (a) coins non repris sur version inconnue → 3 tests CL-22 rouges ; (b) plafond 60 000 → test coins 50001 rouge ; (c) rejet total au premier champ invalide → 20 tests rouges ; (d) historique non gelé → test du gel rouge ; (e) `packCode` effacé → test ADR-017 rouge ; (f) `JSON.parse` qui lève → 3 tests rouges. Code restauré ensuite.
+
+**Résultat** : `npm run check` OK, 370 tests (325 + 45). Un test supplémentaire hors liste : `settings` absent en entier (cas du piège de la fiche). Aucun écart.
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
