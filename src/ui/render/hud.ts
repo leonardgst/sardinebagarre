@@ -24,6 +24,17 @@ export function renderHud(level: number, payout: number, total: number): HTMLEle
   return header;
 }
 
+/** Met à jour le bandeau en place (niveau, jetons de la partie, total). */
+export function updateHud(hud: HTMLElement, level: number, payout: number, total: number): void {
+  const set = (selector: string, value: string): void => {
+    const target = hud.querySelector(selector);
+    if (target) target.textContent = value;
+  };
+  set('.niveau strong', String(level));
+  set('.gain strong', formatCoins(payout));
+  set('.total strong', formatCoins(total));
+}
+
 /** Zone de message d'une ligne (vide pour l'instant). */
 export function renderMessage(text = ''): HTMLElement {
   const p = document.createElement('p');
