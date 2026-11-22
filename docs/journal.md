@@ -36,7 +36,8 @@ _(aucune)_
 - Identifiants de carte toujours 0..24 (`RangeError` sinon) ; `missingCoins` vaut 0 aussi quand l'album est complet : tester `nextPhoto(...) === null` d'abord.
 - Exporter la clé `sardinebagarre:save` en constante dans `storage.ts` (étape 3.1) ; prix par défaut R-115 et validation des prix dans le modèle du pack (étape 3.3).
 - Étape 3.3 : refuser un pack dont un prix n'est pas un entier ≥ 0 (un prix invalide bloque toutes les photos suivantes).
-- Étape 3.1 (relecture T-010, C4) : au chargement d'une sauvegarde dont le total est ≥ 50 000, `createController` ne doit pas lever d'exception. Il passe directement en phase `full` (R-53). Dans la branche `full`, mettre à jour le niveau affiché et afficher les messages R-66 déjà calculés.
+- Étape 3.1 (relecture T-010, C4) : au chargement d'une sauvegarde dont le total est ≥ 50 000, `createController` ne doit pas lever d'exception. Il passe directement en phase `full` (R-53). Dans la branche `full`, mettre à jour le niveau affiché et afficher les messages R-66 déjà calculés. Ajouter le test de C3 (relecture T-010) : avec un total de 49 990, une victoire avec un gain de 36 affiche « Tu remportes 10 jetons ! ».
+- T-011 (relecture T-010) : tout élément ajouté à `body` hors de `#app` (dialogue, bandeau de mise à jour R-104) déclencherait `onElsewhere`. Le placer dans `#app` ou l'exclure explicitement.
 
 ## Historique
 - 2026-11-10 — Opus (cadrage) — Spécification, architecture, plan et fichiers de pilotage de Claude Code rédigés.

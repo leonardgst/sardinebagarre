@@ -202,3 +202,23 @@ Corrections demandées (décidées par Opus) :
 
 ## Corrections de la relecture (appliquées)
 2026-11-22 — codeur : C1 (setFast(false) dans doFlip et nextRound + test e2e), C2 (resume si état ≠ running), C3 (message de victoire = jetons encaissés), C5 (test tactile via tap ; attendre et toucher déplacés dans aide.ts), C6 (écouteur sur body hors racine + test Mac). C4 reporté. check OK (419), e2e 100 passés / 10 ignorés (tests propres au Mac ou au tactile).
+
+2026-11-22 — relecteur (2e relecture, commit d0c2927) — 🔴 À reprendre. check OK (419), e2e 100 passés / 10 ignorés.
+- C1 conforme. Contre-épreuve faite : sans les `setFast(false)` ajoutés, le test C1 échoue sur les 5 projets.
+- C2 conforme (`state !== 'running'` → `resume`).
+- C3 conforme (le message utilise `credited`). Le test est reporté à l'étape 3.1 (49 990 + 36 → « 10 jetons »).
+- C5 conforme : parcours en `tap()` sur les projets tactiles, `attendre` et `toucher` dans `aide.ts`.
+- C6 : contre-épreuve faite (sans l'écouteur sur `body`, le test Mac échoue), et l'écouteur principal est toujours sur `#app`. **Mais** un même vrai clic est traité deux fois.
+  - Entre les deux écouteurs, les microtâches retirent la carte touchée du DOM (`revealAll`, `drawBoard`). Quand le clic arrive sur `body`, `root.contains(target)` est donc faux, et `onElsewhere` est rappelé.
+  - Effets reproduits (mac, iphone-15) :
+    - toucher une carte cachée pendant la fin saute la révélation et lance la partie suivante (R-52, CL-20) ;
+    - toucher une carte en `waitingTap` après une victoire saute le bandeau de niveau (UI-43, R-66).
+
+Corrections demandées :
+- **C7** (bloquant) `src/ui/input.ts:22-23` : remplacer le test par `if (event.composedPath().includes(root)) return;`.
+  - Ajouter deux tests e2e en **vrais clics Playwright** (`locator(...).click()`, pas `el.click()` dans un `evaluate`), sans `reducedMotion` :
+    - « CL-20 vrai toucher sur une carte cachée pendant la fin → waitingTap » : toucher la Sardine, puis `locator('[data-id=<carte non Sardine>]').click()`, attendre environ 300 ms, et attendre la phase `waitingTap` ;
+    - « R-66 toucher une carte en waitingTap → bandeau de niveau affiché » : gagner, puis `locator('[data-id="0"]').click()` ; la phase est alors `ending` et `.bandeau-niveau` est présent.
+  - Le relecteur a validé la correction et les tests dans un worktree temporaire : les deux tests échouent sur d0c2927 et passent avec la correction.
+- **C8** (mineur) `src/ui/audio.ts:12` : `ctx.resume().catch(() => {})` au lieu de `void ctx.resume()`, pour ne pas laisser de rejet non géré si le contexte est `closed`.
+- **C9** (mineur) `src/ui/controller.ts:182, 210` : supprimer les `setFast(false)`, devenus redondants avec ceux des lignes 173 et 221.
