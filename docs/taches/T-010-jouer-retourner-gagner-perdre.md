@@ -180,4 +180,22 @@ Choix : le message de la Sardine est posé au toucher (avant l'animation) ; le b
 Reste pour l'humain : test manuel (aboiement audible), non faisable ici.
 
 ## Relecture
-_(verdict du relecteur, avec la date)_
+2026-11-22 — relecteur — 🟡 Approuvé avec réserves. check OK (419), e2e 115 passés (captures comprises), build OK sans `__sb`, captures vues.
+- R-55 conforme : un seul `finalizeRound`, appelé de façon synchrone avant tout `await`.
+- CL-19 et CL-20 conformes : aucun chemin vers `flip` hors de `playing`, `play()` a un `setTimeout` de secours, `ending()` est dans un `try/finally`.
+- L'écouteur délégué sur `#app` est compatible avec iOS : **ne pas le déplacer vers `document` ou `body`**.
+- Écarts du codeur acceptés.
+
+Test de l'humain sur un vrai iPhone (2026-11-22, `npm run dev -- --host`) : on joue au toucher, et toucher le fond lance la partie suivante. L'aboiement s'entend sur PC.
+
+Corrections demandées (décidées par Opus) :
+- **C1** (important, avant fusion) `src/ui/anim.ts:18`, `src/ui/controller.ts:181, 215, 219` : le mode accéléré (`fast`) reste actif après un toucher pendant la fin ou pendant le bandeau de niveau. La partie suivante perd alors l'animation UI-30.
+  - Correction : appeler `setFast(false)` au début de `doFlip`, pour chaque retournement, et aussi dans `nextRound` avant le passage en `playing`.
+  - Test e2e de non-régression, **sans** `reducedMotion` : Sardine, toucher pendant `ending`, `waitingTap`, toucher, `playing`. Ensuite, dans un seul `evaluate` : clic sur `[data-state=hidden]` puis `!!document.querySelector('.flip-out')`, qui doit valoir `true`.
+- **C2** (important, iOS) `src/ui/audio.ts:15` : iOS met l'`AudioContext` à l'état `interrupted` (arrière-plan, appel, Siri). Remplacer la condition par `if (ctx.state !== 'running') void ctx.resume();`.
+- **C3** `src/ui/controller.ts:156` : le message de victoire doit annoncer les jetons **réellement encaissés** (`credited`, R-50), pas le gain brut. Exemple : 49 990 + 36 → « Tu remportes 10 jetons ! ».
+- **C5** `tests/e2e/partie.spec.ts` :
+  - ajouter un parcours en `locator.tap()` sur les projets tactiles (`hasTouch`) : Sardine, toucher sur `.message`, nouvelle partie ;
+  - déplacer `attendre` et `toucher` (présents en double dans `partie.spec.ts` et `screens.spec.ts`) dans `tests/e2e/aide.ts`.
+- **C6** `src/ui/input.ts:10` (Mac) : en `waitingTap` et en `ending`, un clic sur le fond décoré, hors de la colonne de 480 px, doit aussi compter comme « toucher ailleurs ». Ajouter un second écouteur sur `body` qui ne gère **que** ce cas. L'écouteur principal reste sur `#app`.
+- **C4** : non traité ici. Démarrer avec un total ≥ 50 000 lèverait une exception, et la branche `full` ne met pas à jour le niveau affiché. Reporté à l'étape 3.1 et consigné dans le journal (« Contraintes pour la phase 2 »).
