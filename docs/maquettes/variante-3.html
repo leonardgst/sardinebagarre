@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="description" content="Maquette 3 sur 3 de Sardinebagarre (« Cahier ») : Papier quadrillé, crayon et surligneurs : un jeu dessiné à la main dans un cahier d’écolier.">
+<title>Maquette 3 · Cahier</title>
+<!-- Maquette statique (étape 2.1 du plan). Toucher une carte cachée la retourne, pour voir les faces. -->
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-variant-numeric:lining-nums tabular-nums;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;
+  background:var(--fond-mac);color:var(--encre);font-family:var(--police-texte);overflow:hidden;
+}
+.app{
+  height:100dvh;max-width:480px;margin:0 auto;position:relative;
+  display:grid;grid-template-rows:auto 1fr auto auto auto;grid-template-areas:"hud" "table" "message" "actions" "nav";
+  gap:10px;
+  padding:calc(env(safe-area-inset-top) + 10px) calc(env(safe-area-inset-right) + 12px) calc(env(safe-area-inset-bottom) + 8px) calc(env(safe-area-inset-left) + 12px);
+  background:var(--fond);
+}
+.hud{grid-area:hud;display:grid;grid-template-columns:auto 1fr 1fr;gap:6px;align-items:stretch}
+.hud .bloc{display:flex;flex-direction:column;justify-content:center;padding:6px 10px;min-width:0}
+.hud small{font-size:11px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud strong{font-family:var(--police-chiffres);font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.hud .niveau strong{font-size:26px}
+.table{grid-area:table;container-type:size;display:grid;place-items:center;min-height:0}
+.board{
+  width:min(100cqw,100cqh);aspect-ratio:1;display:grid;
+  grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(6,1fr);gap:var(--gap,5px);
+}
+.card,.ind,.coin{min-width:0;min-height:0;position:relative}
+.card{border:0;font:inherit;color:inherit;cursor:pointer;display:grid;place-items:center}
+.chiffre{font-family:var(--police-chiffres);font-size:min(9cqw,9cqh);line-height:1;font-weight:800}
+.m{position:absolute;font-style:normal;font-family:var(--police-chiffres);font-weight:800;font-size:min(2.6cqw,2.6cqh);line-height:1;
+  width:1.45em;height:1.45em;display:grid;place-items:center;border-radius:50%;opacity:0;transition:opacity .15s}
+.m.on{opacity:1}
+.m-s{top:3px;left:3px}.m-1{top:3px;right:3px}.m-2{bottom:3px;left:3px}.m-3{bottom:3px;right:3px}
+.medaillon{width:82%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;overflow:hidden}
+.tete{width:100%;height:100%}
+.ind{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.ind b{font-family:var(--police-chiffres);font-size:min(5.4cqw,5.4cqh);line-height:1;font-variant-numeric:tabular-nums}
+.ind span{display:flex;align-items:center;gap:2px;font-family:var(--police-chiffres);font-weight:800;font-size:min(3.8cqw,3.8cqh);line-height:1}
+.mini{width:1.25em;height:1.25em}
+.message{grid-area:message;text-align:center;min-height:1.4em;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.actions{grid-area:actions;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions button{min-height:48px;font:inherit;font-size:17px;font-weight:700;cursor:pointer;color:inherit}
+.nav{grid-area:nav;display:flex;justify-content:center;gap:14px;font-size:12px;opacity:.75}
+.nav a{color:inherit}
+.boom{animation:boum .5s ease-out}
+@keyframes boum{0%{transform:scale(.6) rotate(-8deg)}60%{transform:scale(1.12) rotate(3deg)}100%{transform:none}}
+.flip{animation:retourne .28s ease-out}
+@keyframes retourne{0%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.boom,.flip{animation:none}}
+/* Paysage bas (UI-15) : plateau à gauche, le reste à droite */
+@media (orientation:landscape) and (max-height:540px){
+  .app{max-width:none;grid-template-columns:1fr minmax(220px,300px);grid-template-rows:auto 1fr auto auto;
+    grid-template-areas:"table hud" "table message" "table actions" "table nav";column-gap:20px}
+  .hud{grid-template-columns:1fr 1fr}.hud .niveau{grid-column:1 / -1}
+  .message{white-space:normal;align-self:center}
+}
+
+:root{
+  --fond-mac:#e9e3d6;
+  --fond:#fbf8f1;
+  --encre:#2e2f4a;
+  --police-texte:"Chalkboard SE","Marker Felt","Comic Sans MS",cursive;
+  --police-chiffres:"Chalkboard SE","Marker Felt","Comic Sans MS",cursive;
+  --chien-tete:#e2b07a;--chien-oreille:#9a6a44;--chien-museau:#fff4e2;
+}
+body{background:#e9e3d6}
+.app{background:
+  linear-gradient(90deg,transparent 22px,rgba(226,88,88,.45) 22px 24px,transparent 24px),
+  linear-gradient(rgba(84,140,214,.18) 1px,transparent 1px) 0 0/16px 16px,
+  linear-gradient(90deg,rgba(84,140,214,.18) 1px,transparent 1px) 0 0/16px 16px,#fbf8f1}
+@media (min-width:600px){body{background:repeating-linear-gradient(-30deg,#e9e3d6 0 12px,#e3dccd 12px 24px)}.app{box-shadow:6px 8px 0 rgba(46,47,74,.15),0 0 0 1px #d9d0bd}}
+.hud .bloc{background:#fff6a8;color:#2e2f4a;border-radius:3px;box-shadow:2px 3px 0 rgba(46,47,74,.15);transform:rotate(-1deg)}
+.hud .bloc:nth-child(2){background:#c9f0dc;transform:rotate(.8deg)}
+.hud .bloc:nth-child(3){background:#ffd6e0;transform:rotate(-.5deg)}
+.hud strong{font-weight:700}
+.board{--gap:7px}
+.card{border-radius:10px 12px 9px 11px;border:2.2px solid #2e2f4a}
+.card:nth-child(3n){transform:rotate(-1.2deg)}.card:nth-child(4n+1){transform:rotate(1deg)}
+.cachee{background:repeating-linear-gradient(135deg,transparent 0 6px,rgba(46,47,74,.14) 6px 7.5px),#fff}
+.cachee:active{background-color:#f0f0ff}
+.face{background:#fff;color:#2e2f4a}
+.chiffre{font-weight:700}
+.sardine{background:#ffd6e0;border-color:#d1435b;border-width:3px;box-shadow:0 0 0 4px rgba(209,67,91,.2)}
+.medaillon{background:#fff;border:2px dashed #d1435b}
+.m{color:#d1435b;font-weight:700;width:auto;height:auto}
+.ind{border-radius:12px 9px 11px 8px;border:2.2px solid #2e2f4a;color:#2e2f4a}
+.ind b{font-weight:700}
+.c0{background:#ffb3ba}.c1{background:#b5ead7}.c2{background:#ffe29a}.c3{background:#a8d8ff}.c4{background:#d7c1ff}
+.coin{display:grid;place-items:center;font-size:min(7cqw,7cqh);color:#d1435b;transform:rotate(-12deg)}
+.message{color:#d1435b}
+.actions button{background:#fff;border:2.5px solid #2e2f4a;border-radius:14px 10px 13px 9px;box-shadow:3px 3px 0 #2e2f4a;font-family:var(--police-texte)}
+.actions button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #2e2f4a}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="chien" viewBox="0 0 100 100">
+    <path d="M22 30 C10 34 8 58 16 70 C22 78 30 70 31 58 Z" fill="var(--chien-oreille)"/>
+    <path d="M78 30 C90 34 92 58 84 70 C78 78 70 70 69 58 Z" fill="var(--chien-oreille)"/>
+    <ellipse cx="50" cy="52" rx="30" ry="31" fill="var(--chien-tete)"/>
+    <path d="M44 22 C46 30 54 30 56 22 C54 18 46 18 44 22 Z" fill="var(--chien-oreille)" opacity=".55"/>
+    <ellipse cx="50" cy="68" rx="17" ry="13" fill="var(--chien-museau)"/>
+    <circle cx="38" cy="47" r="4.2" fill="#1d1a1a"/>
+    <circle cx="62" cy="47" r="4.2" fill="#1d1a1a"/>
+    <circle cx="39.4" cy="45.6" r="1.4" fill="#fff"/>
+    <circle cx="63.4" cy="45.6" r="1.4" fill="#fff"/>
+    <ellipse cx="50" cy="61" rx="6.5" ry="4.8" fill="#1d1a1a"/>
+    <path d="M50 65.5 V70 M50 70 Q45 75 40.5 71 M50 70 Q55 75 59.5 71" stroke="#1d1a1a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M46.5 72.5 Q50 81 53.5 72.5 Z" fill="#e8798a"/>
+  </symbol>
+</svg>
+<div class="app">
+  <header class="hud">
+    <div class="bloc niveau"><small>Niveau</small><strong>3</strong></div>
+    <div class="bloc"><small>Jetons de la partie</small><strong>00000</strong></div>
+    <div class="bloc"><small>Total</small><strong>01235</strong></div>
+  </header>
+  <main class="table"><div class="board"><div class="card face" aria-label="1"><span class="chiffre">1</span></div><button class="card cachee" data-v="0" aria-label="Carte cachée"><i class="m m-s on">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><div class="card face" aria-label="2"><span class="chiffre">2</span></div><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1 on">1</i><i class="m m-2 on">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="0" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><div class="ind c0 ligne" aria-label="Somme 4, 2 Sardines"><b>04</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>2</span></div><div class="card face" aria-label="3"><span class="chiffre">3</span></div><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><div class="card face" aria-label="1"><span class="chiffre">1</span></div><button class="card cachee" data-v="0" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><div class="ind c1 ligne" aria-label="Somme 6, 1 Sardine"><b>06</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>1</span></div><div class="card face" aria-label="1"><span class="chiffre">1</span></div><button class="card cachee" data-v="0" aria-label="Carte cachée"><i class="m m-s on">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><div class="card face sardine boom" aria-label="Sardine"><span class="medaillon"><svg class="tete" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg></span></div><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="2" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2 on">2</i><i class="m m-3">3</i></button><div class="ind c2 ligne" aria-label="Somme 4, 2 Sardines"><b>04</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>2</span></div><div class="card face" aria-label="2"><span class="chiffre">2</span></div><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="0" aria-label="Carte cachée"><i class="m m-s on">S</i><i class="m m-1 on">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><div class="ind c3 ligne" aria-label="Somme 5, 1 Sardine"><b>05</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>1</span></div><button class="card cachee" data-v="0" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="3" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1">1</i><i class="m m-2">2</i><i class="m m-3">3</i></button><button class="card cachee" data-v="1" aria-label="Carte cachée"><i class="m m-s">S</i><i class="m m-1 on">1</i><i class="m m-2">2</i><i class="m m-3 on">3</i></button><div class="ind c4 ligne" aria-label="Somme 6, 1 Sardine"><b>06</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>1</span></div><div class="ind c0 colonne" aria-label="Somme 7, 1 Sardine"><b>07</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>1</span></div><div class="ind c1 colonne" aria-label="Somme 3, 2 Sardines"><b>03</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>2</span></div><div class="ind c2 colonne" aria-label="Somme 7, 1 Sardine"><b>07</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>1</span></div><div class="ind c3 colonne" aria-label="Somme 4, 1 Sardine"><b>04</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>1</span></div><div class="ind c4 colonne" aria-label="Somme 4, 2 Sardines"><b>04</b><span><svg class="mini" viewBox="0 0 100 100" aria-hidden="true"><use href="#chien"/></svg>2</span></div><div class="coin" aria-hidden="true">✎</div></div></main>
+  <p class="message">Ouaf ! Sardine t’a trouvée !</p>
+  <footer class="actions"><button type="button">Mémo</button><button type="button">Quitter</button></footer>
+  <nav class="nav"><a href="variante-2.html">← Conserverie</a><span>Maquette 3/3 · Cahier</span><a href="variante-1.html">Salon →</a></nav>
+</div>
+<script>
+document.querySelectorAll('.card.cachee').forEach(function(b){
+  b.addEventListener('click',function(){
+    var v=Number(b.dataset.v),d=document.createElement('div');
+    if(v===0){d.className='card face sardine boom';d.innerHTML='<span class="medaillon"><svg class="tete" viewBox="0 0 100 100"><use href="#chien"/></svg></span>';}
+    else{d.className='card face flip';d.innerHTML='<span class="chiffre">'+v+'</span>';}
+    b.replaceWith(d);
+  });
+});
+</script>
+</body>
+</html>
