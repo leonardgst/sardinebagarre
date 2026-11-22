@@ -15,6 +15,7 @@
 | T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | terminée |
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
+| T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | planifiée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -68,3 +69,4 @@ _(aucune)_
 - 2026-11-22 — codeur — Le port 5173 était occupé par le serveur des maquettes : `playwright.config.ts` accepte `E2E_PORT` (défaut 5173).
 - 2026-11-22 — codeur — T-009 : corrections de relecture C1 (police des chiffres Palatino), C2 (rôles ARIA), C3 (test géométrique R-01/R-02) ; check OK, e2e 55 passés.
 - 2026-11-22 — Opus — T-009 terminée après 2e relecture (🟢) et fusionnée dans main (non poussée). Prochaine étape : T-010 (étape 2.3a).
+- 2026-11-22 — Opus — v0.1.0 publiée (main poussée, tag v0.1.0). T-010 planifiée (étape 2.3a : contrôleur, animations, aboiement, R-55 avant animation, CL-19/CL-20).
