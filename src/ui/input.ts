@@ -16,4 +16,12 @@ export function installInput(root: HTMLElement, handlers: InputHandlers): void {
     if (card && Number.isInteger(id) && id >= 0 && id <= 24) handlers.onCard(id);
     else handlers.onElsewhere();
   });
+  // Mac : le fond décoré hors de la colonne compte aussi comme « toucher ailleurs ».
+  // Ce second écouteur ne gère que les clics situés en dehors de la racine.
+  document.body.addEventListener('click', (event) => {
+    const target = event.target instanceof Node ? event.target : null;
+    if (target && root.contains(target)) return;
+    handlers.onGesture();
+    handlers.onElsewhere();
+  });
 }

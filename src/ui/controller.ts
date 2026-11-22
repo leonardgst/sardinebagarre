@@ -153,7 +153,7 @@ export function createController(
           ),
         );
         shown.payout = 0;
-        setMessage(wonPayoutMessage(gain));
+        setMessage(wonPayoutMessage(credited));
       }
       await revealAll();
     } finally {
@@ -170,6 +170,7 @@ export function createController(
     const before = round;
     const next = flip(before, id);
     if (next === before) return; // R-30 : carte déjà retournée.
+    setFast(false); // Un toucher accélérateur précédent ne doit pas couper UI-30.
     round = next;
     const previousCoins = game.coins;
     const finished = next.status !== 'PLAYING';
@@ -206,6 +207,7 @@ export function createController(
       return;
     }
     round = next.round;
+    setFast(false);
     shown.level = game.level;
     shown.total = game.coins;
     shown.payout = 0;

@@ -199,3 +199,6 @@ Corrections demandées (décidées par Opus) :
   - déplacer `attendre` et `toucher` (présents en double dans `partie.spec.ts` et `screens.spec.ts`) dans `tests/e2e/aide.ts`.
 - **C6** `src/ui/input.ts:10` (Mac) : en `waitingTap` et en `ending`, un clic sur le fond décoré, hors de la colonne de 480 px, doit aussi compter comme « toucher ailleurs ». Ajouter un second écouteur sur `body` qui ne gère **que** ce cas. L'écouteur principal reste sur `#app`.
 - **C4** : non traité ici. Démarrer avec un total ≥ 50 000 lèverait une exception, et la branche `full` ne met pas à jour le niveau affiché. Reporté à l'étape 3.1 et consigné dans le journal (« Contraintes pour la phase 2 »).
+
+## Corrections de la relecture (appliquées)
+2026-11-22 — codeur : C1 (setFast(false) dans doFlip et nextRound + test e2e), C2 (resume si état ≠ running), C3 (message de victoire = jetons encaissés), C5 (test tactile via tap ; attendre et toucher déplacés dans aide.ts), C6 (écouteur sur body hors racine + test Mac). C4 reporté. check OK (419), e2e 100 passés / 10 ignorés (tests propres au Mac ou au tactile).

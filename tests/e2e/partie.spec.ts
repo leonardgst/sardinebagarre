@@ -1,20 +1,13 @@
 import { expect, type Page, test } from '@playwright/test';
 import { formatCoins } from '../../src/ui/format';
 import { messages } from '../../src/ui/texts.fr';
-import { idsWhere, ouvrir, roundForSeed } from './aide';
+import { attendre, idsWhere, ouvrir, roundForSeed, toucher } from './aide';
 
 const SEED = 42;
 
 async function ouvrirRapide(page: Page): Promise<void> {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await ouvrir(page, SEED, true);
-}
-
-const attendre = (page: Page, phase: string) =>
-  page.waitForFunction((p) => window.__sb?.phase() === p, phase);
-
-async function toucher(page: Page, id: number): Promise<void> {
-  await page.locator(`[data-id="${id}"]`).click();
 }
 
 test('R-32 R-33 R-50 partie gagnée', async ({ page }) => {
@@ -125,5 +118,49 @@ test('CL-20 toucher pendant la fin', async ({ page }) => {
 test('CL-21 aucun retournement automatique', async ({ page }) => {
   await ouvrir(page, SEED);
   await page.waitForTimeout(1000);
+  await expect(page.locator('[data-state=hidden]')).toHaveCount(25);
+});
+
+test('C1 le toucher pendant la fin ne coupe pas UI-30 de la partie suivante', async ({ page }) => {
+  const [sardine] = idsWhere(roundForSeed(SEED), (v) => v === 'S');
+  if (sardine === undefined) throw new Error('plateau');
+  await ouvrir(page, SEED, true); // sans reducedMotion
+  await toucher(page, sardine);
+  await page.evaluate(() => document.querySelector<HTMLElement>('[data-state=hidden]')?.click());
+  await attendre(page, 'waitingTap');
+  await page.locator('.message').click();
+  await attendre(page, 'playing');
+  const animee = await page.evaluate(() => {
+    document.querySelector<HTMLElement>('[data-state=hidden]')?.click();
+    return !!document.querySelector('.flip-out');
+  });
+  expect(animee).toBe(true);
+});
+
+test('R-52 clic sur le fond décoré (Mac) : la partie suivante démarre', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'mac', 'fond décoré hors colonne : grand écran seulement');
+  const [sardine] = idsWhere(roundForSeed(SEED), (v) => v === 'S');
+  if (sardine === undefined) throw new Error('plateau');
+  await ouvrirRapide(page);
+  await toucher(page, sardine);
+  await attendre(page, 'waitingTap');
+  await page.mouse.click(5, 400);
+  await attendre(page, 'playing');
+  await expect(page.locator('[data-state=hidden]')).toHaveCount(25);
+});
+
+test('R-52 parcours au doigt : Sardine, toucher sur le message, nouvelle partie', async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.use.hasTouch, 'projets tactiles seulement');
+  const [sardine] = idsWhere(roundForSeed(SEED), (v) => v === 'S');
+  if (sardine === undefined) throw new Error('plateau');
+  await ouvrirRapide(page);
+  await page.locator(`[data-id="${sardine}"]`).tap();
+  await attendre(page, 'waitingTap');
+  await page.locator('.message').tap();
+  await attendre(page, 'playing');
   await expect(page.locator('[data-state=hidden]')).toHaveCount(25);
 });

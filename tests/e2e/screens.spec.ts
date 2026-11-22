@@ -1,5 +1,5 @@
-import { type Page, test } from '@playwright/test';
-import { idsWhere, ouvrir, roundForSeed } from './aide';
+import { test } from '@playwright/test';
+import { attendre, idsWhere, ouvrir, roundForSeed, toucher } from './aide';
 
 const SEED = 42;
 const chemin = (profil: string, fichier: string) => `test-results/screens/${profil}/${fichier}`;
@@ -30,13 +30,6 @@ test('@screens en cours et défaite', async ({ page }, testInfo) => {
   );
   await page.screenshot({ path: chemin(testInfo.project.name, '03-en-cours.png') });
 });
-
-const attendre = (page: Page, phase: string) =>
-  page.waitForFunction((p) => window.__sb?.phase() === p, phase);
-
-async function toucher(page: Page, id: number): Promise<void> {
-  await page.locator(`[data-id="${id}"]`).click();
-}
 
 test('@screens gain affiché', async ({ page }, testInfo) => {
   const round = roundForSeed(SEED);
