@@ -132,4 +132,10 @@ _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 Rendu statique du plateau 6×6, du bandeau, du message et des boutons (style Salon) ; seed.ts (2 générateurs), format.ts, texts.fr.ts, crochet debug réservé au dev (absent du build), 5 profils Playwright. Tests : 7 Vitest, 10 e2e par profil (50 passés, 5 ignorés par conception). Captures des 5 profils vérifiées : pas de défaut visible (cartes >= 44 px, aucun défilement, paysage correct). Écart : `playwright.config.ts` accepte la variable `E2E_PORT` (défaut 5173) car le port 5173 était occupé par le serveur des maquettes. Les marques S/1/2/3 et le symbole ♣ sont dans `symbols` de texts.fr.ts. Les captures 00-page-minimale restantes ont été supprimées.
 
 ## Relecture
-_(verdict du relecteur, avec la date)_
+2026-11-22 — relecteur — 🟡 Approuvé avec réserves. check OK, e2e 50/50 (5 ignorés), captures vues (5 profils), debug et `__sb` absents du build vérifiés.
+
+Corrections demandées :
+- **C1** (important) `src/ui/styles/main.css:11` : Georgia n'a pas de chiffres alignés (`lining-nums` sans effet ; le « 0 » du nombre de Sardines se lit « o », le « 1 » est plus petit que le « 3 »). Remplacer par `--police-chiffres: Palatino, "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;`, puis relancer les captures.
+- **C2** (mineur) `src/ui/render/board.ts:43, 48, 76, 92` : `aria-label` ignoré sur des `div` génériques. Ajouter `role="img"` sur la face Sardine, la face chiffrée et les indicateurs, et `role="group"` sur le plateau.
+- **C3** (mineur) `tests/e2e/plateau.spec.ts` : ajouter un test géométrique R-01/R-02 avec `boundingBox`. La carte `id` doit être à la ligne `floor(id/5)` et à la colonne `id%5`. `row-r` doit être aligné sur la ligne r, à droite de la carte `r*5+4`. `col-c` doit être aligné sur la colonne c, sous la carte `20+c`.
+- **C4** (documentation, Opus) : UI-15 et disposition paysage (fait : UI-15 et ADR-018 annotés). Nom de l'appareil iPhone SE dans le skill `controle-visuel` et `E2E_PORT` dans CLAUDE.md : en attente de l'accord de l'humain.

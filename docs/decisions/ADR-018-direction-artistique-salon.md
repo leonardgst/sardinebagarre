@@ -24,6 +24,8 @@ Repères à reprendre dans `src/ui/` :
 - **Marques de mémo** : pastilles bordeaux dans les 4 coins (S en haut à gauche, 1 en haut à droite, 2 en bas à gauche, 3 en bas à droite).
 - **Typographie** : polices système à empattements (`"Iowan Old Style", Palatino, Georgia, serif`), avec chiffres alignés (`font-variant-numeric: lining-nums tabular-nums`).
 - **Boutons** : pilules crème et or.
+- **Paysage** (UI-15) : quand la hauteur est faible (`orientation: landscape` et hauteur ≤ 540 px), le plateau passe à gauche, et le bandeau, le message et les boutons à droite, comme dans la maquette.
+- **Chiffres** : Georgia n'a pas de chiffres alignés. Pour les chiffres, utiliser une pile à chiffres alignés par défaut : `Palatino, "Palatino Linotype", "Book Antiqua", "Times New Roman", serif` (relecture T-009, C1).
 - **Tête de chien de secours** : le SVG `#chien` de la maquette, à déplacer dans `src/ui/art/`.
 
 ## Conséquences
