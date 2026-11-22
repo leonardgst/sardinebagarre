@@ -14,6 +14,7 @@
 | T-006 | Enchaîner les parties, encaisser et débloquer l'album | terminée |
 | T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | terminée |
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
+| T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | planifiée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -62,3 +63,4 @@ _(aucune)_
 - 2026-11-21 — codeur — T-008 : corrections après relecture (C1 statut testé, C2 ligne sans Sardine, C3 documentation) ; contre-épreuves faites ; check OK (407 tests).
 - 2026-11-22 — humain — Parties en console (`scripts/partie-console.ts`) jouées : le jeu fonctionne. Phase 1 (logique) terminée.
 - 2026-11-22 — Opus — Étape 2.1 : 3 maquettes (Salon, Conserverie, Cahier) dans docs/maquettes/ ; l'humain retient « Salon » (ADR-018). Vues sur iPhone via `npx vite docs/maquettes --host` (http, port 5173 ouvert sur le profil Privé).
+- 2026-11-22 — Opus — Branche maquettes fusionnée ; T-009 planifiée (étape 2.2 : rendu statique, seed.ts à deux générateurs, 5 profils Playwright, crochet de debug).
