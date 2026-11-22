@@ -23,6 +23,7 @@ TypeScript strict · Vite (`base: '/sardinebagarre/'`) · DOM natif (sans framew
 - `npm run dev` : serveur local (`npm run dev -- --host` pour l'iPhone en Wi-Fi) · `npm run dev:https -- --host` : en HTTPS (requis pour tester le pack et le service worker sur iPhone)
 - `npm run check` : **typecheck + lint + tests unitaires + contrôle de confidentialité**. Doit passer avant tout commit.
 - `npm test` : Vitest seul · `npm run e2e` : Playwright · `npm run screens` : captures dans `test-results/screens/`
+- Port 5173 déjà pris (par exemple par `npx vite docs/maquettes --host`) : `E2E_PORT=5199 npm run e2e` (même chose pour `screens` ; dans PowerShell : `$env:E2E_PORT=5199; npm run e2e`)
 - `npm run build` puis `npm run preview` : version de production locale
 - `npm run pack` : **réservé à l'humain** (demande le code secret)
 

@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | terminée |
 | Étape du plan | 2.2 |
 | Branche | `t-009-rendu-plateau` |
 | Estimation | M (1–3 h) |
@@ -106,14 +106,14 @@
 Les ids des cartes chiffrées et des Sardines se calculent dans le test à partir de la logique (même graine) : ne pas les coder en dur.
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe (typecheck, Biome, Vitest, confidentialité)
-- [ ] `npm run e2e` passe sur les 5 projets
-- [ ] `npm run screens` produit `test-results/screens/<profil>/02-plateau-neuf.png`, `03-en-cours.png` et `07-defaite-revelation.png` pour les 5 profils
-- [ ] Les captures sont vérifiées avec la checklist du skill `controle-visuel`. Le compte rendu liste les problèmes vus et corrigés. Comparer aussi avec `docs/maquettes/variante-1.html` (même ambiance, mêmes couleurs).
-- [ ] `grep -rn "getRandomValues" src` ne trouve que `src/ui/seed.ts`
-- [ ] Aucun texte affiché en dur hors de `src/ui/texts.fr.ts`
-- [ ] Aucun chemin absolu `/…` dans `src/ui/` ni `index.html` (sauf le `src="/src/ui/main.ts"` géré par Vite)
-- [ ] `npm run build` passe
+- [x] `npm run check` passe (typecheck, Biome, Vitest, confidentialité)
+- [x] `npm run e2e` passe sur les 5 projets
+- [x] `npm run screens` produit `test-results/screens/<profil>/02-plateau-neuf.png`, `03-en-cours.png` et `07-defaite-revelation.png` pour les 5 profils
+- [x] Les captures sont vérifiées avec la checklist du skill `controle-visuel`. Le compte rendu liste les problèmes vus et corrigés. Comparer aussi avec `docs/maquettes/variante-1.html` (même ambiance, mêmes couleurs).
+- [x] `grep -rn "getRandomValues" src` ne trouve que `src/ui/seed.ts`
+- [x] Aucun texte affiché en dur hors de `src/ui/texts.fr.ts`
+- [x] Aucun chemin absolu `/…` dans `src/ui/` ni `index.html` (sauf le `src="/src/ui/main.ts"` géré par Vite)
+- [x] `npm run build` passe
 
 ## Pièges connus
 - **Taille des cartes sur iPhone SE.** Le cadre doré du plateau (padding + liseré) mange de la place : dans la maquette, les cartes font 42 px à 320 px de large. À 375 px, c'est plus large, mais vérifiez ≥ 44 px. Si ce n'est pas le cas, amincissez le cadre ou réduisez l'écart, sans réduire les marges latérales sous 12 px.
@@ -129,7 +129,23 @@ Les ids des cartes chiffrées et des Sardines se calculent dans le test à parti
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+Rendu statique du plateau 6×6, du bandeau, du message et des boutons (style Salon) ; seed.ts (2 générateurs), format.ts, texts.fr.ts, crochet debug réservé au dev (absent du build), 5 profils Playwright. Tests : 7 Vitest, 10 e2e par profil (50 passés, 5 ignorés par conception). Captures des 5 profils vérifiées : pas de défaut visible (cartes >= 44 px, aucun défilement, paysage correct). Écart : `playwright.config.ts` accepte la variable `E2E_PORT` (défaut 5173) car le port 5173 était occupé par le serveur des maquettes. Les marques S/1/2/3 et le symbole ♣ sont dans `symbols` de texts.fr.ts. Les captures 00-page-minimale restantes ont été supprimées.
 
 ## Relecture
-_(verdict du relecteur, avec la date)_
+2026-11-22 — relecteur — 🟡 Approuvé avec réserves. check OK, e2e 50/50 (5 ignorés), captures vues (5 profils), debug et `__sb` absents du build vérifiés.
+
+Corrections demandées :
+- **C1** (important) `src/ui/styles/main.css:11` : Georgia n'a pas de chiffres alignés (`lining-nums` sans effet ; le « 0 » du nombre de Sardines se lit « o », le « 1 » est plus petit que le « 3 »). Remplacer par `--police-chiffres: Palatino, "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;`, puis relancer les captures.
+- **C2** (mineur) `src/ui/render/board.ts:43, 48, 76, 92` : `aria-label` ignoré sur des `div` génériques. Ajouter `role="img"` sur la face Sardine, la face chiffrée et les indicateurs, et `role="group"` sur le plateau.
+- **C3** (mineur) `tests/e2e/plateau.spec.ts` : ajouter un test géométrique R-01/R-02 avec `boundingBox`. La carte `id` doit être à la ligne `floor(id/5)` et à la colonne `id%5`. `row-r` doit être aligné sur la ligne r, à droite de la carte `r*5+4`. `col-c` doit être aligné sur la colonne c, sous la carte `20+c`.
+- **C4** (documentation, Opus) : UI-15 et disposition paysage (fait : UI-15 et ADR-018 annotés). Nom de l'appareil iPhone SE dans le skill `controle-visuel` et `E2E_PORT` dans CLAUDE.md : faits avec l'accord de l'humain (commit 90bc31e).
+
+### Corrections après relecture (codeur)
+C1, C2, C3 appliquées (police des chiffres Palatino, `role` img/group, test géométrique e2e). check OK ; e2e 55 passés ; captures revues (chiffres alignés). C4 reste à Opus/humain.
+
+2026-11-22 — relecteur — 🟢 Approuvé (2e relecture, corrections C1 à C4). check OK (414 tests) ; e2e avec E2E_PORT=5199 : 55 passés, 5 ignorés ; captures des 5 profils produites, dont iphone-se, iphone-15-paysage et mac regardées.
+- C1 ✔ : chiffres en Palatino, alignés (le « 0 » se lit zéro, le « 1 » a la hauteur du « 3 »).
+- C2 ✔ : `role="img"` sur les cartes retournées et les indicateurs, `role="group"` sur le plateau.
+- C3 ✔ : le test géométrique R-01/R-02 échouerait si la grille était rendue colonne par colonne, si les indicateurs de ligne et de colonne étaient inversés, ou si la grille était inversée en miroir. Ajout possible plus tard : vérifier que les pas horizontal et vertical sont positifs.
+- C4 ✔ : UI-15, ADR-018, E2E_PORT dans CLAUDE.md, skill controle-visuel (iPhone SE 3e génération, paysage).
+Fins de ligne LF sur tous les fichiers de la branche ; arbre de travail propre ; contrôle de confidentialité OK.

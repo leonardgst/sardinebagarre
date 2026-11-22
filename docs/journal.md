@@ -14,7 +14,7 @@
 | T-006 | Enchaîner les parties, encaisser et débloquer l'album | terminée |
 | T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | terminée |
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
-| T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | planifiée |
+| T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -25,7 +25,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 2 (interface) : étape 2.2, rendu statique du plateau et du bandeau selon ADR-018 (maquette docs/maquettes/variante-1.html).
+- Phase 2 (interface) : étape 2.3a, retourner une carte, gagner, perdre (controller.ts, input.ts, CL-19), à planifier en T-010.
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
 - `finalizeRound` historise `game.level` : interdire « Effacer la progression », « Vider la boîte » et « Quitter la table » pendant une partie `PLAYING` (sinon la partie est historisée au mauvais niveau).
@@ -64,3 +64,7 @@ _(aucune)_
 - 2026-11-22 — humain — Parties en console (`scripts/partie-console.ts`) jouées : le jeu fonctionne. Phase 1 (logique) terminée.
 - 2026-11-22 — Opus — Étape 2.1 : 3 maquettes (Salon, Conserverie, Cahier) dans docs/maquettes/ ; l'humain retient « Salon » (ADR-018). Vues sur iPhone via `npx vite docs/maquettes --host` (http, port 5173 ouvert sur le profil Privé).
 - 2026-11-22 — Opus — Branche maquettes fusionnée ; T-009 planifiée (étape 2.2 : rendu statique, seed.ts à deux générateurs, 5 profils Playwright, crochet de debug).
+- 2026-11-22 — codeur — T-009 : rendu statique du plateau et du bandeau (style Salon), seed.ts à deux générateurs, crochet `?debug=1` (dev seulement), 5 profils Playwright ; check OK (414 tests), e2e 50 passés, captures vérifiées. Reste : relecture, puis T-010 (interactions).
+- 2026-11-22 — codeur — Le port 5173 était occupé par le serveur des maquettes : `playwright.config.ts` accepte `E2E_PORT` (défaut 5173).
+- 2026-11-22 — codeur — T-009 : corrections de relecture C1 (police des chiffres Palatino), C2 (rôles ARIA), C3 (test géométrique R-01/R-02) ; check OK, e2e 55 passés.
+- 2026-11-22 — Opus — T-009 terminée après 2e relecture (🟢) et fusionnée dans main (non poussée). Prochaine étape : T-010 (étape 2.3a).

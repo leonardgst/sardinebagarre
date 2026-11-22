@@ -321,7 +321,7 @@ Formulé simplement :
 - **UI-12** Cartes : cibles ≥ 44 × 44 px. Indicateurs : chaque ligne et chaque colonne a sa couleur (palette de 5 couleurs, style « classique » inspiré de la disposition du jeu d'origine), avec la somme en grand et le nombre de Sardines à côté d'une petite **tête de chien**. Les couleurs ne sont jamais la seule information.
 - **UI-13** Pas de zoom au double-toucher (`touch-action: manipulation`), pas de sélection de texte, pas de menu contextuel sur appui long.
 - **UI-14 Carte Sardine** : quand elle est révélée, la carte affiche la **tête de Sardine** (photo détourée en rond, issue du pack personnel, §13). Tant que le code secret n'a pas été saisi, une **tête de chien dessinée** (SVG original) la remplace.
-- **UI-15 Paysage** : pas de mise en page dédiée. Si le jeu s'affiche en paysage (iOS qui ignore le verrouillage d'orientation, fenêtre Mac basse), rien ne déborde et le plateau tient entièrement dans la hauteur disponible.
+- **UI-15 Paysage** : pas d'écran dédié, mais une disposition adaptée quand la hauteur est faible (plateau à gauche, bandeau et boutons à droite ; voir ADR-018). Si le jeu s'affiche en paysage (iOS qui ignore le verrouillage d'orientation, fenêtre Mac basse), rien ne déborde et le plateau tient entièrement dans la hauteur disponible.
 
 ### 10.3 Entrées
 - **UI-20** Tactile et souris : toucher une carte = retourner (ou sélectionner, en mode mémo).
