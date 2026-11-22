@@ -170,7 +170,7 @@ Captures `@screens` (5 profils), nouvelles :
 - Les ids sont toujours entre 0 et 24 : sinon `flip` lève une `RangeError`. Ne transmettre que des ids lus sur `data-id`.
 
 ## Questions
-- Décision d'Opus, que l'humain peut changer : quand on retourne un **1 après la première carte**, le message ne change pas. Les exemples de §10.6 ne prévoient rien pour ce cas.
+- Décision d'Opus, que l'humain peut changer : quand on retourne un **1 après la première carte**, le message ne change pas. Les exemples de §10.6 ne prévoient rien pour ce cas. → **Validée par l'humain le 2026-11-22.**
 
 ## Compte rendu
 _(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
