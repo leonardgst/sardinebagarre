@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | à relire |
 | Étape du plan | 2.3a |
 | Branche | `t-010-jouer` |
 | Estimation | L (> 3 h), à la limite : voir le découpage dans « Périmètre » |
@@ -151,12 +151,12 @@ Captures `@screens` (5 profils), nouvelles :
 - `08-niveau.png` : bandeau UI-43 « Niveau 2 ».
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe
-- [ ] `npm run e2e` passe sur les 5 projets (les tests de partie sur au moins `iphone-15` et `mac`)
-- [ ] `npm run screens` produit les captures listées. Elles sont vérifiées avec la checklist `controle-visuel`, et le compte rendu cite les problèmes vus et corrigés.
-- [ ] `grep -rn "finalizeRound" src/ui` : un seul appel, dans `controller.ts`, placé **avant** tout `await` d'animation (le relecteur le vérifie dans le code)
+- [x] `npm run check` passe
+- [x] `npm run e2e` passe sur les 5 projets (les tests de partie sur au moins `iphone-15` et `mac`)
+- [x] `npm run screens` produit les captures listées. Elles sont vérifiées avec la checklist `controle-visuel`, et le compte rendu cite les problèmes vus et corrigés.
+- [x] `grep -rn "finalizeRound" src/ui` : un seul appel, dans `controller.ts`, placé **avant** tout `await` d'animation (le relecteur le vérifie dans le code)
 - [ ] Aucun texte affiché en dur hors de `texts.fr.ts` ; tous les tirages de messages utilisent `rngs.decor`
-- [ ] `npm run build` passe et `__sb` est absent du build
+- [x] `npm run build` passe et `__sb` est absent du build
 - [ ] Test manuel par l'humain, `npm run dev`, PC à la souris : une partie gagnée et une partie perdue, l'aboiement s'entend
 
 ## Pièges connus
@@ -173,7 +173,11 @@ Captures `@screens` (5 profils), nouvelles :
 - Décision d'Opus, que l'humain peut changer : quand on retourne un **1 après la première carte**, le message ne change pas. Les exemples de §10.6 ne prévoient rien pour ce cas. → **Validée par l'humain le 2026-11-22.**
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+Fait : contrôleur à phases (`controller.ts`), entrées déléguées (`input.ts`), animations interruptibles (`anim.ts`), aboiement synthétisé (`audio.ts`), mise à jour en place du plateau et du bandeau, messages et pluriels dans `texts.fr.ts`, CSS des animations et bandeaux, crochets `game()` et `phase()`. `finalizeRound` est appelé une seule fois (`controller.ts`), avant tout `await`, puis `onFinalized`.
+Tests : 5 Vitest (`tests/ui/texts.test.ts`), 7 e2e (`tests/e2e/partie.spec.ts`) ; check OK (419), e2e 90 passés, build OK sans `__sb`.
+Captures vérifiées (iphone-15, paysage, se) : 04, 05 (tête qui surgit), 06, 06b, 07, 08. Réglé : captures prises trop tôt (tête et bandeau pas encore visibles).
+Choix : le message de la Sardine est posé au toucher (avant l'animation) ; le bandeau UI-43 affiche les messages R-66 (titre + « Bravo ») ; cartes révélées légèrement assombries pour les distinguer de celles retournées par le joueur ; durées de l'ouverture du bandeau ÷ 4 via CSS en mouvement réduit.
+Reste pour l'humain : test manuel (aboiement audible), non faisable ici.
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
