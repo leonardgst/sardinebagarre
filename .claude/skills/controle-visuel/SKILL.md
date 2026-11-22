@@ -9,10 +9,12 @@ allowed-tools: Bash(npm run screens*) Bash(npm run e2e*) Read Glob
 ## 1. Produire les captures
 `npm run screens` lance `tests/e2e/screens.spec.ts`, qui doit produire, pour chaque profil (`iphone-se` 375×667, `iphone-15` 393×852, `iphone-15-pro-max` 430×932, `iphone-15-paysage` 852×393, `mac` 1280×800), les écrans suivants dans `test-results/screens/<profil>/` :
 `01-menu.png`, `02-plateau-neuf.png`, `03-en-cours.png` (quelques cartes retournées), `04-memo-ouvert.png`, `05-dialogue-quitter.png`, `06-victoire.png`, `07-defaite-revelation.png` (Sardine révélée), `08-reglages.png`, `09-bienvenue-code.png`, `10-album.png` (avec le pack de test déverrouillé : quelques photos débloquées, la suivante à acheter, les autres verrouillées).
-Sur le profil `mac`, la mise en page attendue est **celle de l'iPhone, centrée** (UI-11). Sur `iphone-15-paysage`, il n'y a pas de mise en page dédiée, mais rien ne déborde et le plateau tient dans la hauteur (UI-15).
+Sur le profil `mac`, la mise en page attendue est **celle de l'iPhone, centrée** (UI-11). Sur `iphone-15-paysage`, la disposition paysage d'ADR-018 s'applique (plateau à gauche, bandeau et boutons à droite) : rien ne déborde et le plateau tient dans la hauteur (UI-15).
+Les hauteurs des appareils Playwright sont plus petites que celles de la spec §15 (barres de Safari déduites) : c'est voulu, elles sont plus exigeantes.
+Si le port 5173 est occupé : `E2E_PORT=5199 npm run screens`.
 Les états sont obtenus avec une **graine fixe** passée par l'URL (`?seed=42&debug=1`). Ce paramètre n'est actif qu'en développement.
 
-Si le script ou la spec n'existent pas encore, crée-les (Playwright, navigateur WebKit, 5 projets dans `playwright.config.ts` : `devices['iPhone SE']`, `devices['iPhone 15']`, `devices['iPhone 15 Pro Max']`, `devices['iPhone 15 landscape']`, et un viewport 1280×800 pour `mac`).
+Si le script ou la spec n'existent pas encore, crée-les (Playwright, navigateur WebKit, 5 projets dans `playwright.config.ts` : `devices['iPhone SE (3rd gen)']` (375 × 667 ; `devices['iPhone SE']` est l'ancien modèle de 320 px), `devices['iPhone 15']`, `devices['iPhone 15 Pro Max']`, `devices['iPhone 15 landscape']`, et un viewport 1280×800 pour `mac`).
 
 ## 2. Regarder vraiment
 Ouvre **chaque** capture avec l'outil Read (il affiche l'image) et vérifie :
