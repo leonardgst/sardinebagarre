@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | terminée (à relire) |
+| Statut | terminée |
 | Étape du plan | 2.2 |
 | Branche | `t-009-rendu-plateau` |
 | Estimation | M (1–3 h) |
@@ -138,7 +138,14 @@ Corrections demandées :
 - **C1** (important) `src/ui/styles/main.css:11` : Georgia n'a pas de chiffres alignés (`lining-nums` sans effet ; le « 0 » du nombre de Sardines se lit « o », le « 1 » est plus petit que le « 3 »). Remplacer par `--police-chiffres: Palatino, "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;`, puis relancer les captures.
 - **C2** (mineur) `src/ui/render/board.ts:43, 48, 76, 92` : `aria-label` ignoré sur des `div` génériques. Ajouter `role="img"` sur la face Sardine, la face chiffrée et les indicateurs, et `role="group"` sur le plateau.
 - **C3** (mineur) `tests/e2e/plateau.spec.ts` : ajouter un test géométrique R-01/R-02 avec `boundingBox`. La carte `id` doit être à la ligne `floor(id/5)` et à la colonne `id%5`. `row-r` doit être aligné sur la ligne r, à droite de la carte `r*5+4`. `col-c` doit être aligné sur la colonne c, sous la carte `20+c`.
-- **C4** (documentation, Opus) : UI-15 et disposition paysage (fait : UI-15 et ADR-018 annotés). Nom de l'appareil iPhone SE dans le skill `controle-visuel` et `E2E_PORT` dans CLAUDE.md : en attente de l'accord de l'humain.
+- **C4** (documentation, Opus) : UI-15 et disposition paysage (fait : UI-15 et ADR-018 annotés). Nom de l'appareil iPhone SE dans le skill `controle-visuel` et `E2E_PORT` dans CLAUDE.md : faits avec l'accord de l'humain (commit 90bc31e).
 
 ### Corrections après relecture (codeur)
 C1, C2, C3 appliquées (police des chiffres Palatino, `role` img/group, test géométrique e2e). check OK ; e2e 55 passés ; captures revues (chiffres alignés). C4 reste à Opus/humain.
+
+2026-11-22 — relecteur — 🟢 Approuvé (2e relecture, corrections C1 à C4). check OK (414 tests) ; e2e avec E2E_PORT=5199 : 55 passés, 5 ignorés ; captures des 5 profils produites, dont iphone-se, iphone-15-paysage et mac regardées.
+- C1 ✔ : chiffres en Palatino, alignés (le « 0 » se lit zéro, le « 1 » a la hauteur du « 3 »).
+- C2 ✔ : `role="img"` sur les cartes retournées et les indicateurs, `role="group"` sur le plateau.
+- C3 ✔ : le test géométrique R-01/R-02 échouerait si la grille était rendue colonne par colonne, si les indicateurs de ligne et de colonne étaient inversés, ou si la grille était inversée en miroir. Ajout possible plus tard : vérifier que les pas horizontal et vertical sont positifs.
+- C4 ✔ : UI-15, ADR-018, E2E_PORT dans CLAUDE.md, skill controle-visuel (iPhone SE 3e génération, paysage).
+Fins de ligne LF sur tous les fichiers de la branche ; arbre de travail propre ; contrôle de confidentialité OK.
