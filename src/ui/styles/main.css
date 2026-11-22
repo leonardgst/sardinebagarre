@@ -1,0 +1,343 @@
+/* Style « Salon » (ADR-018), repris de docs/maquettes/variante-1.html. */
+:root {
+  --fond: #6b2a2d;
+  --encre: #fbefd9;
+  --encre-sombre: #3b2417;
+  --or: #b8924f;
+  --or-clair: #c9a45c;
+  --creme: #f6e8cc;
+  --ombre: #2c0f11;
+  --police-texte: "Iowan Old Style", "Palatino", Georgia, serif;
+  --police-chiffres: Georgia, "Times New Roman", serif;
+  --chien-tete: #d9a066;
+  --chien-oreille: #8a5a33;
+  --chien-museau: #f6e3c6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-variant-numeric: lining-nums tabular-nums;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  background: #2c0f11;
+  color: var(--encre);
+  font-family: var(--police-texte);
+  overflow: hidden;
+}
+
+#app {
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  grid-template-areas: "hud" "table" "message" "actions";
+  gap: 10px;
+  padding: calc(env(safe-area-inset-top) + 10px) calc(env(safe-area-inset-right) + 12px)
+    calc(env(safe-area-inset-bottom) + 10px) calc(env(safe-area-inset-left) + 12px);
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.035) 0 2px, transparent 2px 14px),
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.06) 0 2px, transparent 2px 14px), var(--fond);
+}
+
+@media (min-width: 600px) {
+  body {
+    background: radial-gradient(circle at 50% 30%, #5a2326, #220b0c);
+  }
+  #app {
+    box-shadow:
+      0 0 0 1px var(--or),
+      0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Bandeau */
+.hud {
+  grid-area: hud;
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 6px;
+  align-items: stretch;
+}
+.hud .bloc {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6px 10px;
+  min-width: 0;
+  background: var(--creme);
+  color: var(--encre-sombre);
+  border-radius: 10px;
+  box-shadow:
+    inset 0 0 0 2px var(--or-clair),
+    inset 0 0 0 4px var(--creme),
+    inset 0 0 0 5px var(--or-clair);
+}
+.hud small {
+  font-size: 11px;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-style: italic;
+}
+.hud strong {
+  font-family: var(--police-chiffres);
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+}
+.hud .niveau strong {
+  font-size: 26px;
+}
+
+/* Plateau */
+.table {
+  grid-area: table;
+  container-type: size;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+}
+.board {
+  width: min(100cqw, 100cqh);
+  aspect-ratio: 1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 6px;
+  padding: 8px;
+  background: #4a1b1e;
+  border-radius: 14px;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.45),
+    0 0 0 2px var(--or);
+}
+.card,
+.ind,
+.coin {
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+.card {
+  border: 0;
+  font: inherit;
+  color: inherit;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+}
+.chiffre {
+  font-family: var(--police-chiffres);
+  font-size: min(9cqw, 9cqh);
+  line-height: 1;
+  font-weight: 800;
+}
+
+.cachee {
+  cursor: pointer;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 26%, var(--or-clair) 27% 30%, transparent 31%),
+    repeating-linear-gradient(45deg, #ead7b2 0 4px, #f3e5c6 4px 8px);
+  box-shadow:
+    inset 0 0 0 2px var(--creme),
+    inset 0 0 0 3.5px var(--or),
+    0 2px 0 var(--ombre);
+}
+.face {
+  background: #fffaf0;
+  color: var(--encre-sombre);
+  box-shadow:
+    inset 0 0 0 2px var(--or-clair),
+    0 2px 0 var(--ombre);
+}
+.sardine {
+  background: #2f5d50;
+  box-shadow:
+    inset 0 0 0 2px var(--or-clair),
+    0 0 0 3px #f2c14e,
+    0 0 14px #f2c14e;
+}
+.medaillon {
+  width: 82%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--creme);
+  box-shadow: 0 0 0 2px var(--or-clair);
+}
+.tete {
+  width: 100%;
+  height: 100%;
+}
+
+/* Marques du mémo (R-82) : 4 coins */
+.m {
+  position: absolute;
+  font-style: normal;
+  font-family: var(--police-chiffres);
+  font-weight: 800;
+  font-size: min(2.6cqw, 2.6cqh);
+  line-height: 1;
+  width: 1.45em;
+  height: 1.45em;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  opacity: 0;
+  background: var(--fond);
+  color: var(--encre);
+  transition: opacity 0.15s;
+}
+.m.on {
+  opacity: 1;
+}
+.m-s {
+  top: 3px;
+  left: 3px;
+}
+.m-1 {
+  top: 3px;
+  right: 3px;
+}
+.m-2 {
+  bottom: 3px;
+  left: 3px;
+}
+.m-3 {
+  bottom: 3px;
+  right: 3px;
+}
+
+/* Indicateurs */
+.ind {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border-radius: 8px;
+  color: #2a1810;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.15);
+}
+.ind b {
+  font-family: var(--police-chiffres);
+  font-size: min(5.4cqw, 5.4cqh);
+  line-height: 1;
+  font-weight: 700;
+}
+.ind span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 72%;
+  padding-top: 2px;
+  border-top: 1.5px solid rgba(42, 24, 16, 0.35);
+  font-family: var(--police-chiffres);
+  font-weight: 800;
+  font-size: min(3.8cqw, 3.8cqh);
+  line-height: 1;
+}
+.mini {
+  width: 1.25em;
+  height: 1.25em;
+}
+.c0 {
+  background: #f29b84;
+}
+.c1 {
+  background: #a9d596;
+}
+.c2 {
+  background: #f5c46a;
+}
+.c3 {
+  background: #97bfe8;
+}
+.c4 {
+  background: #c8abe2;
+}
+.coin {
+  display: grid;
+  place-items: center;
+  font-size: min(7cqw, 7cqh);
+  color: var(--or);
+}
+
+/* Message et boutons */
+.message {
+  grid-area: message;
+  text-align: center;
+  min-height: 1.4em;
+  font-size: 16px;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.actions {
+  grid-area: actions;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.actions button {
+  min-height: 48px;
+  font: inherit;
+  font-family: var(--police-chiffres);
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(var(--creme), #e5cf9f);
+  color: var(--encre-sombre);
+  border: 0;
+  border-radius: 999px;
+  box-shadow:
+    inset 0 0 0 2px var(--or),
+    0 3px 0 var(--ombre);
+}
+
+/* Paysage bas (UI-15) : plateau à gauche, le reste à droite */
+@media (orientation: landscape) and (max-height: 540px) {
+  #app {
+    max-width: none;
+    grid-template-columns: 1fr minmax(220px, 300px);
+    grid-template-rows: auto 1fr auto auto;
+    grid-template-areas: "table hud" "table message" "table actions" "table .";
+    column-gap: 20px;
+  }
+  .hud {
+    grid-template-columns: 1fr 1fr;
+  }
+  .hud .niveau {
+    grid-column: 1 / -1;
+  }
+  .message {
+    white-space: normal;
+    align-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m {
+    transition: none;
+  }
+}

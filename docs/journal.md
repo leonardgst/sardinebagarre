@@ -64,3 +64,5 @@ _(aucune)_
 - 2026-11-22 — humain — Parties en console (`scripts/partie-console.ts`) jouées : le jeu fonctionne. Phase 1 (logique) terminée.
 - 2026-11-22 — Opus — Étape 2.1 : 3 maquettes (Salon, Conserverie, Cahier) dans docs/maquettes/ ; l'humain retient « Salon » (ADR-018). Vues sur iPhone via `npx vite docs/maquettes --host` (http, port 5173 ouvert sur le profil Privé).
 - 2026-11-22 — Opus — Branche maquettes fusionnée ; T-009 planifiée (étape 2.2 : rendu statique, seed.ts à deux générateurs, 5 profils Playwright, crochet de debug).
+- 2026-11-22 — codeur — T-009 : rendu statique du plateau et du bandeau (style Salon), seed.ts à deux générateurs, crochet `?debug=1` (dev seulement), 5 profils Playwright ; check OK (414 tests), e2e 50 passés, captures vérifiées. Reste : relecture, puis T-010 (interactions).
+- 2026-11-22 — codeur — Le port 5173 était occupé par le serveur des maquettes : `playwright.config.ts` accepte `E2E_PORT` (défaut 5173).

@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | terminée (à relire) |
 | Étape du plan | 2.2 |
 | Branche | `t-009-rendu-plateau` |
 | Estimation | M (1–3 h) |
@@ -106,14 +106,14 @@
 Les ids des cartes chiffrées et des Sardines se calculent dans le test à partir de la logique (même graine) : ne pas les coder en dur.
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe (typecheck, Biome, Vitest, confidentialité)
-- [ ] `npm run e2e` passe sur les 5 projets
-- [ ] `npm run screens` produit `test-results/screens/<profil>/02-plateau-neuf.png`, `03-en-cours.png` et `07-defaite-revelation.png` pour les 5 profils
-- [ ] Les captures sont vérifiées avec la checklist du skill `controle-visuel`. Le compte rendu liste les problèmes vus et corrigés. Comparer aussi avec `docs/maquettes/variante-1.html` (même ambiance, mêmes couleurs).
-- [ ] `grep -rn "getRandomValues" src` ne trouve que `src/ui/seed.ts`
-- [ ] Aucun texte affiché en dur hors de `src/ui/texts.fr.ts`
-- [ ] Aucun chemin absolu `/…` dans `src/ui/` ni `index.html` (sauf le `src="/src/ui/main.ts"` géré par Vite)
-- [ ] `npm run build` passe
+- [x] `npm run check` passe (typecheck, Biome, Vitest, confidentialité)
+- [x] `npm run e2e` passe sur les 5 projets
+- [x] `npm run screens` produit `test-results/screens/<profil>/02-plateau-neuf.png`, `03-en-cours.png` et `07-defaite-revelation.png` pour les 5 profils
+- [x] Les captures sont vérifiées avec la checklist du skill `controle-visuel`. Le compte rendu liste les problèmes vus et corrigés. Comparer aussi avec `docs/maquettes/variante-1.html` (même ambiance, mêmes couleurs).
+- [x] `grep -rn "getRandomValues" src` ne trouve que `src/ui/seed.ts`
+- [x] Aucun texte affiché en dur hors de `src/ui/texts.fr.ts`
+- [x] Aucun chemin absolu `/…` dans `src/ui/` ni `index.html` (sauf le `src="/src/ui/main.ts"` géré par Vite)
+- [x] `npm run build` passe
 
 ## Pièges connus
 - **Taille des cartes sur iPhone SE.** Le cadre doré du plateau (padding + liseré) mange de la place : dans la maquette, les cartes font 42 px à 320 px de large. À 375 px, c'est plus large, mais vérifiez ≥ 44 px. Si ce n'est pas le cas, amincissez le cadre ou réduisez l'écart, sans réduire les marges latérales sous 12 px.
@@ -129,7 +129,7 @@ Les ids des cartes chiffrées et des Sardines se calculent dans le test à parti
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+Rendu statique du plateau 6×6, du bandeau, du message et des boutons (style Salon) ; seed.ts (2 générateurs), format.ts, texts.fr.ts, crochet debug réservé au dev (absent du build), 5 profils Playwright. Tests : 7 Vitest, 10 e2e par profil (50 passés, 5 ignorés par conception). Captures des 5 profils vérifiées : pas de défaut visible (cartes >= 44 px, aucun défilement, paysage correct). Écart : `playwright.config.ts` accepte la variable `E2E_PORT` (défaut 5173) car le port 5173 était occupé par le serveur des maquettes. Les marques S/1/2/3 et le symbole ♣ sont dans `symbols` de texts.fr.ts. Les captures 00-page-minimale restantes ont été supprimées.
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
