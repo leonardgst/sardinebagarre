@@ -139,3 +139,6 @@ Corrections demandées :
 - **C2** (mineur) `src/ui/render/board.ts:43, 48, 76, 92` : `aria-label` ignoré sur des `div` génériques. Ajouter `role="img"` sur la face Sardine, la face chiffrée et les indicateurs, et `role="group"` sur le plateau.
 - **C3** (mineur) `tests/e2e/plateau.spec.ts` : ajouter un test géométrique R-01/R-02 avec `boundingBox`. La carte `id` doit être à la ligne `floor(id/5)` et à la colonne `id%5`. `row-r` doit être aligné sur la ligne r, à droite de la carte `r*5+4`. `col-c` doit être aligné sur la colonne c, sous la carte `20+c`.
 - **C4** (documentation, Opus) : UI-15 et disposition paysage (fait : UI-15 et ADR-018 annotés). Nom de l'appareil iPhone SE dans le skill `controle-visuel` et `E2E_PORT` dans CLAUDE.md : en attente de l'accord de l'humain.
+
+### Corrections après relecture (codeur)
+C1, C2, C3 appliquées (police des chiffres Palatino, `role` img/group, test géométrique e2e). check OK ; e2e 55 passés ; captures revues (chiffres alignés). C4 reste à Opus/humain.

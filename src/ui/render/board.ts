@@ -39,6 +39,7 @@ function renderCard(round: RoundState, id: number): HTMLElement {
     card.dataset.id = String(id);
     card.dataset.state = 'shown';
     card.dataset.value = String(value);
+    card.setAttribute('role', 'img');
     if (value === 'S') {
       card.setAttribute('aria-label', texts.sardine);
       const medal = el('span', 'medaillon');
@@ -72,6 +73,7 @@ function renderCard(round: RoundState, id: number): HTMLElement {
 function renderHint(kind: 'row' | 'col', index: number, hint: LineHint): HTMLElement {
   const ind = el('div', `ind c${index}`);
   ind.dataset.hint = `${kind}-${index}`;
+  ind.setAttribute('role', 'img');
   ind.setAttribute(
     'aria-label',
     kind === 'row'
@@ -89,6 +91,7 @@ function renderHint(kind: 'row' | 'col', index: number, hint: LineHint): HTMLEle
 /** R-01..R-04, R-82 : grille 6 × 6 (25 cartes, 10 indicateurs, 1 coin décoratif). */
 export function renderBoard(round: RoundState): HTMLElement {
   const board = el('div', 'board');
+  board.setAttribute('role', 'group');
   board.setAttribute('aria-label', texts.board);
   for (let row = 0; row < 5; row++) {
     for (let col = 0; col < 5; col++) board.append(renderCard(round, row * 5 + col));

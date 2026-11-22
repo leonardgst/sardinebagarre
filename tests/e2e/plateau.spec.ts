@@ -119,3 +119,30 @@ test('debug absent sans ?debug=1', async ({ page }) => {
   await ouvrir(page, SEED);
   expect(await page.evaluate(() => window.__sb)).toBeUndefined();
 });
+
+test('R-01 R-02 position des cartes et des indicateurs', async ({ page }) => {
+  await ouvrir(page, SEED);
+  const box = async (sel: string) => {
+    const b = await page.locator(sel).boundingBox();
+    if (!b) throw new Error(`introuvable : ${sel}`);
+    return b;
+  };
+  const ref = await box('[data-id="0"]');
+  const pasX = (await box('[data-id="1"]')).x - ref.x;
+  const pasY = (await box('[data-id="5"]')).y - ref.y;
+  for (let id = 0; id < 25; id++) {
+    const b = await box(`[data-id="${id}"]`);
+    expect(Math.abs(b.x - (ref.x + (id % 5) * pasX))).toBeLessThanOrEqual(1);
+    expect(Math.abs(b.y - (ref.y + Math.floor(id / 5) * pasY))).toBeLessThanOrEqual(1);
+  }
+  for (let i = 0; i < 5; i++) {
+    const row = await box(`[data-hint=row-${i}]`);
+    const last = await box(`[data-id="${i * 5 + 4}"]`);
+    expect(row.x).toBeGreaterThanOrEqual(last.x + last.width - 1);
+    expect(Math.abs(row.y + row.height / 2 - (last.y + last.height / 2))).toBeLessThanOrEqual(2);
+    const col = await box(`[data-hint=col-${i}]`);
+    const bas = await box(`[data-id="${20 + i}"]`);
+    expect(col.y).toBeGreaterThanOrEqual(bas.y + bas.height - 1);
+    expect(Math.abs(col.x + col.width / 2 - (bas.x + bas.width / 2))).toBeLessThanOrEqual(2);
+  }
+});
