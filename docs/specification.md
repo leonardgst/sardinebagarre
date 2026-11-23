@@ -149,9 +149,10 @@ Chaque niveau a 5 configurations, et chacune existe en deux variantes de contrai
                  ├── retourner le dernier 2/3 ─► [GAGNÉE] ──────┤
                  └── quitter + confirmer ──────► [ABANDONNÉE] ──┤
                                                                 ▼
-                 finalisation (R-55) → révélation (R-52, UI-40) → (toucher) → partie suivante
+                 finalisation (R-55) → révélation (R-52, UI-40) → (toucher) → « Jouer au niveau {n} ? » (ADR-019)
 ```
 
+- **Navigation (ADR-019)** : au lancement, l'app affiche le menu (UI-01). Après le toucher de fin de partie et le bandeau de niveau éventuel (R-66), le jeu demande « Jouer au niveau {n} ? » : Oui lance la partie suivante, Non ramène au menu. Boîte pleine (R-53) : message, puis retour au menu.
 - La partie est `EN_COURS` dès que le plateau s'affiche après « Jouer ». Il n'y a pas d'état intermédiaire : on peut quitter sans avoir retourné de carte (CL-01).
 
 ### 5.2 Retourner une carte
@@ -308,7 +309,7 @@ Formulé simplement :
 ### 10.1 Écrans
 | ID | Écran | Contenu |
 |---|---|---|
-| UI-01 | **Accueil / menu** | Titre « Sardinebagarre », niveau courant, total de jetons. Boutons : **Jouer** (« Jouer au niveau {n} ? »), **Album** (§12), **Infos** (sous-menu : Comment jouer / Astuces / Le mémo), **Réglages**, **Quitter la table** (R-67) |
+| UI-01 | **Accueil / menu** | Titre « Sardinebagarre », niveau courant, total de jetons. Boutons : **Jouer** (intitulé « Jouer au niveau {n} », lance la partie directement, ADR-019), **Album** (§12), **Infos** (sous-menu : Comment jouer / Astuces / Le mémo), **Réglages**, **Quitter la table** (R-67) |
 | UI-02 | **Jeu** | Bandeau : « Niveau {n} », **Jetons de la partie** (5 chiffres), **Total** (5 chiffres). Plateau 5 × 5 + 5 indicateurs de ligne (à droite) + 5 indicateurs de colonne (en bas). Boutons : **Mémo**, **Quitter**. Zone de message (une ligne) |
 | UI-03 | **Infos** | 3 pages de texte original, inspirées des écrans d'aide de la DS : **« Comment jouer »** (règles et jetons), **« Astuces »** (lecture des indicateurs et règle du niveau 8), **« Le mémo »**. Courtes : ma sœur connaît très bien le jeu |
 | UI-04 | **Réglages** | Son (on/off) ; animations réduites (valeur par défaut : la préférence système `prefers-reduced-motion` ; dès que le joueur change ce réglage dans l'app, son choix la remplace) ; **code secret** (saisir ou changer, §13) ; records (R-72) ; vider la boîte à jetons ; effacer toute la progression ; version de l'app ; crédits |
