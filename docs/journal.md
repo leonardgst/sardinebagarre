@@ -17,6 +17,7 @@
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
 | T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
+| T-012 | Mode mémo (sélection, 4 marques, Fermer) | planifiée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -27,7 +28,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 2 (interface) : étape 2.4 (mémo), à planifier.
+- Phase 2 (interface) : T-012 (étape 2.4, mémo), à implémenter.
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -97,3 +98,4 @@ _(aucune)_
 - 2026-11-23 — Opus — T-011 : C6 à C8 vérifiés (check OK, e2e 240 passés / 10 ignorés). Reste : recette humaine, puis fusion.
 - 2026-11-23 — humain — Recette T-011 sur iPhone OK ; v0.2.0 jouée aussi hors de chez soi depuis GitHub Pages, sans souci.
 - 2026-11-23 — Opus — T-011 terminée et fusionnée dans main (non poussée). Prochaine étape : étape 2.4 (mémo).
+- 2026-11-23 — Opus — v0.3.0 publiée (main poussée, tag v0.3.0). T-012 planifiée (étape 2.4 : mémo ; son « refus » reporté à l'étape 4.5).
