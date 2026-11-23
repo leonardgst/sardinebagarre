@@ -16,7 +16,7 @@
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
-| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | relue 🟢, recette à faire |
+| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -27,7 +27,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 2 (interface) : relecture de T-011 (étape 2.3b), puis étape 2.4 (mémo).
+- Phase 2 (interface) : étape 2.4 (mémo), à planifier.
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -95,3 +95,5 @@ _(aucune)_
 
 - 2026-11-23 — T-011 : corrections de 2e relecture C6 (verrou à l'ouverture d'un dialogue, Oui/Non ignorés pendant le verrou), C7 (verrou avant le menu), C8 (compte e2e). e2e : 240 passés, 10 ignorés.
 - 2026-11-23 — Opus — T-011 : C6 à C8 vérifiés (check OK, e2e 240 passés / 10 ignorés). Reste : recette humaine, puis fusion.
+- 2026-11-23 — humain — Recette T-011 sur iPhone OK ; v0.2.0 jouée aussi hors de chez soi depuis GitHub Pages, sans souci.
+- 2026-11-23 — Opus — T-011 terminée et fusionnée dans main (non poussée). Prochaine étape : étape 2.4 (mémo).
