@@ -127,7 +127,12 @@ test('C1 le toucher pendant la fin ne coupe pas UI-30 de la partie suivante', as
   await ouvrir(page, SEED, true); // sans reducedMotion
   await toucher(page, sardine);
   await page.evaluate(() => document.querySelector<HTMLElement>('[data-state=hidden]')?.click());
-  await attendre(page, 'waitingTap');
+  // CL-20 : la fin doit être accélérée (naturelle ~1,65 s), pas seulement finir par aboutir.
+  await page.waitForFunction(() => window.__sb?.phase() === 'waitingTap', undefined, {
+    timeout: 500,
+  });
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => window.__sb?.phase())).toBe('waitingTap');
   await page.locator('.message').click();
   await attendre(page, 'playing');
   const animee = await page.evaluate(() => {
@@ -173,8 +178,12 @@ test('CL-20 vrai toucher sur une carte cachée pendant la fin → waitingTap', a
   await ouvrir(page, SEED, true); // sans reducedMotion
   await toucher(page, sardine);
   await page.locator(`[data-id="${autre}"]`).click({ force: true }); // sans attente de stabilité : la fin dure ~1 s
+  // CL-20 : la fin doit être accélérée (naturelle ~1,65 s), pas seulement finir par aboutir.
+  await page.waitForFunction(() => window.__sb?.phase() === 'waitingTap', undefined, {
+    timeout: 500,
+  });
   await page.waitForTimeout(300);
-  await attendre(page, 'waitingTap');
+  expect(await page.evaluate(() => window.__sb?.phase())).toBe('waitingTap');
 });
 
 test('R-66 toucher une carte en waitingTap → bandeau de niveau affiché', async ({ page }) => {

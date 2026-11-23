@@ -234,3 +234,5 @@ Correction demandée :
 - **C10** (important, petite) `tests/e2e/partie.spec.ts:168-178` : rien ne prouve l'accélération de CL-20. Avec `skip()` neutralisé, les tests CL-20 et C1 restent verts, car `attendre` n'a pas de limite et la fin naturelle dure environ 1,65 s.
   - Après le clic forcé : `waitForFunction(phase === 'waitingTap', { timeout: 500 })`, puis `waitForTimeout(300)`, puis vérifier que la phase vaut toujours `waitingTap`.
   - Variante validée : rouge 5/5 sans `skip()`, verte 25/25 avec.
+
+2026-11-23 — codeur — C10 : `waitForFunction(waitingTap, { timeout: 500 })`, `waitForTimeout(300)` puis vérification de la phase, ajoutés aux tests « C1 » et « CL-20 vrai toucher… » (sans reducedMotion). Le test « CL-20 toucher pendant la fin » (reducedMotion, fin quasi instantanée) n'est pas durci : il ne distinguerait rien. Contre-épreuve : avec `skip()` neutralisé dans `onCard` et `onElsewhere`, ces 2 tests échouent sur les 5 projets (10 échecs) ; code rétabli, `git diff src/` vide, 75/75 verts en `--repeat-each 5`. check OK (419), e2e 110 passés / 10 ignorés.
