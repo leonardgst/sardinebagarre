@@ -16,7 +16,7 @@
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
-| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | à reprendre (C1 à C5) |
+| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | 2e relecture 🟡 (C6 à C8 à faire) |
 
 ## Questions ouvertes
 _(aucune)_
@@ -42,6 +42,7 @@ _(aucune)_
 - T-011 (relecture T-010) : tout élément ajouté à `body` hors de `#app` (dialogue, bandeau de mise à jour R-104) déclencherait `onElsewhere`. Le placer dans `#app` ou l'exclure explicitement.
 - Anti-rebond (relecture T-011, C1) : après la fermeture de tout dialogue ou bandeau qui recouvre le plateau, et après l'affichage d'un nouveau plateau, les touchers de carte sont ignorés pendant un court délai. Un double toucher ne doit jamais retourner une carte que le joueur n'a pas visée (même esprit que CL-19).
 - Hors `playing`, tout bouton de l'écran de jeu se comporte comme un toucher d'écran : il accélère en `ending` et continue en `waitingTap` (relecture T-011, C2). Valable aussi pour Mémo à l'étape 2.4.
+- Tout changement d'écran ou ouverture de dialogue sous le doigt passe par le même verrou anti-rebond (relecture T-011, C6 et C7).
 
 ## Historique
 - 2026-11-10 — Opus (cadrage) — Spécification, architecture, plan et fichiers de pilotage de Claude Code rédigés.
@@ -90,3 +91,4 @@ _(aucune)_
 - 2026-11-23 — codeur — Reste : relecture de T-011, puis étape 2.4 (mémo). Le bouton Mémo est toujours inerte.
 - 2026-11-23 — relecteur — T-011 : 🔴 à reprendre. Bloquant C1 : un double toucher sur « Non » (Quitter) ou « Oui » (Jouer au niveau n ?) retourne la carte située sous le bouton. Importants : C2 (Quitter et Mémo continuent en waitingTap), C3 (test CL-20 Quitter sans preuve d'accélération), C4 (test boîte pleine en fin de partie). Mineur : C5. Choix 2 du codeur accepté.
 - 2026-11-23 : corrections de relecture T-011 (C1 à C5) appliquées : verrou anti-rebond 350 ms (`#app[data-verrou]`), boutons = toucher d'écran hors `playing`, 4 tests e2e ajoutés.
+- 2026-11-23 — relecteur — T-011, 2e relecture : 🟡. C1 à C5 conformes (contre-épreuves faites, verrou de 350 ms en temps réel accepté). C6 (important) : un double toucher sur une carte en waitingTap répond à « Jouer au niveau n ? » (dialogue ouvert sous le doigt). C7 (mineur) : un double toucher sur Oui/Non au-dessus du menu ouvre Album. C8 : compte e2e réel 230 passés / 10 ignorés.

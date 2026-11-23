@@ -194,6 +194,17 @@ Choix du codeur :
 1. Quitter inerte en `waitingTap` : rejeté (C2). R-52 dit « toucher l'écran », et ce même bouton accélère déjà pendant `ending`.
 2. Niveau du bandeau mis à jour au début du bandeau R-66 : accepté. Il reste à l'ancien niveau avant le toucher, puis passe au nouveau en même temps que l'annonce, ce qui est cohérent avec « Jouer au niveau n ? » et avec le menu.
 
+2026-11-23 — relecteur — 2e relecture — 🟡 Approuvé avec réserves.
+
+Vérifications : `npm run check` OK (419 tests, confidentialité OK) ; `npm run e2e` 230 passés, 10 ignorés (48 tests × 5 profils ; le « 270 » du compte rendu incluait les 40 captures @screens) ; capture 09 regardée (iphone-se, paysage) : zone de message vide. Contre-épreuves sur une copie hors dépôt : sans verrou → les 2 tests de double toucher rouges (9 échecs ; Non vert en paysage, faute de carte sous le bouton) ; sans `skip()` sur bouton en ending → CL-20 rouge ×5 ; sans `setMessage('')` → R-52 rouge ×5 ; question toujours posée → R-53 fin de partie rouge ×5.
+
+C1 à C5 : conformes. Verrou en temps réel accepté (un double toucher humain ne dépend pas de la vitesse des animations) ; un seul timer, pas de timer orphelin ; Oui, Non et Quitter ne sont pas bloqués.
+
+Corrections :
+- **C6** (important) `controller.ts` (`openDialog`, `onAction` en phase dialog) : un double toucher sur une carte en `waitingTap` répond à « Jouer au niveau n ? ». Le dialogue s'ouvre sous le doigt et le second toucher atteint Oui ou Non (graine 42, défaite au niveau 1 : carte 16 → nouvelle partie sur 4 profils, carte 19 → menu sur 4 profils et nouvelle partie en paysage). Conséquence : la question est contournée et la seule sortie, Quitter à 0 carte, renvoie au niveau 1 (R-63). À faire : poser le verrou à l'ouverture d'un dialogue et ignorer `yes`/`no` tant qu'il est posé. Faire attendre `#app:not([data-verrou])` à `repondre()` AVANT le clic, ainsi qu'avant chaque clic ou dblclick direct sur Oui/Non dans les specs, sinon les tests de double toucher deviennent verts sans rien prouver. Test : « ADR-019 double toucher sur une carte en waitingTap : la question reste ouverte » (cartes 16 et 19 → phase dialog, `dialog() === 'play'`), rouge aujourd'hui.
+- **C7** (mineur) `controller.ts` (`answer` play/Non, `onAction` menu) : un double toucher sur Oui ou Non au-dessus du menu ouvre « Album » (« Réglages » en paysage quand on répond Non). Poser le verrou avant `showMenu()` dans le cas play/Non et ignorer les actions du menu pendant le verrou. Test : « UI-01 double toucher sur Non : le menu reste affiché ».
+- **C8** (mineur) Compte rendu : corriger le compte e2e (230 passés, 10 ignorés avec `npm run e2e`).
+
 ## Compte rendu des corrections de relecture
 - C1 : verrou `LOCK_MS = 350` ms sur `onCard` (`lockCards()` à `closeDialog` et `startNewRound`), repère `#app[data-verrou]`, attendu par `ouvrir()` et `repondre()`. Durée réelle (`setTimeout`), volontairement non divisée par l'échelle « animations réduites » : le double toucher d'un humain dure ~100-300 ms quelle que soit l'animation, un verrou raccourci ne protégerait plus. Les tests attendent le repère, donc pas de ralentissement notable.
 - C2 : hors `dialog`/`menu`/`screen`, tout bouton est un toucher d'écran (`ending` → `skip()`, `waitingTap` → `afterRound()`) ; Quitter n'ouvre le dialogue qu'en `playing`.
