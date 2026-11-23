@@ -44,7 +44,7 @@ export function renderMessage(text = ''): HTMLElement {
   return p;
 }
 
-/** Boutons Mémo et Quitter (inertes pour l'instant). */
+/** Boutons Mémo (inerte jusqu'à l'étape 2.4) et Quitter. */
 export function renderActions(): HTMLElement {
   const footer = document.createElement('footer');
   footer.className = 'actions';
