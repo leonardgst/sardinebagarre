@@ -211,3 +211,10 @@ Corrections :
 - C3 : CL-20 exige `waitingTap` en moins de 500 ms. C4 : test boîte pleine en fin de partie. C5 : `setMessage('')` à l'ouverture de la question ; capture 09 (iPhone SE) vérifiée.
 - Tests ajoutés : 4 (double toucher Non, double toucher Oui, R-52 Quitter en waitingTap, R-53 boîte pleine) + CL-20 durci. `--repeat-each 5` : 125 passés. e2e complet : 270 passés, 10 ignorés.
 - Contre-épreuves faites puis annulées : sans verrou, les 2 tests de double toucher échouent ; sans `skip()` sur le bouton en `ending`, CL-20 échoue.
+
+## Compte rendu des corrections de 2e relecture (C6 C7 C8)
+- C6 : `lockCards` renommé `lockInput`, aussi posé à l'ouverture d'un dialogue (`openDialog`) ; `yes` et `no` ignorés tant que `locked()`. `repondre()` attend `#app:not([data-verrou])` avant et après le clic ; même attente avant le `tap` de `partie.spec.ts` et les `dblclick` directs de `quitter.spec.ts` (menu.spec et screens.spec n'ont pas de clic direct sur Oui/Non). Test « ADR-019 double toucher sur une carte en waitingTap : la question reste ouverte » (cartes 16 et 19).
+- C7 : verrou posé avant `showMenu()` dans `answer` (play/Non) ; actions du menu ignorées pendant le verrou. Test « UI-01 double toucher sur Non : le menu reste affiché ».
+- C8 : le compte e2e du compte rendu précédent était faux : 230 passés et 10 ignorés avec `npm run e2e` (le 270 incluait les captures). Après ces corrections : 240 passés, 10 ignorés (50 tests × 5 profils). `npm run screens` : 40 passés.
+- `--repeat-each 5` sur quitter + menu : 650 passés.
+- Contre-épreuves faites puis annulées (`git diff src` = corrections seules) : sans verrou à l'ouverture du dialogue, le test C6 échoue (5 profils) ; sans aucun verrou, les 2 tests de double toucher de C1 échouent (Non : 4 profils, Oui : 5) ; sans verrou avant `showMenu`, le test C7 échoue (4 profils sur 5, pas de carte sous le bouton en paysage).

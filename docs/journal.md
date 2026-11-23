@@ -92,3 +92,5 @@ _(aucune)_
 - 2026-11-23 — relecteur — T-011 : 🔴 à reprendre. Bloquant C1 : un double toucher sur « Non » (Quitter) ou « Oui » (Jouer au niveau n ?) retourne la carte située sous le bouton. Importants : C2 (Quitter et Mémo continuent en waitingTap), C3 (test CL-20 Quitter sans preuve d'accélération), C4 (test boîte pleine en fin de partie). Mineur : C5. Choix 2 du codeur accepté.
 - 2026-11-23 : corrections de relecture T-011 (C1 à C5) appliquées : verrou anti-rebond 350 ms (`#app[data-verrou]`), boutons = toucher d'écran hors `playing`, 4 tests e2e ajoutés.
 - 2026-11-23 — relecteur — T-011, 2e relecture : 🟡. C1 à C5 conformes (contre-épreuves faites, verrou de 350 ms en temps réel accepté). C6 (important) : un double toucher sur une carte en waitingTap répond à « Jouer au niveau n ? » (dialogue ouvert sous le doigt). C7 (mineur) : un double toucher sur Oui/Non au-dessus du menu ouvre Album. C8 : compte e2e réel 230 passés / 10 ignorés.
+
+- 2026-11-23 — T-011 : corrections de 2e relecture C6 (verrou à l'ouverture d'un dialogue, Oui/Non ignorés pendant le verrou), C7 (verrou avant le menu), C8 (compte e2e). e2e : 240 passés, 10 ignorés.

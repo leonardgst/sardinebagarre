@@ -30,6 +30,7 @@ export async function ouvrir(page: Page, seed: number, debug = false): Promise<v
 
 /** Répond au dialogue Oui/Non ouvert. */
 export async function repondre(page: Page, reponse: 'yes' | 'no'): Promise<void> {
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
   await page.locator(`[role=dialog] [data-action=${reponse}]`).click();
   await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
 }

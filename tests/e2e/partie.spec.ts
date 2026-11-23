@@ -177,6 +177,7 @@ test('R-52 parcours au doigt : Sardine, toucher sur le message, nouvelle partie'
   await attendre(page, 'waitingTap');
   await page.locator('.message').tap();
   await attendre(page, 'dialog');
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
   await page.locator('[role=dialog] [data-action=yes]').tap();
   await attendre(page, 'playing');
   await expect(page.locator('[data-state=hidden]')).toHaveCount(25);

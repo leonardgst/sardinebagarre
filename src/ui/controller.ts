@@ -82,7 +82,7 @@ export function createController(
 
   let lockTimer: ReturnType<typeof setTimeout> | undefined;
   /** Un double toucher ne doit pas atteindre la carte située sous le bouton qui vient de disparaître. */
-  function lockCards(): void {
+  function lockInput(): void {
     clearTimeout(lockTimer);
     root.dataset.verrou = '';
     lockTimer = setTimeout(() => {
@@ -121,6 +121,7 @@ export function createController(
 
   /** Dialogue Oui/Non modal, dans `#app`. */
   function openDialog(kind: DialogKind, text: string): void {
+    lockInput(); // Le dialogue s'ouvre parfois sous le doigt : le second toucher d'un double toucher ne doit pas y répondre.
     beforeDialog = phase;
     phase = 'dialog';
     dialogKind = kind;
@@ -136,7 +137,7 @@ export function createController(
     dialogEl = null;
     dialogKind = null;
     phase = beforeDialog;
-    lockCards();
+    lockInput();
   }
 
   async function showBanner(
@@ -300,7 +301,7 @@ export function createController(
     root.replaceChildren(hud, table, message, actions);
     drawBoard();
     phase = 'playing';
-    lockCards();
+    lockInput();
   }
 
   /** Après le toucher de fin : bandeau de niveau (R-66), puis la question (ADR-019). */
@@ -325,6 +326,7 @@ export function createController(
     const kind = dialogKind;
     if (kind === 'play') {
       if (!yes) {
+        lockInput();
         showMenu();
         return;
       }
@@ -364,9 +366,9 @@ export function createController(
     },
     onAction(name) {
       if (phase === 'dialog') {
-        if (name === 'yes' || name === 'no') answer(name === 'yes');
+        if ((name === 'yes' || name === 'no') && !locked()) answer(name === 'yes');
       } else if (phase === 'menu') {
-        menuAction(name);
+        if (!locked()) menuAction(name);
       } else if (phase === 'screen') {
         if (name === 'back') showMenu();
       } else if (phase === 'ending') {

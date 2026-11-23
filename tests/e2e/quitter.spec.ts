@@ -215,6 +215,7 @@ test('R-41 CL-12 double toucher sur Non : état exact', async ({ page }) => {
   await attendre(page, 'playing');
   const avant = await page.evaluate(() => window.__sb?.state());
   await quitter(page);
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
   await page.locator('[role=dialog] [data-action=no]').dblclick();
   await page.waitForTimeout(600);
   expect(await page.evaluate(() => window.__sb?.state())).toEqual(avant);
@@ -230,6 +231,7 @@ test('ADR-019 double toucher sur Oui : aucune carte retournée', async ({ page }
   await attendre(page, 'waitingTap');
   await page.locator('.message').click();
   await attendre(page, 'dialog');
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
   await page.locator('[role=dialog] [data-action=yes]').dblclick();
   await page.waitForTimeout(600);
   expect(await page.evaluate(() => window.__sb?.phase())).toBe('playing');
@@ -273,4 +275,36 @@ test('ADR-019 R-53 boîte pleine en fin de partie : pas de question, menu avec l
   await expect(page.locator('.menu-message')).toHaveText(messages.boxFull);
   await expect(page.locator('[role=dialog]')).toHaveCount(0);
   expect(await page.evaluate(() => window.__sb?.dialog())).toBeNull();
+});
+
+test('ADR-019 double toucher sur une carte en waitingTap : la question reste ouverte', async ({
+  page,
+}) => {
+  const [sardine] = idsWhere(roundForSeed(SEED), (v) => v === 'S');
+  if (sardine === undefined) throw new Error('plateau');
+  for (const carte of [16, 19]) {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await ouvrir(page, SEED, true);
+    await toucher(page, sardine);
+    await attendre(page, 'waitingTap');
+    await page.locator(`[data-id="${carte}"]`).dblclick({ force: true });
+    await page.waitForTimeout(600);
+    expect(await page.evaluate(() => window.__sb?.phase())).toBe('dialog');
+    expect(await page.evaluate(() => window.__sb?.dialog())).toBe('play');
+  }
+});
+
+test('UI-01 double toucher sur Non : le menu reste affiché', async ({ page }) => {
+  const [sardine] = idsWhere(roundForSeed(SEED), (v) => v === 'S');
+  if (sardine === undefined) throw new Error('plateau');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await ouvrir(page, SEED, true);
+  await toucher(page, sardine);
+  await attendre(page, 'waitingTap');
+  await page.locator('.message').click();
+  await attendre(page, 'dialog');
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
+  await page.locator('[role=dialog] [data-action=no]').dblclick();
+  await page.waitForTimeout(600);
+  expect(await page.evaluate(() => window.__sb?.phase())).toBe('menu');
 });
