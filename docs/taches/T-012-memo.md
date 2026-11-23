@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | implémentée (relecture à faire) |
 | Étape du plan | 2.4 |
 | Branche | `t-012-memo` |
 | Estimation | M (1 à 2 h) |
@@ -83,17 +83,17 @@ Graine 42 et `roundForSeed(42)` pour connaître le plateau. Attendre `#app:not([
 | `UI-20 libellé accessible des marques` | Marquer S et 2 sur une carte | `aria-label` contient « Sardine » et « 2 » |
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe (typecheck, lint, tests unitaires, contrôle de confidentialité).
-- [ ] `npm run e2e` (avec `E2E_PORT=5199` si le port 5173 est pris) : tous les tests ci-dessus existent et passent sur les 5 profils, ainsi que tous les tests existants. Les nouveaux tests qui utilisent un clic forcé, un double clic ou une attente passent avec `--repeat-each 5`.
-- [ ] Contre-épreuves faites puis annulées (`git diff src/` vide ensuite) et rapportées dans le compte rendu :
+- [x] `npm run check` passe (typecheck, lint, tests unitaires, contrôle de confidentialité).
+- [x] `npm run e2e` (avec `E2E_PORT=5199` si le port 5173 est pris) : tous les tests ci-dessus existent et passent sur les 5 profils, ainsi que tous les tests existants. Les nouveaux tests qui utilisent un clic forcé, un double clic ou une attente passent avec `--repeat-each 5`.
+- [x] Contre-épreuves faites puis annulées (`git diff src/` vide ensuite) et rapportées dans le compte rendu :
   - a. Si `onCard` appelle `doFlip` même mémo ouvert, le test « sélectionne sans la retourner » échoue.
   - b. Si « Non » au dialogue Quitter ferme le mémo, le test `R-41` échoue.
   - c. Si la fermeture ou l'ouverture du mémo n'appelle pas `lockInput()`, le test anti-rebond échoue.
   - d. Si une marque est posée sans sélection valide (carte retournée), le test de refus échoue.
-- [ ] `npm run screens` : `10-memo.png` produite sur les 5 profils et conforme à la checklist de la skill `controle-visuel`. Aucun débordement ni défilement (iPhone SE et paysage compris), boutons de marque ≥ 44 px, curseur et pastilles lisibles. Les captures existantes (`02` à `09`) restent conformes.
-- [ ] `git diff main --stat -- src/logic` est vide.
-- [ ] `grep -rn "document.body.append\|body.appendChild" src/ui` ne renvoie rien.
-- [ ] `npm run build` passe et `__sb` est absent de `dist/`.
+- [x] `npm run screens` : `10-memo.png` produite sur les 5 profils et conforme à la checklist de la skill `controle-visuel`. Aucun débordement ni défilement (iPhone SE et paysage compris), boutons de marque ≥ 44 px, curseur et pastilles lisibles. Les captures existantes (`02` à `09`) restent conformes.
+- [x] `git diff main --stat -- src/logic` est vide.
+- [x] `grep -rn "document.body.append\|body.appendChild" src/ui` ne renvoie rien.
+- [x] `npm run build` passe et `__sb` est absent de `dist/`.
 
 ## Pièges connus
 - **Écouteur délégué** : les boutons de marque doivent porter `data-action`. Ne pas utiliser l'attribut `disabled` (le clic n'arrive pas à `#app` sur WebKit, puis un toucher passerait pour « ailleurs »).
@@ -109,7 +109,22 @@ Graine 42 et `roundForSeed(42)` pour connaître le plateau. Attendre `#app:not([
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+Branche `t-012-memo`. Commit : `feat(ui): mode mémo, sélection, 4 marques, Fermer (R-80..R-84, R-41)`, puis un commit de documentation.
+
+Fait :
+- Contrôleur : état `memo { open, selected }`, `onCard` (sélection ou refus en mode mémo, sinon retournement), actions `memo` et `mark-*`, verrou `lockInput()` à l'ouverture et à la fermeture, fermeture du mémo dans `confirmQuit()` avant l'encaissement, remise à zéro dans `startNewRound()`, `memo()` exposé (contrôleur et `window.__sb`).
+- Rendu : `renderActions(open, marks)` avec rangée de 4 boutons (`aria-pressed`, `aria-disabled`, jamais `disabled`), `updateMemoPanel`, `renderCard` avec option `selected` (`aria-current`) et libellé « Carte cachée, marques : … ». Une marque ne redessine que la carte concernée.
+- Textes dans `texts.fr.ts` (`close`, `markNames`, `markButtonLabel`, `hiddenCardLabel`) ; CSS du panneau, du curseur doré et de l'animation `refus` (200 ms, durée fixe).
+- Le curseur n'est affiché que mémo ouvert ; la sélection est conservée mémo fermé (choix d'interface, non précisé par la fiche).
+- Tests : 15 tests e2e dans `tests/e2e/memo.spec.ts` (75 exécutions sur 5 profils, 375 avec `--repeat-each 5`, tous verts) ; `10-memo.png` ajoutée aux captures.
+
+Vérifications : `npm run check` OK (419 tests unitaires) ; `npm run e2e` : 315 réussis, 10 ignorés (déjà ignorés avant) ; build OK, `__sb` absent de `dist/` ; `git diff main --stat -- src/logic` vide ; aucun ajout à `body`.
+
+Contre-épreuves (faites puis annulées par `git checkout src`) : a. `onCard` qui retourne même mémo ouvert : « sélectionne sans la retourner » échoue. b. « Non » qui ferme le mémo : `R-41` échoue (panneau absent). c. sans `lockInput()` dans l'ouverture/fermeture : « Anti-rebond » échoue. d. marque posée sur une carte retournée (refus supprimé) : le test de refus échoue (classe `refus` absente).
+
+Captures : `test-results/screens/<profil>/10-memo.png`, relues sur iPhone SE, iPhone 15, paysage et Mac : pas de débordement, boutons de marque de 44 px ou plus, curseur et pastilles lisibles ; `03-en-cours.png` inchangée.
+
+Écarts : (1) les tests ont été écrits avant le code, mais la première exécution « rouge » a été interrompue (serveur mêlé) ; le rouge est établi par les contre-épreuves. (2) Un clic Playwright sur un bouton `aria-disabled` est refusé par l'actionnabilité : le test « sans sélection » utilise `click({ force: true })`. Aucune question ouverte.
 
 ## Relecture
 _(verdict du relecteur, avec la date)_

@@ -99,3 +99,4 @@ _(aucune)_
 - 2026-11-23 — humain — Recette T-011 sur iPhone OK ; v0.2.0 jouée aussi hors de chez soi depuis GitHub Pages, sans souci.
 - 2026-11-23 — Opus — T-011 terminée et fusionnée dans main (non poussée). Prochaine étape : étape 2.4 (mémo).
 - 2026-11-23 — Opus — v0.3.0 publiée (main poussée, tag v0.3.0). T-012 planifiée (étape 2.4 : mémo ; son « refus » reporté à l'étape 4.5).
+- 2026-11-23 — codeur — T-012 : mode mémo (sélection, 4 marques, Fermer, refus, R-41, anti-rebond), 15 tests e2e, contre-épreuves a à d faites, `10-memo.png` ; check OK. Reste : relecture, puis étape 2.5.
