@@ -21,7 +21,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-function dogHead(className: string): SVGSVGElement {
+export function dogHead(className: string): SVGSVGElement {
   const svg = document.createElementNS(SVG_NS, 'svg');
   svg.setAttribute('class', className);
   svg.setAttribute('viewBox', '0 0 100 100');
@@ -32,7 +32,7 @@ function dogHead(className: string): SVGSVGElement {
   return svg;
 }
 
-function renderCard(round: RoundState, id: number): HTMLElement {
+export function renderCard(round: RoundState, id: number): HTMLElement {
   const value = round.board.cells[id];
   if (round.flipped[id] && value !== undefined) {
     const card = el('div', value === 'S' ? 'card face sardine' : 'card face');

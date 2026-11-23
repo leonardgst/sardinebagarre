@@ -19,3 +19,10 @@ export async function ouvrir(page: Page, seed: number, debug = false): Promise<v
   await page.goto(`./?seed=${seed}${debug ? '&debug=1' : ''}`);
   await page.locator('.board').waitFor();
 }
+
+export const attendre = (page: Page, phase: string) =>
+  page.waitForFunction((p) => window.__sb?.phase() === p, phase);
+
+export async function toucher(page: Page, id: number): Promise<void> {
+  await page.locator(`[data-id="${id}"]`).click();
+}

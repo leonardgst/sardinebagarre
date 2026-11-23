@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | terminée |
 | Étape du plan | 2.3a |
 | Branche | `t-010-jouer` |
 | Estimation | L (> 3 h), à la limite : voir le découpage dans « Périmètre » |
@@ -151,12 +151,12 @@ Captures `@screens` (5 profils), nouvelles :
 - `08-niveau.png` : bandeau UI-43 « Niveau 2 ».
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe
-- [ ] `npm run e2e` passe sur les 5 projets (les tests de partie sur au moins `iphone-15` et `mac`)
-- [ ] `npm run screens` produit les captures listées. Elles sont vérifiées avec la checklist `controle-visuel`, et le compte rendu cite les problèmes vus et corrigés.
-- [ ] `grep -rn "finalizeRound" src/ui` : un seul appel, dans `controller.ts`, placé **avant** tout `await` d'animation (le relecteur le vérifie dans le code)
+- [x] `npm run check` passe
+- [x] `npm run e2e` passe sur les 5 projets (les tests de partie sur au moins `iphone-15` et `mac`)
+- [x] `npm run screens` produit les captures listées. Elles sont vérifiées avec la checklist `controle-visuel`, et le compte rendu cite les problèmes vus et corrigés.
+- [x] `grep -rn "finalizeRound" src/ui` : un seul appel, dans `controller.ts`, placé **avant** tout `await` d'animation (le relecteur le vérifie dans le code)
 - [ ] Aucun texte affiché en dur hors de `texts.fr.ts` ; tous les tirages de messages utilisent `rngs.decor`
-- [ ] `npm run build` passe et `__sb` est absent du build
+- [x] `npm run build` passe et `__sb` est absent du build
 - [ ] Test manuel par l'humain, `npm run dev`, PC à la souris : une partie gagnée et une partie perdue, l'aboiement s'entend
 
 ## Pièges connus
@@ -173,7 +173,66 @@ Captures `@screens` (5 profils), nouvelles :
 - Décision d'Opus, que l'humain peut changer : quand on retourne un **1 après la première carte**, le message ne change pas. Les exemples de §10.6 ne prévoient rien pour ce cas. → **Validée par l'humain le 2026-11-22.**
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+Fait : contrôleur à phases (`controller.ts`), entrées déléguées (`input.ts`), animations interruptibles (`anim.ts`), aboiement synthétisé (`audio.ts`), mise à jour en place du plateau et du bandeau, messages et pluriels dans `texts.fr.ts`, CSS des animations et bandeaux, crochets `game()` et `phase()`. `finalizeRound` est appelé une seule fois (`controller.ts`), avant tout `await`, puis `onFinalized`.
+Tests : 5 Vitest (`tests/ui/texts.test.ts`), 7 e2e (`tests/e2e/partie.spec.ts`) ; check OK (419), e2e 90 passés, build OK sans `__sb`.
+Captures vérifiées (iphone-15, paysage, se) : 04, 05 (tête qui surgit), 06, 06b, 07, 08. Réglé : captures prises trop tôt (tête et bandeau pas encore visibles).
+Choix : le message de la Sardine est posé au toucher (avant l'animation) ; le bandeau UI-43 affiche les messages R-66 (titre + « Bravo ») ; cartes révélées légèrement assombries pour les distinguer de celles retournées par le joueur ; durées de l'ouverture du bandeau ÷ 4 via CSS en mouvement réduit.
+Reste pour l'humain : test manuel (aboiement audible), non faisable ici.
 
 ## Relecture
-_(verdict du relecteur, avec la date)_
+2026-11-22 — relecteur — 🟡 Approuvé avec réserves. check OK (419), e2e 115 passés (captures comprises), build OK sans `__sb`, captures vues.
+- R-55 conforme : un seul `finalizeRound`, appelé de façon synchrone avant tout `await`.
+- CL-19 et CL-20 conformes : aucun chemin vers `flip` hors de `playing`, `play()` a un `setTimeout` de secours, `ending()` est dans un `try/finally`.
+- L'écouteur délégué sur `#app` est compatible avec iOS : **ne pas le déplacer vers `document` ou `body`**.
+- Écarts du codeur acceptés.
+
+Test de l'humain sur un vrai iPhone (2026-11-22, `npm run dev -- --host`) : on joue au toucher, et toucher le fond lance la partie suivante. L'aboiement s'entend sur PC.
+
+Corrections demandées (décidées par Opus) :
+- **C1** (important, avant fusion) `src/ui/anim.ts:18`, `src/ui/controller.ts:181, 215, 219` : le mode accéléré (`fast`) reste actif après un toucher pendant la fin ou pendant le bandeau de niveau. La partie suivante perd alors l'animation UI-30.
+  - Correction : appeler `setFast(false)` au début de `doFlip`, pour chaque retournement, et aussi dans `nextRound` avant le passage en `playing`.
+  - Test e2e de non-régression, **sans** `reducedMotion` : Sardine, toucher pendant `ending`, `waitingTap`, toucher, `playing`. Ensuite, dans un seul `evaluate` : clic sur `[data-state=hidden]` puis `!!document.querySelector('.flip-out')`, qui doit valoir `true`.
+- **C2** (important, iOS) `src/ui/audio.ts:15` : iOS met l'`AudioContext` à l'état `interrupted` (arrière-plan, appel, Siri). Remplacer la condition par `if (ctx.state !== 'running') void ctx.resume();`.
+- **C3** `src/ui/controller.ts:156` : le message de victoire doit annoncer les jetons **réellement encaissés** (`credited`, R-50), pas le gain brut. Exemple : 49 990 + 36 → « Tu remportes 10 jetons ! ».
+- **C5** `tests/e2e/partie.spec.ts` :
+  - ajouter un parcours en `locator.tap()` sur les projets tactiles (`hasTouch`) : Sardine, toucher sur `.message`, nouvelle partie ;
+  - déplacer `attendre` et `toucher` (présents en double dans `partie.spec.ts` et `screens.spec.ts`) dans `tests/e2e/aide.ts`.
+- **C6** `src/ui/input.ts:10` (Mac) : en `waitingTap` et en `ending`, un clic sur le fond décoré, hors de la colonne de 480 px, doit aussi compter comme « toucher ailleurs ». Ajouter un second écouteur sur `body` qui ne gère **que** ce cas. L'écouteur principal reste sur `#app`.
+- **C4** : non traité ici. Démarrer avec un total ≥ 50 000 lèverait une exception, et la branche `full` ne met pas à jour le niveau affiché. Reporté à l'étape 3.1 et consigné dans le journal (« Contraintes pour la phase 2 »).
+
+## Corrections de la relecture (appliquées)
+2026-11-22 — codeur : C1 (setFast(false) dans doFlip et nextRound + test e2e), C2 (resume si état ≠ running), C3 (message de victoire = jetons encaissés), C5 (test tactile via tap ; attendre et toucher déplacés dans aide.ts), C6 (écouteur sur body hors racine + test Mac). C4 reporté. check OK (419), e2e 100 passés / 10 ignorés (tests propres au Mac ou au tactile).
+
+2026-11-22 — relecteur (2e relecture, commit d0c2927) — 🔴 À reprendre. check OK (419), e2e 100 passés / 10 ignorés.
+- C1 conforme. Contre-épreuve faite : sans les `setFast(false)` ajoutés, le test C1 échoue sur les 5 projets.
+- C2 conforme (`state !== 'running'` → `resume`).
+- C3 conforme (le message utilise `credited`). Le test est reporté à l'étape 3.1 (49 990 + 36 → « 10 jetons »).
+- C5 conforme : parcours en `tap()` sur les projets tactiles, `attendre` et `toucher` dans `aide.ts`.
+- C6 : contre-épreuve faite (sans l'écouteur sur `body`, le test Mac échoue), et l'écouteur principal est toujours sur `#app`. **Mais** un même vrai clic est traité deux fois.
+  - Entre les deux écouteurs, les microtâches retirent la carte touchée du DOM (`revealAll`, `drawBoard`). Quand le clic arrive sur `body`, `root.contains(target)` est donc faux, et `onElsewhere` est rappelé.
+  - Effets reproduits (mac, iphone-15) :
+    - toucher une carte cachée pendant la fin saute la révélation et lance la partie suivante (R-52, CL-20) ;
+    - toucher une carte en `waitingTap` après une victoire saute le bandeau de niveau (UI-43, R-66).
+
+Corrections demandées :
+- **C7** (bloquant) `src/ui/input.ts:22-23` : remplacer le test par `if (event.composedPath().includes(root)) return;`.
+  - Ajouter deux tests e2e en **vrais clics Playwright** (`locator(...).click()`, pas `el.click()` dans un `evaluate`), sans `reducedMotion` :
+    - « CL-20 vrai toucher sur une carte cachée pendant la fin → waitingTap » : toucher la Sardine, puis `locator('[data-id=<carte non Sardine>]').click()`, attendre environ 300 ms, et attendre la phase `waitingTap` ;
+    - « R-66 toucher une carte en waitingTap → bandeau de niveau affiché » : gagner, puis `locator('[data-id="0"]').click()` ; la phase est alors `ending` et `.bandeau-niveau` est présent.
+  - Le relecteur a validé la correction et les tests dans un worktree temporaire : les deux tests échouent sur d0c2927 et passent avec la correction.
+- **C8** (mineur) `src/ui/audio.ts:12` : `ctx.resume().catch(() => {})` au lieu de `void ctx.resume()`, pour ne pas laisser de rejet non géré si le contexte est `closed`.
+- **C9** (mineur) `src/ui/controller.ts:182, 210` : supprimer les `setFast(false)`, devenus redondants avec ceux des lignes 173 et 221.
+
+2026-11-23 — codeur — C7 (`composedPath().includes(root)` dans `input.ts` ; 2 tests e2e en vrais clics, sans reducedMotion : les 10 exécutions échouaient avant la correction, passent après), C8 (`resume().catch`), C9 (deux `setFast(false)` redondants supprimés).
+
+2026-11-23 — relecteur (3e relecture, commit 4909677) — 🟡 Approuvé avec réserves, fusion possible. check OK (419), e2e 110 passés / 10 ignorés, build OK sans `__sb`.
+- C7 conforme (`composedPath().includes(root)`). Contre-épreuve : avec l'ancien `input.ts`, les 2 nouveaux tests échouent sur les 5 projets ; avec la correction, 80/80 verts en `--repeat-each 8`.
+- `{ force: true }` (test CL-20) est justifié. Sans lui, Playwright attend la fin du tremblement et de la révélation, donc clique en `waitingTap`. Le clic reste un vrai clic de souris. La cible (carte ou tête `.surgit`) est dans `#app` et retirée du DOM, donc le défaut de C7 est bien exercé. Aucun défaut masqué.
+- C8 et C9 conformes, sans régression (C1 vert ; fast est remis à faux en tête de `doFlip`).
+
+Correction demandée :
+- **C10** (important, petite) `tests/e2e/partie.spec.ts:168-178` : rien ne prouve l'accélération de CL-20. Avec `skip()` neutralisé, les tests CL-20 et C1 restent verts, car `attendre` n'a pas de limite et la fin naturelle dure environ 1,65 s.
+  - Après le clic forcé : `waitForFunction(phase === 'waitingTap', { timeout: 500 })`, puis `waitForTimeout(300)`, puis vérifier que la phase vaut toujours `waitingTap`.
+  - Variante validée : rouge 5/5 sans `skip()`, verte 25/25 avec.
+
+2026-11-23 — codeur — C10 : `waitForFunction(waitingTap, { timeout: 500 })`, `waitForTimeout(300)` puis vérification de la phase, ajoutés aux tests « C1 » et « CL-20 vrai toucher… » (sans reducedMotion). Le test « CL-20 toucher pendant la fin » (reducedMotion, fin quasi instantanée) n'est pas durci : il ne distinguerait rien. Contre-épreuve : avec `skip()` neutralisé dans `onCard` et `onElsewhere`, ces 2 tests échouent sur les 5 projets (10 échecs) ; code rétabli, `git diff src/` vide, 75/75 verts en `--repeat-each 5`. check OK (419), e2e 110 passés / 10 ignorés.

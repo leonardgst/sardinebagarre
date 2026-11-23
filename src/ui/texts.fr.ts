@@ -32,3 +32,52 @@ export const symbols = {
   marks: { S: 'S', 1: '1', 2: '2', 3: '3' },
   coin: '♣',
 } as const;
+
+/** UI-60 : « jeton » au singulier pour 0 et 1. */
+export function coinsLabel(n: number): string {
+  return `${n} ${n >= 2 ? 'jetons' : 'jeton'}`;
+}
+
+export const messages = {
+  /** UI-60 : listes d'ambiance (tirage avec `rngs.decor`). */
+  sardine: [
+    "Wouf ! Sardine t'a tout pris. 0 jeton.",
+    'Ouaf ! Sardine a trouvé ta cachette… 0 jeton.',
+    'Sardine est passée par là : 0 jeton !',
+  ],
+  won: 'Gagné ! Tu as trouvé tous les 2 et les 3.',
+  wonBanner: 'Gagné !',
+  tapToContinue: "Touche l'écran pour continuer.",
+  boxFull: 'Ta boîte à jetons est pleine (50 000). Tu ne peux plus en gagner.',
+  bravo: 'Bravo ! Tu peux gagner encore plus de jetons.',
+} as const;
+
+/** Tire un message dans une liste avec le générateur de décor. */
+export function pickMessage(list: readonly string[], rng: () => number): string {
+  const item = list[Math.min(list.length - 1, Math.floor(rng() * list.length))];
+  return item ?? '';
+}
+
+/** Première carte chiffrée (§10.6). */
+export function firstCardMessage(value: number, payout: number): string {
+  return `${value} ! Tu gagnes ${coinsLabel(payout)} !`;
+}
+
+/** 2 ou 3 retourné ensuite (§10.6). */
+export function multiplierMessage(value: number, payout: number): string {
+  return `×${value} ! Tu as maintenant ${coinsLabel(payout)} !`;
+}
+
+export function wonPayoutMessage(payout: number): string {
+  return `Tu remportes ${coinsLabel(payout)} !`;
+}
+
+/** R-66 : messages de changement de niveau ; le « Bravo » une seule fois par session. */
+export function levelChangeMessages(from: number, to: number, bravoSeen: boolean): string[] {
+  if (to > from) {
+    const up = `Niveau ${to} atteint !`;
+    return bravoSeen ? [up] : [up, messages.bravo];
+  }
+  if (to < from) return [`Retour au niveau ${to}.`];
+  return [];
+}
