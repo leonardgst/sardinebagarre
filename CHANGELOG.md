@@ -1,5 +1,11 @@
 # Journal des versions
 
+## v0.2.0 — 2026-11-23
+- Le jeu est jouable : retourner une carte, gains multipliés, victoire, défaite sur une Sardine avec aboiement.
+- Révélation du plateau en fin de partie, accélérée par un toucher ; partie suivante au bon niveau avec bandeau de niveau.
+- Entrées bloquées pendant les animations (CL-19) ; jetons encaissés avant toute animation (R-55).
+- Tests de navigateur en vrais clics pour la fin de partie (110 tests sur 5 profils).
+
 ## v0.1.0 — 2026-11-22
 - Logique du jeu complète et testée : plateaux, indicateurs, jetons, niveaux 1 à 8, mémo, album, sauvegarde (sans interface).
 - Direction artistique « Salon » retenue (ADR-018) ; maquettes dans `docs/maquettes/`.
