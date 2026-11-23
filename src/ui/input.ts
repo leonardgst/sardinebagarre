@@ -19,8 +19,7 @@ export function installInput(root: HTMLElement, handlers: InputHandlers): void {
   // Mac : le fond décoré hors de la colonne compte aussi comme « toucher ailleurs ».
   // Ce second écouteur ne gère que les clics situés en dehors de la racine.
   document.body.addEventListener('click', (event) => {
-    const target = event.target instanceof Node ? event.target : null;
-    if (target && root.contains(target)) return;
+    if (event.composedPath().includes(root)) return;
     handlers.onGesture();
     handlers.onElsewhere();
   });

@@ -164,3 +164,29 @@ test('R-52 parcours au doigt : Sardine, toucher sur le message, nouvelle partie'
   await attendre(page, 'playing');
   await expect(page.locator('[data-state=hidden]')).toHaveCount(25);
 });
+
+test('CL-20 vrai toucher sur une carte cachée pendant la fin → waitingTap', async ({ page }) => {
+  const round = roundForSeed(SEED);
+  const [sardine] = idsWhere(round, (v) => v === 'S');
+  const [autre] = idsWhere(round, (v) => v !== 'S');
+  if (sardine === undefined || autre === undefined) throw new Error('plateau');
+  await ouvrir(page, SEED, true); // sans reducedMotion
+  await toucher(page, sardine);
+  await page.locator(`[data-id="${autre}"]`).click({ force: true }); // sans attente de stabilité : la fin dure ~1 s
+  await page.waitForTimeout(300);
+  await attendre(page, 'waitingTap');
+});
+
+test('R-66 toucher une carte en waitingTap → bandeau de niveau affiché', async ({ page }) => {
+  const round = roundForSeed(SEED);
+  const multis = idsWhere(round, (v) => v === 2 || v === 3);
+  await ouvrir(page, SEED, true); // sans reducedMotion
+  for (const id of multis) {
+    await toucher(page, id);
+    if (id !== multis[multis.length - 1]) await attendre(page, 'playing');
+  }
+  await attendre(page, 'waitingTap');
+  await page.locator('[data-id="0"]').click();
+  await attendre(page, 'ending');
+  await expect(page.locator('.bandeau-niveau')).toBeVisible();
+});

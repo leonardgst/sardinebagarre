@@ -75,3 +75,4 @@ _(aucune)_
 - 2026-11-22 — codeur — T-010 : jeu jouable (retournement, Sardine + aboiement synthétisé, victoire, révélation, niveau suivant, R-55 avant animations, CL-19/20/21) ; check OK (419), e2e 90 passés, captures vérifiées. Reste : relecture et test manuel de l'aboiement.
 
 - 2026-11-22 — T-010 : corrections de relecture C1, C2, C3, C5, C6 appliquées ; C4 reste pour l'étape 3.1.
+- 2026-11-23 — codeur — T-010 : corrections de la 2e relecture C7 (clic traité deux fois), C8, C9 appliquées ; tests e2e C7 rouges avant, verts après.

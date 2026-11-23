@@ -179,7 +179,6 @@ export function createController(
       game = finalizeRound(game, next);
       options.onFinalized?.(game);
       phase = 'ending';
-      setFast(false);
     } else {
       phase = 'flipping';
     }
@@ -207,7 +206,6 @@ export function createController(
       return;
     }
     round = next.round;
-    setFast(false);
     shown.level = game.level;
     shown.total = game.coins;
     shown.payout = 0;

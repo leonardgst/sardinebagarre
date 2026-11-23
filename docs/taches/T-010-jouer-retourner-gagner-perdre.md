@@ -222,3 +222,5 @@ Corrections demandées :
   - Le relecteur a validé la correction et les tests dans un worktree temporaire : les deux tests échouent sur d0c2927 et passent avec la correction.
 - **C8** (mineur) `src/ui/audio.ts:12` : `ctx.resume().catch(() => {})` au lieu de `void ctx.resume()`, pour ne pas laisser de rejet non géré si le contexte est `closed`.
 - **C9** (mineur) `src/ui/controller.ts:182, 210` : supprimer les `setFast(false)`, devenus redondants avec ceux des lignes 173 et 221.
+
+2026-11-23 — codeur — C7 (`composedPath().includes(root)` dans `input.ts` ; 2 tests e2e en vrais clics, sans reducedMotion : les 10 exécutions échouaient avant la correction, passent après), C8 (`resume().catch`), C9 (deux `setFast(false)` redondants supprimés).

@@ -12,7 +12,7 @@ export function unlockAudio(): void {
       if (!Ctor) return;
       ctx = new Ctor();
     }
-    if (ctx.state !== 'running') void ctx.resume();
+    if (ctx.state !== 'running') ctx.resume().catch(() => {});
   } catch {
     ctx = null;
   }
