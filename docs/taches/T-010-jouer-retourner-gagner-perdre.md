@@ -224,3 +224,13 @@ Corrections demandées :
 - **C9** (mineur) `src/ui/controller.ts:182, 210` : supprimer les `setFast(false)`, devenus redondants avec ceux des lignes 173 et 221.
 
 2026-11-23 — codeur — C7 (`composedPath().includes(root)` dans `input.ts` ; 2 tests e2e en vrais clics, sans reducedMotion : les 10 exécutions échouaient avant la correction, passent après), C8 (`resume().catch`), C9 (deux `setFast(false)` redondants supprimés).
+
+2026-11-23 — relecteur (3e relecture, commit 4909677) — 🟡 Approuvé avec réserves, fusion possible. check OK (419), e2e 110 passés / 10 ignorés, build OK sans `__sb`.
+- C7 conforme (`composedPath().includes(root)`). Contre-épreuve : avec l'ancien `input.ts`, les 2 nouveaux tests échouent sur les 5 projets ; avec la correction, 80/80 verts en `--repeat-each 8`.
+- `{ force: true }` (test CL-20) est justifié. Sans lui, Playwright attend la fin du tremblement et de la révélation, donc clique en `waitingTap`. Le clic reste un vrai clic de souris. La cible (carte ou tête `.surgit`) est dans `#app` et retirée du DOM, donc le défaut de C7 est bien exercé. Aucun défaut masqué.
+- C8 et C9 conformes, sans régression (C1 vert ; fast est remis à faux en tête de `doFlip`).
+
+Correction demandée :
+- **C10** (important, petite) `tests/e2e/partie.spec.ts:168-178` : rien ne prouve l'accélération de CL-20. Avec `skip()` neutralisé, les tests CL-20 et C1 restent verts, car `attendre` n'a pas de limite et la fin naturelle dure environ 1,65 s.
+  - Après le clic forcé : `waitForFunction(phase === 'waitingTap', { timeout: 500 })`, puis `waitForTimeout(300)`, puis vérifier que la phase vaut toujours `waitingTap`.
+  - Variante validée : rouge 5/5 sans `skip()`, verte 25/25 avec.

@@ -76,3 +76,4 @@ _(aucune)_
 
 - 2026-11-22 — T-010 : corrections de relecture C1, C2, C3, C5, C6 appliquées ; C4 reste pour l'étape 3.1.
 - 2026-11-23 — codeur — T-010 : corrections de la 2e relecture C7 (clic traité deux fois), C8, C9 appliquées ; tests e2e C7 rouges avant, verts après.
+- 2026-11-23 — relecteur — 3e relecture de T-010 : 🟡, fusion possible. C7, C8 et C9 conformes (contre-épreuve C7 faite, `force: true` justifié). C10 : borner l'attente du test CL-20 pour prouver l'accélération.
