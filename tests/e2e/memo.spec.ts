@@ -218,3 +218,44 @@ test('UI-20 libellé accessible des marques', async ({ page }) => {
   expect(label).toContain('Sardine');
   expect(label).toContain('2');
 });
+
+test('Anti-rebond double toucher sur Fermer', async ({ page }) => {
+  await ouvrir(page, SEED, true);
+  await basculerMemo(page);
+  await page.locator('[data-action=memo]').dblclick();
+  await page.waitForTimeout(600);
+  expect((await memoState(page))?.open).toBe(false);
+  const s = await etat(page);
+  expect(s?.flipped.some(Boolean)).toBe(false);
+  expect(s?.memos.every((x) => x === 0)).toBe(true);
+});
+
+test('Décision 2 sélection et curseur conservés après Fermer puis Mémo', async ({ page }) => {
+  const { a } = ids();
+  await ouvrir(page, SEED, true);
+  await basculerMemo(page);
+  await toucher(page, a);
+  await marque(page, '2').click();
+  await basculerMemo(page);
+  await expect(page.locator('[aria-current=true]')).toHaveCount(0);
+  await basculerMemo(page);
+  await expect(page.locator(`[data-id="${a}"]`)).toHaveAttribute('aria-current', 'true');
+  expect((await memoState(page))?.selected).toBe(a);
+  await expect(marque(page, '2')).toHaveAttribute('aria-pressed', 'true');
+  await expect(marque(page, '3')).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('Décision 2 la sélection disparaît quand la carte est retournée', async ({ page }) => {
+  const { un } = ids();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await ouvrir(page, SEED, true);
+  await basculerMemo(page);
+  await toucher(page, un);
+  await basculerMemo(page);
+  await toucher(page, un);
+  await attendre(page, 'playing');
+  await basculerMemo(page);
+  expect((await memoState(page))?.selected).toBeNull();
+  await expect(page.locator('[aria-current=true]')).toHaveCount(0);
+  for (const m of MARQUES) await expect(marque(page, m)).toHaveAttribute('aria-disabled', 'true');
+});

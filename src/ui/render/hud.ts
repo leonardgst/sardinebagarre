@@ -1,3 +1,4 @@
+import { MEMO_BITS } from '../../logic/round';
 import { formatCoins } from '../format';
 import { markButtonLabel, symbols, texts } from '../texts.fr';
 
@@ -45,7 +46,6 @@ export function renderMessage(text = ''): HTMLElement {
 }
 
 const MARK_ORDER = ['S', 1, 2, 3] as const;
-const MARK_BIT: Readonly<Record<(typeof MARK_ORDER)[number], number>> = { S: 1, 1: 2, 2: 4, 3: 8 };
 
 function actionButton(name: string, label: string): HTMLButtonElement {
   const button = document.createElement('button');
@@ -92,6 +92,6 @@ export function updateMemoPanel(footer: HTMLElement, marks: number | null): void
     const button = footer.querySelector<HTMLElement>(`[data-action=mark-${mark}]`);
     if (!button) continue;
     button.setAttribute('aria-disabled', String(marks === null));
-    button.setAttribute('aria-pressed', String(marks !== null && (marks & MARK_BIT[mark]) !== 0));
+    button.setAttribute('aria-pressed', String(marks !== null && (marks & MEMO_BITS[mark]) !== 0));
   }
 }

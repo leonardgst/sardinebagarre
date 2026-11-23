@@ -24,7 +24,7 @@ Pendant une partie, le bouton « Mémo » ouvre un panneau de 4 marques (S, 1, 2
 
 ## Décisions d'interface prises pour cette tâche (pas de nouvelle règle de jeu)
 1. **Disposition** : quand le mémo est ouvert, le pied de page `.actions` montre une rangée de 4 boutons de marque (S, 1, 2, 3) **au-dessus** de la rangée « Fermer » et « Quitter ». « Fermer » prend la place de « Mémo ». Les boutons de marque reprennent les pastilles bordeaux du style Salon (ADR-018). Le plateau peut rétrécir (rangée `1fr`), mais rien ne doit déborder ni défiler. En paysage, le panneau est dans la colonne de droite.
-2. **Sélection** : aucune carte n'est sélectionnée au début d'une partie. La sélection est conservée si l'on ferme puis rouvre le mémo pendant la même partie. Elle disparaît si la carte sélectionnée est retournée (en mode normal) et à chaque nouvelle partie. La carte sélectionnée porte `aria-current="true"` et un liseré doré (curseur).
+2. **Sélection** : aucune carte n'est sélectionnée au début d'une partie. La sélection est conservée si l'on ferme puis rouvre le mémo pendant la même partie. Elle disparaît si la carte sélectionnée est retournée (en mode normal) et à chaque nouvelle partie. La carte sélectionnée porte `aria-current="true"` et un liseré doré (curseur), **visible seulement mémo ouvert** ; la sélection reste mémorisée mémo fermé.
 3. **Sans sélection**, les boutons de marque portent `aria-disabled="true"` (pas l'attribut `disabled`, qui empêche le clic d'atteindre l'écouteur délégué) et un toucher sur eux ne fait rien.
 4. **État des boutons** : chaque bouton de marque porte `aria-pressed="true"` ou `"false"` selon que la carte sélectionnée a cette marque.
 5. **Refus (R-81)** : toucher une carte retournée en mode mémo ne change ni la sélection ni les marques. La carte joue une courte animation de refus (classe `refus`, environ 200 ms, sans durée réduite qui bloque). **Le son « refus » est reporté à l'étape 4.5** (sons Web Audio), comme les autres sons hors aboiement.
@@ -125,6 +125,14 @@ Contre-épreuves (faites puis annulées par `git checkout src`) : a. `onCard` qu
 Captures : `test-results/screens/<profil>/10-memo.png`, relues sur iPhone SE, iPhone 15, paysage et Mac : pas de débordement, boutons de marque de 44 px ou plus, curseur et pastilles lisibles ; `03-en-cours.png` inchangée.
 
 Écarts : (1) les tests ont été écrits avant le code, mais la première exécution « rouge » a été interrompue (serveur mêlé) ; le rouge est établi par les contre-épreuves. (2) Un clic Playwright sur un bouton `aria-disabled` est refusé par l'actionnabilité : le test « sans sélection » utilise `click({ force: true })`. Aucune question ouverte.
+
+Corrections de relecture (C1 à C5), commit `fix(ui): corrections de relecture T-012 (C1 à C5)` :
+- C1 : test « Anti-rebond double toucher sur Fermer » ; contre-épreuve : sans `lockInput()` à la fermeture, il échoue.
+- C2 : deux tests de la décision 2 (sélection et curseur conservés après Fermer puis Mémo ; sélection effacée après retournement, boutons `aria-disabled`) ; contre-épreuve : sans la remise à `null` au retournement, le second échoue.
+- C3 : bouton de marque pressé = fond bordeaux, chiffre crème ; non pressé = fond crème, chiffre bordeaux (captures SE et paysage relues).
+- C4 : `MEMO_BITS` importé de `src/logic/round.ts` dans `hud.ts` et `board.ts` (aucune modification de `src/logic`).
+- C5 : décision 2 complétée dans la fiche.
+- Vérifications : check OK, e2e 330 réussis / 10 ignorés, `--repeat-each 5` des nouveaux tests : 100 réussis.
 
 ## Relecture
 ### Relecture du 2026-11-23 (relecteur) : 🟡 approuvée avec réserves

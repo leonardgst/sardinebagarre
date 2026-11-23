@@ -1,3 +1,4 @@
+import { MEMO_BITS } from '../../logic/round';
 import type { LineHint, MemoMark, RoundState } from '../../logic/types';
 import { formatHintSum } from '../format';
 import {
@@ -15,7 +16,6 @@ const MARKS: readonly { readonly mark: MemoMark; readonly className: string }[] 
   { mark: 2, className: 'm-2' },
   { mark: 3, className: 'm-3' },
 ];
-const MARK_BITS: Readonly<Record<MemoMark, number>> = { S: 1, 1: 2, 2: 4, 3: 8 };
 
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
@@ -72,10 +72,10 @@ export function renderCard(
   const bits = round.memos[id] ?? 0;
   card.setAttribute(
     'aria-label',
-    hiddenCardLabel(MARKS.filter(({ mark }) => (bits & MARK_BITS[mark]) !== 0).map((m) => m.mark)),
+    hiddenCardLabel(MARKS.filter(({ mark }) => (bits & MEMO_BITS[mark]) !== 0).map((m) => m.mark)),
   );
   for (const { mark, className } of MARKS) {
-    const on = (bits & MARK_BITS[mark]) !== 0;
+    const on = (bits & MEMO_BITS[mark]) !== 0;
     const m = el('i', `m ${className}${on ? ' on' : ''}`);
     m.textContent = symbols.marks[mark];
     m.setAttribute('aria-hidden', 'true');
