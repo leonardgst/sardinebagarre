@@ -41,3 +41,11 @@ export const attendre = (page: Page, phase: string) =>
 export async function toucher(page: Page, id: number): Promise<void> {
   await page.locator(`[data-id="${id}"]`).click();
 }
+
+/** Ouvre ou ferme le mémo (même bouton) et attend la fin du verrou anti-rebond. */
+export async function basculerMemo(page: Page): Promise<void> {
+  await page.locator('[data-action=memo]').click();
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
+}
+
+export const memoState = (page: Page) => page.evaluate(() => window.__sb?.memo());

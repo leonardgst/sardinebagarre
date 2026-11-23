@@ -5,6 +5,7 @@ export const texts = {
   total: 'Total',
   memo: 'Mémo',
   quit: 'Quitter',
+  close: 'Fermer',
   hiddenCard: 'Carte cachée',
   sardine: 'Sardine',
   board: 'Plateau',
@@ -38,6 +39,20 @@ export function quitQuestion(payout: number): string {
 
 /** R-67 : confirmation de « Quitter la table ». */
 export const leaveTableQuestion = 'Quitter la table ? Tu repartiras du niveau 1.';
+
+/** R-80 : nom parlé d'une marque du mémo. */
+export const markNames = { S: 'Sardine', 1: '1', 2: '2', 3: '3' } as const;
+
+/** Libellé du bouton de marque (« Marque Sardine », « Marque 1 »…). */
+export function markButtonLabel(mark: 'S' | 1 | 2 | 3): string {
+  return `Marque ${markNames[mark]}`;
+}
+
+/** Carte cachée, avec ses marques s'il y en a (UI-20, R-82). */
+export function hiddenCardLabel(marks: readonly ('S' | 1 | 2 | 3)[]): string {
+  if (marks.length === 0) return texts.hiddenCard;
+  return `${texts.hiddenCard}, marques : ${marks.map((m) => markNames[m]).join(', ')}`;
+}
 
 export function cardLabel(value: number): string {
   return `Carte ${value}`;

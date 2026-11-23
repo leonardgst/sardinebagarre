@@ -6,14 +6,14 @@ import {
   leaveTable,
   startRound,
 } from '../logic/game';
-import { flip, quit } from '../logic/round';
-import type { GameState, Rng, RoundState } from '../logic/types';
+import { flip, quit, toggleMemo } from '../logic/round';
+import type { GameState, MemoMark, Rng, RoundState } from '../logic/types';
 import { play, scale, setFast, skip, tween, wait } from './anim';
 import { bark, unlockAudio } from './audio';
 import { installInput } from './input';
 import { dogHead, renderBoard, renderCard } from './render/board';
 import { renderDialog } from './render/dialog';
-import { renderActions, renderHud, renderMessage, updateHud } from './render/hud';
+import { renderActions, renderHud, renderMessage, updateHud, updateMemoPanel } from './render/hud';
 import { renderMenu, renderScreen } from './render/menu';
 import {
   firstCardMessage,
@@ -42,6 +42,8 @@ export interface Controller {
   setRound(round: RoundState): void;
   /** Remplace l'état du jeu, depuis le menu seulement (tests, développement seulement). */
   setGame(game: GameState): void;
+  /** R-81 : mode mémo ouvert ou non, carte sélectionnée. */
+  memo(): { readonly open: boolean; readonly selected: number | null };
 }
 
 export interface ControllerOptions {
@@ -58,6 +60,8 @@ const REVEAL_SPREAD_MS = 350;
 const LEVEL_MS = 1200;
 /** Anti-rebond des touchers de carte (durée réelle, indépendante des animations réduites). */
 const LOCK_MS = 350;
+/** Durée de l'animation de refus (R-81). */
+const REFUS_MS = 250;
 
 export function createController(
   root: HTMLElement,
@@ -78,7 +82,8 @@ export function createController(
   const table = document.createElement('main');
   table.className = 'table';
   const message = renderMessage();
-  const actions = renderActions();
+  let actions = renderActions();
+  let memo: { open: boolean; selected: number | null } = { open: false, selected: null };
 
   let lockTimer: ReturnType<typeof setTimeout> | undefined;
   /** Un double toucher ne doit pas atteindre la carte située sous le bouton qui vient de disparaître. */
@@ -103,9 +108,62 @@ export function createController(
   };
   const refreshHud = (): void => updateHud(hud, shown.level, shown.payout, shown.total);
   const drawBoard = (): void => {
-    table.replaceChildren(renderBoard(cur()));
+    table.replaceChildren(renderBoard(cur(), memo.open ? memo.selected : null));
     refreshHud();
   };
+
+  /** Bits de mémo de la carte sélectionnée, ou `null` sans sélection. */
+  const selectedBits = (): number | null =>
+    memo.selected === null ? null : (cur().memos[memo.selected] ?? 0);
+
+  /** Remplace le pied de page (mémo ouvert ou fermé). */
+  function drawActions(): void {
+    const next = renderActions(memo.open, selectedBits());
+    actions.replaceWith(next);
+    actions = next;
+  }
+
+  /** Redessine une seule carte (garde le curseur, évite de faire clignoter le plateau). */
+  function refreshCard(id: number | null): void {
+    if (id === null) return;
+    cardEl(id)?.replaceWith(renderCard(cur(), id, { selected: memo.open && memo.selected === id }));
+  }
+
+  /** R-81 : ouvre ou ferme le mémo ; la mise en page change sous le doigt, donc verrou. */
+  function toggleMemoMode(): void {
+    lockInput();
+    memo = { ...memo, open: !memo.open };
+    drawActions();
+    refreshCard(memo.selected);
+  }
+
+  function selectCard(id: number): void {
+    if (cur().flipped[id]) {
+      // R-81 : carte retournée refusée, sans changer la sélection ni les marques.
+      const el = cardEl(id);
+      if (!el) return;
+      el.classList.add('refus');
+      setTimeout(() => el.classList.remove('refus'), REFUS_MS);
+      return;
+    }
+    const previous = memo.selected;
+    memo = { ...memo, selected: id };
+    if (previous !== id) refreshCard(previous);
+    refreshCard(id);
+    updateMemoPanel(actions, selectedBits());
+  }
+
+  function markSelected(mark: MemoMark): void {
+    if (memo.selected === null) return;
+    round = toggleMemo(cur(), memo.selected, mark);
+    refreshCard(memo.selected);
+    updateMemoPanel(actions, selectedBits());
+  }
+
+  /** R-81 : le mémo repart fermé et sans sélection. */
+  function resetMemo(): void {
+    memo = { open: false, selected: null };
+  }
 
   function showMenu(note = ''): void {
     dialogKind = null;
@@ -245,6 +303,7 @@ export function createController(
     const before = cur();
     const next = flip(before, id);
     if (next === before) return; // R-30 : carte déjà retournée.
+    if (memo.selected === id) memo = { ...memo, selected: null };
     setFast(false); // Un toucher accélérateur précédent ne doit pas couper UI-30.
     round = next;
     const previousCoins = game.coins;
@@ -274,6 +333,10 @@ export function createController(
   /** R-42, R-55 : abandon confirmé. Finalisation avant toute animation. */
   async function confirmQuit(): Promise<void> {
     setFast(false);
+    if (memo.open) {
+      resetMemo(); // R-42 : le mémo se ferme avant l'encaissement.
+      drawActions();
+    }
     const next = quit(cur());
     round = next;
     const previousCoins = game.coins;
@@ -298,6 +361,8 @@ export function createController(
     shown.total = game.coins;
     shown.payout = 0;
     setMessage('');
+    resetMemo();
+    actions = renderActions();
     root.replaceChildren(hud, table, message, actions);
     drawBoard();
     phase = 'playing';
@@ -359,8 +424,10 @@ export function createController(
     onGesture: unlockAudio,
     onCard(id) {
       if (locked()) return;
-      if (phase === 'playing') void doFlip(id);
-      else if (phase === 'ending')
+      if (phase === 'playing') {
+        if (memo.open) selectCard(id);
+        else void doFlip(id);
+      } else if (phase === 'ending')
         skip(); // CL-20 : jamais `flip` après la fin.
       else if (phase === 'waitingTap') void afterRound();
     },
@@ -375,8 +442,14 @@ export function createController(
         skip(); // CL-20 : tout bouton de l'écran de jeu est un toucher d'écran.
       } else if (phase === 'waitingTap') {
         void afterRound(); // R-52
-      } else if (name === 'quit' && phase === 'playing') {
-        openDialog('quit', quitQuestion(cur().payout));
+      } else if (phase === 'playing') {
+        if (name === 'quit') openDialog('quit', quitQuestion(cur().payout));
+        else if (locked()) return;
+        else if (name === 'memo') toggleMemoMode();
+        else if (memo.open && name.startsWith('mark-')) {
+          const mark = name.slice(5);
+          markSelected(mark === 'S' ? 'S' : (Number(mark) as 1 | 2 | 3));
+        }
       }
     },
     onElsewhere() {
@@ -392,6 +465,7 @@ export function createController(
     round: () => round,
     phase: () => phase,
     dialog: () => dialogKind,
+    memo: () => memo,
     setRound(next) {
       round = next;
       shown.payout = next.payout;

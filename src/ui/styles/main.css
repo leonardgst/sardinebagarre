@@ -315,6 +315,54 @@ body {
     0 3px 0 var(--ombre);
 }
 
+/* Mémo (R-81) : rangée de 4 marques au-dessus de Fermer / Quitter */
+.memo-marques {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.actions .marque {
+  min-height: 44px;
+  padding: 0;
+  font-size: 20px;
+  background: var(--fond);
+  color: var(--encre);
+  box-shadow:
+    inset 0 0 0 2px var(--or),
+    0 3px 0 var(--ombre);
+}
+.actions .marque[aria-pressed="true"] {
+  background: var(--encre);
+  color: var(--fond);
+}
+.actions .marque[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: default;
+}
+/* Curseur de sélection (liseré doré) */
+.card[aria-current="true"] {
+  outline: 3px solid #f2c14e;
+  outline-offset: 1px;
+  z-index: 1;
+}
+/* Refus : petite secousse, durée fixe (ne dépend pas des animations réduites) */
+@keyframes refus {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+.refus {
+  animation: refus 200ms ease-in-out;
+}
+
 /* Paysage bas (UI-15) : plateau à gauche, le reste à droite */
 @media (orientation: landscape) and (max-height: 540px) {
   #app {

@@ -1,5 +1,13 @@
 import { test } from '@playwright/test';
-import { attendre, idsWhere, ouvrir, ouvrirMenu, roundForSeed, toucher } from './aide';
+import {
+  attendre,
+  basculerMemo,
+  idsWhere,
+  ouvrir,
+  ouvrirMenu,
+  roundForSeed,
+  toucher,
+} from './aide';
 
 const SEED = 42;
 const chemin = (profil: string, fichier: string) => `test-results/screens/${profil}/${fichier}`;
@@ -90,6 +98,22 @@ test('@screens dialogue Quitter', async ({ page }, testInfo) => {
   }
   await page.locator('[data-action=quit]').click();
   await page.screenshot({ path: chemin(testInfo.project.name, '08-dialogue-quitter.png') });
+});
+
+test('@screens mémo ouvert', async ({ page }, testInfo) => {
+  const round = roundForSeed(SEED);
+  const [a, b] = idsWhere(round, (v) => v !== 'S');
+  if (a === undefined || b === undefined) throw new Error('plateau inattendu');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await ouvrir(page, SEED, true);
+  await page.evaluate((id) => {
+    for (const k of ['S', 1, 2, 3] as const) window.__sb?.mark(id, k);
+  }, b);
+  await basculerMemo(page);
+  await toucher(page, a);
+  await page.locator('[data-action=mark-2]').click();
+  await page.locator('[data-action=mark-S]').click();
+  await page.screenshot({ path: chemin(testInfo.project.name, '10-memo.png') });
 });
 
 test('@screens question Jouer au niveau', async ({ page }, testInfo) => {

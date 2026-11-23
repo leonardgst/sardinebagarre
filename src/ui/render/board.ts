@@ -1,6 +1,13 @@
 import type { LineHint, MemoMark, RoundState } from '../../logic/types';
 import { formatHintSum } from '../format';
-import { cardLabel, colHintLabel, rowHintLabel, symbols, texts } from '../texts.fr';
+import {
+  cardLabel,
+  colHintLabel,
+  hiddenCardLabel,
+  rowHintLabel,
+  symbols,
+  texts,
+} from '../texts.fr';
 
 const MARKS: readonly { readonly mark: MemoMark; readonly className: string }[] = [
   { mark: 'S', className: 'm-s' },
@@ -32,7 +39,11 @@ export function dogHead(className: string): SVGSVGElement {
   return svg;
 }
 
-export function renderCard(round: RoundState, id: number): HTMLElement {
+export function renderCard(
+  round: RoundState,
+  id: number,
+  options: { readonly selected?: boolean } = {},
+): HTMLElement {
   const value = round.board.cells[id];
   if (round.flipped[id] && value !== undefined) {
     const card = el('div', value === 'S' ? 'card face sardine' : 'card face');
@@ -57,8 +68,12 @@ export function renderCard(round: RoundState, id: number): HTMLElement {
   card.type = 'button';
   card.dataset.id = String(id);
   card.dataset.state = 'hidden';
-  card.setAttribute('aria-label', texts.hiddenCard);
+  if (options.selected) card.setAttribute('aria-current', 'true');
   const bits = round.memos[id] ?? 0;
+  card.setAttribute(
+    'aria-label',
+    hiddenCardLabel(MARKS.filter(({ mark }) => (bits & MARK_BITS[mark]) !== 0).map((m) => m.mark)),
+  );
   for (const { mark, className } of MARKS) {
     const on = (bits & MARK_BITS[mark]) !== 0;
     const m = el('i', `m ${className}${on ? ' on' : ''}`);
@@ -89,12 +104,15 @@ function renderHint(kind: 'row' | 'col', index: number, hint: LineHint): HTMLEle
 }
 
 /** R-01..R-04, R-82 : grille 6 × 6 (25 cartes, 10 indicateurs, 1 coin décoratif). */
-export function renderBoard(round: RoundState): HTMLElement {
+export function renderBoard(round: RoundState, selected: number | null = null): HTMLElement {
   const board = el('div', 'board');
   board.setAttribute('role', 'group');
   board.setAttribute('aria-label', texts.board);
   for (let row = 0; row < 5; row++) {
-    for (let col = 0; col < 5; col++) board.append(renderCard(round, row * 5 + col));
+    for (let col = 0; col < 5; col++) {
+      const id = row * 5 + col;
+      board.append(renderCard(round, id, { selected: id === selected }));
+    }
     const hint = round.board.rowHints[row];
     if (hint) board.append(renderHint('row', row, hint));
   }

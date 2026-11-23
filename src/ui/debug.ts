@@ -12,6 +12,7 @@ export interface DebugHooks {
   dialog(): DialogKind | null;
   /** Remplace l'état du jeu (depuis le menu seulement). */
   setGame(game: GameState): void;
+  memo(): { readonly open: boolean; readonly selected: number | null };
 }
 
 declare global {
@@ -35,5 +36,6 @@ export function installDebug(controller: Controller): void {
     phase: () => controller.phase(),
     dialog: () => controller.dialog(),
     setGame: (game) => controller.setGame(game),
+    memo: () => controller.memo(),
   };
 }
