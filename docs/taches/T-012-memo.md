@@ -144,3 +144,5 @@ check OK (419), e2e 315 réussis / 10 ignorés, captures 45 (10-memo vue sur SE,
 - C5 (mineur) : compléter la décision 2 : curseur visible seulement mémo ouvert (choix accepté).
 
 Décision d'Opus pour C3 : bouton pressé = aspect d'une pastille allumée (fond bordeaux, chiffre crème) ; bouton non pressé = fond crème, chiffre bordeaux, liseré doré.
+
+2026-11-23 — Opus — vérification des corrections C1 à C5 (commit d0207ee) : diff conforme ; contre-épreuve C1 refaite avec le seul test « Anti-rebond double toucher sur Fermer » (rouge sans verrou à la fermeture, sur tous les profils) ; `10-memo.png` (iPhone SE) : boutons S et 2 pressés en bordeaux, comme les pastilles de la carte sélectionnée ; `npm run check` OK. 🟢 Prête pour la recette humaine.
