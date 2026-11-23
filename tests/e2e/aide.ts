@@ -25,11 +25,13 @@ export async function ouvrir(page: Page, seed: number, debug = false): Promise<v
   await ouvrirMenu(page, seed, debug);
   await page.locator('[data-action=play]').click();
   await page.locator('.board').waitFor();
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
 }
 
 /** Répond au dialogue Oui/Non ouvert. */
 export async function repondre(page: Page, reponse: 'yes' | 'no'): Promise<void> {
   await page.locator(`[role=dialog] [data-action=${reponse}]`).click();
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
 }
 
 export const attendre = (page: Page, phase: string) =>

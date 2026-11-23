@@ -1,6 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { initialGame } from '../../src/logic/game';
 import { formatCoins } from '../../src/ui/format';
+import { messages } from '../../src/ui/texts.fr';
 import { attendre, idsWhere, ouvrir, ouvrirMenu, repondre, roundForSeed, toucher } from './aide';
 
 const SEED = 42;
@@ -177,11 +178,13 @@ test('CL-19 Quitter pendant un retournement est ignoré', async ({ page }) => {
 test("CL-20 Quitter pendant la fin n'ouvre rien", async ({ page }) => {
   const [sardine] = idsWhere(roundForSeed(SEED), (v) => v === 'S');
   if (sardine === undefined) throw new Error('plateau');
-  await ouvrir(page, SEED, true);
+  await ouvrir(page, SEED, true); // sans reducedMotion : sans skip(), la fin dure plus de 500 ms
   await toucher(page, sardine);
   await page.locator('[data-action=quit]').click({ force: true });
   await expect(page.locator('[role=dialog]')).toHaveCount(0);
+  const debut = Date.now();
   await attendre(page, 'waitingTap');
+  expect(Date.now() - debut).toBeLessThan(500);
   await expect(page.locator('[role=dialog]')).toHaveCount(0);
 });
 
@@ -201,4 +204,73 @@ test('T-011 un dialogue est dans #app', async ({ page }) => {
   await quitter(page);
   await expect(page.locator('#app [role=dialog]')).toHaveCount(1);
   await expect(page.locator('body > [role=dialog]')).toHaveCount(0);
+});
+
+test('R-41 CL-12 double toucher sur Non : état exact', async ({ page }) => {
+  const [un] = idsWhere(roundForSeed(SEED), (v) => v === 1);
+  if (un === undefined) throw new Error('plateau');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await ouvrir(page, SEED, true);
+  await toucher(page, un);
+  await attendre(page, 'playing');
+  const avant = await page.evaluate(() => window.__sb?.state());
+  await quitter(page);
+  await page.locator('[role=dialog] [data-action=no]').dblclick();
+  await page.waitForTimeout(600);
+  expect(await page.evaluate(() => window.__sb?.state())).toEqual(avant);
+  expect(await page.evaluate(() => window.__sb?.phase())).toBe('playing');
+});
+
+test('ADR-019 double toucher sur Oui : aucune carte retournée', async ({ page }) => {
+  const [sardine] = idsWhere(roundForSeed(SEED), (v) => v === 'S');
+  if (sardine === undefined) throw new Error('plateau');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await ouvrir(page, SEED, true);
+  await toucher(page, sardine);
+  await attendre(page, 'waitingTap');
+  await page.locator('.message').click();
+  await attendre(page, 'dialog');
+  await page.locator('[role=dialog] [data-action=yes]').dblclick();
+  await page.waitForTimeout(600);
+  expect(await page.evaluate(() => window.__sb?.phase())).toBe('playing');
+  expect(await page.evaluate(() => window.__sb?.state().flipped.some(Boolean))).toBe(false);
+});
+
+test('R-52 toucher Quitter en waitingTap → question Jouer au niveau n', async ({ page }) => {
+  const [sardine] = idsWhere(roundForSeed(SEED), (v) => v === 'S');
+  if (sardine === undefined) throw new Error('plateau');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await ouvrir(page, SEED, true);
+  await toucher(page, sardine);
+  await attendre(page, 'waitingTap');
+  await page.locator('[data-action=quit]').click();
+  await attendre(page, 'dialog');
+  expect(await page.evaluate(() => window.__sb?.dialog())).toBe('play');
+  await expect(page.locator('[role=dialog] p')).toHaveText('Jouer au niveau 1 ?');
+  await expect(page.locator('.message')).toHaveText('');
+});
+
+test('ADR-019 R-53 boîte pleine en fin de partie : pas de question, menu avec le message', async ({
+  page,
+}) => {
+  const game = { ...initialGame(), coins: 49_999 };
+  const [id] = idsWhere(roundForSeed(SEED, game), (v) => v === 2 || v === 3);
+  if (id === undefined) throw new Error('plateau');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await ouvrirMenu(page, SEED, true);
+  await page.evaluate((g) => window.__sb?.setGame(g), game);
+  await page.locator('[data-action=play]').click();
+  await page.locator('.board').waitFor();
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
+  await toucher(page, id);
+  await attendre(page, 'playing');
+  await quitter(page);
+  await repondre(page, 'yes');
+  expect((await page.evaluate(() => window.__sb?.game()))?.coins).toBe(50_000);
+  await attendre(page, 'waitingTap');
+  await page.locator('.message').click();
+  await attendre(page, 'menu');
+  await expect(page.locator('.menu-message')).toHaveText(messages.boxFull);
+  await expect(page.locator('[role=dialog]')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__sb?.dialog())).toBeNull();
 });

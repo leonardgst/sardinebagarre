@@ -89,3 +89,4 @@ _(aucune)_
 - 2026-11-23 — codeur — T-011 : menu d'accueil, dialogue Quitter, question « Jouer au niveau n ? », Quitter la table ; `onFinalized` renommé `onGameChange` ; 20 tests e2e ajoutés, contre-épreuves a à d faites ; check OK (419 tests unitaires), e2e 210 passés.
 - 2026-11-23 — codeur — Reste : relecture de T-011, puis étape 2.4 (mémo). Le bouton Mémo est toujours inerte.
 - 2026-11-23 — relecteur — T-011 : 🔴 à reprendre. Bloquant C1 : un double toucher sur « Non » (Quitter) ou « Oui » (Jouer au niveau n ?) retourne la carte située sous le bouton. Importants : C2 (Quitter et Mémo continuent en waitingTap), C3 (test CL-20 Quitter sans preuve d'accélération), C4 (test boîte pleine en fin de partie). Mineur : C5. Choix 2 du codeur accepté.
+- 2026-11-23 : corrections de relecture T-011 (C1 à C5) appliquées : verrou anti-rebond 350 ms (`#app[data-verrou]`), boutons = toucher d'écran hors `playing`, 4 tests e2e ajoutés.

@@ -56,6 +56,8 @@ const CASH_MS = 1500;
 const REVEAL_MS = 600;
 const REVEAL_SPREAD_MS = 350;
 const LEVEL_MS = 1200;
+/** Anti-rebond des touchers de carte (durée réelle, indépendante des animations réduites). */
+const LOCK_MS = 350;
 
 export function createController(
   root: HTMLElement,
@@ -77,6 +79,17 @@ export function createController(
   table.className = 'table';
   const message = renderMessage();
   const actions = renderActions();
+
+  let lockTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Un double toucher ne doit pas atteindre la carte située sous le bouton qui vient de disparaître. */
+  function lockCards(): void {
+    clearTimeout(lockTimer);
+    root.dataset.verrou = '';
+    lockTimer = setTimeout(() => {
+      delete root.dataset.verrou;
+    }, LOCK_MS);
+  }
+  const locked = (): boolean => root.dataset.verrou !== undefined;
 
   const cur = (): RoundState => {
     if (!round) throw new Error("Aucune partie n'est en cours.");
@@ -123,6 +136,7 @@ export function createController(
     dialogEl = null;
     dialogKind = null;
     phase = beforeDialog;
+    lockCards();
   }
 
   async function showBanner(
@@ -286,6 +300,7 @@ export function createController(
     root.replaceChildren(hud, table, message, actions);
     drawBoard();
     phase = 'playing';
+    lockCards();
   }
 
   /** Après le toucher de fin : bandeau de niveau (R-66), puis la question (ADR-019). */
@@ -300,7 +315,10 @@ export function createController(
     refreshHud();
     if (lines.length > 0) await showBanner(lines, LEVEL_MS, 'bandeau-niveau');
     if (!canStartRound(game)) showMenu(messages.boxFull);
-    else openDialog('play', playQuestion(game.level));
+    else {
+      setMessage('');
+      openDialog('play', playQuestion(game.level));
+    }
   }
 
   function answer(yes: boolean): void {
@@ -338,6 +356,7 @@ export function createController(
   installInput(root, {
     onGesture: unlockAudio,
     onCard(id) {
+      if (locked()) return;
       if (phase === 'playing') void doFlip(id);
       else if (phase === 'ending')
         skip(); // CL-20 : jamais `flip` après la fin.
@@ -350,9 +369,12 @@ export function createController(
         menuAction(name);
       } else if (phase === 'screen') {
         if (name === 'back') showMenu();
-      } else if (name === 'quit') {
-        if (phase === 'playing') openDialog('quit', quitQuestion(cur().payout));
-        else if (phase === 'ending') skip(); // CL-20
+      } else if (phase === 'ending') {
+        skip(); // CL-20 : tout bouton de l'écran de jeu est un toucher d'écran.
+      } else if (phase === 'waitingTap') {
+        void afterRound(); // R-52
+      } else if (name === 'quit' && phase === 'playing') {
+        openDialog('quit', quitQuestion(cur().payout));
       }
     },
     onElsewhere() {

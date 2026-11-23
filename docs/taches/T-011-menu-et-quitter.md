@@ -193,3 +193,10 @@ Corrections :
 Choix du codeur :
 1. Quitter inerte en `waitingTap` : rejeté (C2). R-52 dit « toucher l'écran », et ce même bouton accélère déjà pendant `ending`.
 2. Niveau du bandeau mis à jour au début du bandeau R-66 : accepté. Il reste à l'ancien niveau avant le toucher, puis passe au nouveau en même temps que l'annonce, ce qui est cohérent avec « Jouer au niveau n ? » et avec le menu.
+
+## Compte rendu des corrections de relecture
+- C1 : verrou `LOCK_MS = 350` ms sur `onCard` (`lockCards()` à `closeDialog` et `startNewRound`), repère `#app[data-verrou]`, attendu par `ouvrir()` et `repondre()`. Durée réelle (`setTimeout`), volontairement non divisée par l'échelle « animations réduites » : le double toucher d'un humain dure ~100-300 ms quelle que soit l'animation, un verrou raccourci ne protégerait plus. Les tests attendent le repère, donc pas de ralentissement notable.
+- C2 : hors `dialog`/`menu`/`screen`, tout bouton est un toucher d'écran (`ending` → `skip()`, `waitingTap` → `afterRound()`) ; Quitter n'ouvre le dialogue qu'en `playing`.
+- C3 : CL-20 exige `waitingTap` en moins de 500 ms. C4 : test boîte pleine en fin de partie. C5 : `setMessage('')` à l'ouverture de la question ; capture 09 (iPhone SE) vérifiée.
+- Tests ajoutés : 4 (double toucher Non, double toucher Oui, R-52 Quitter en waitingTap, R-53 boîte pleine) + CL-20 durci. `--repeat-each 5` : 125 passés. e2e complet : 270 passés, 10 ignorés.
+- Contre-épreuves faites puis annulées : sans verrou, les 2 tests de double toucher échouent ; sans `skip()` sur le bouton en `ending`, CL-20 échoue.
