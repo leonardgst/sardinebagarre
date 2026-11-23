@@ -128,11 +128,11 @@ Captures : `test-results/screens/<profil>/10-memo.png`, relues sur iPhone SE, iP
 
 ## Relecture
 ### Relecture du 2026-11-23 (relecteur) : 🟡 approuvée avec réserves
-check OK (419), e2e 315 réussis / 10 ignorés, captures 45 (10-memo vue sur SE, 15 Pro Max et paysage : conformes), build OK,  absent de dist, src/logic intact. Contre-épreuves du relecteur : e (marque sans sélection → carte 0) rouge, donc le clic forcé atteint bien l'écouteur ; c' (pas de verrou à la fermeture) et f (sélection gardée après retournement) restent vertes, d'où C1 et C2.
+check OK (419), e2e 315 réussis / 10 ignorés, captures 45 (10-memo vue sur SE, 15 Pro Max et paysage : conformes), build OK, `__sb` absent de dist, src/logic intact. Contre-épreuves du relecteur : e (marque sans sélection → carte 0) rouge, donc le clic forcé atteint bien l'écouteur ; c' (pas de verrou à la fermeture) et f (sélection gardée après retournement) restent vertes, d'où C1 et C2.
 - C1 (important) : ajouter le test « Anti-rebond double toucher sur Fermer ».
-- C2 (important) : tester la décision 2 : sélection et curseur conservés après Fermer puis Mémo ; sélection effacée après retournement en mode normal (, boutons en ).
+- C2 (important) : tester la décision 2 : sélection et curseur conservés après Fermer puis Mémo ; sélection effacée après retournement en mode normal (`selected === null`, boutons en `aria-disabled`).
 - C3 (mineur) : l'état pressé des boutons de marque a le code couleur inverse des pastilles des cartes ; le rendre cohérent.
-- C4 (mineur) : réutiliser  de src/logic/round.ts au lieu des tables de hud.ts:48 et board.ts:18.
+- C4 (mineur) : réutiliser `MEMO_BITS` de src/logic/round.ts au lieu des tables de hud.ts:48 et board.ts:18.
 - C5 (mineur) : compléter la décision 2 : curseur visible seulement mémo ouvert (choix accepté).
 
 Décision d'Opus pour C3 : bouton pressé = aspect d'une pastille allumée (fond bordeaux, chiffre crème) ; bouton non pressé = fond crème, chiffre bordeaux, liseré doré.
