@@ -100,3 +100,4 @@ _(aucune)_
 - 2026-11-23 — Opus — T-011 terminée et fusionnée dans main (non poussée). Prochaine étape : étape 2.4 (mémo).
 - 2026-11-23 — Opus — v0.3.0 publiée (main poussée, tag v0.3.0). T-012 planifiée (étape 2.4 : mémo ; son « refus » reporté à l'étape 4.5).
 - 2026-11-23 — codeur — T-012 : mode mémo (sélection, 4 marques, Fermer, refus, R-41, anti-rebond), 15 tests e2e, contre-épreuves a à d faites, `10-memo.png` ; check OK. Reste : relecture, puis étape 2.5.
+- 2026-11-23 — relecteur — T-012 : 🟡, fusion possible après C1 et C2 (tests manquants : anti-rebond sur Fermer, conservation et effacement de la sélection). Mineurs : C3 (couleur des boutons pressés), C4 (bits recopiés), C5 (décision 2 à compléter). Clic forcé validé par contre-épreuve ; captures SE, Pro Max et paysage conformes.
