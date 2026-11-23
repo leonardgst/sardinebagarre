@@ -8,7 +8,36 @@ export const texts = {
   hiddenCard: 'Carte cachée',
   sardine: 'Sardine',
   board: 'Plateau',
+  title: 'Sardinebagarre',
+  yes: 'Oui',
+  no: 'Non',
+  album: 'Album',
+  infos: 'Infos',
+  settings: 'Réglages',
+  leaveTable: 'Quitter la table',
+  soon: 'Bientôt ici.',
+  back: 'Retour',
 } as const;
+
+/** UI-01 : bouton du menu. */
+export function playButtonLabel(level: number): string {
+  return `Jouer au niveau ${level}`;
+}
+
+/** ADR-019 : question posée après chaque partie. */
+export function playQuestion(level: number): string {
+  return `Jouer au niveau ${level} ?`;
+}
+
+/** R-40 : confirmation de l'abandon. */
+export function quitQuestion(payout: number): string {
+  return payout === 0
+    ? "Tu n'as encore trouvé aucun jeton. Quitter quand même ?"
+    : `Si tu t'arrêtes maintenant, tu gagnes ${coinsLabel(payout)}. Tu t'arrêtes ?`;
+}
+
+/** R-67 : confirmation de « Quitter la table ». */
+export const leaveTableQuestion = 'Quitter la table ? Tu repartiras du niveau 1.';
 
 export function cardLabel(value: number): string {
   return `Carte ${value}`;

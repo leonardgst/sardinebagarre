@@ -16,6 +16,7 @@
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
+| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -26,7 +27,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 2 (interface) : étape 2.3b, dialogue Quitter (R-40..R-42, CL-12) et menu d'accueil UI-01, à planifier en T-011 (voir la contrainte T-011 ci-dessous).
+- Phase 2 (interface) : étape 2.4 (mémo), à planifier.
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -37,8 +38,11 @@ _(aucune)_
 - Identifiants de carte toujours 0..24 (`RangeError` sinon) ; `missingCoins` vaut 0 aussi quand l'album est complet : tester `nextPhoto(...) === null` d'abord.
 - Exporter la clé `sardinebagarre:save` en constante dans `storage.ts` (étape 3.1) ; prix par défaut R-115 et validation des prix dans le modèle du pack (étape 3.3).
 - Étape 3.3 : refuser un pack dont un prix n'est pas un entier ≥ 0 (un prix invalide bloque toutes les photos suivantes).
-- Étape 3.1 (relecture T-010, C4) : au chargement d'une sauvegarde dont le total est ≥ 50 000, `createController` ne doit pas lever d'exception. Il passe directement en phase `full` (R-53). Dans la branche `full`, mettre à jour le niveau affiché et afficher les messages R-66 déjà calculés. Ajouter le test de C3 (relecture T-010) : avec un total de 49 990, une victoire avec un gain de 36 affiche « Tu remportes 10 jetons ! ».
+- Étape 3.1 (relecture T-010, C4) : au chargement d'une sauvegarde dont le total est ≥ 50 000, `createController` ne doit pas lever d'exception. Depuis T-011 (ADR-019), l'app démarre sur le menu et la phase `full` n'existe plus : la boîte pleine affiche `messages.boxFull` sur le menu (R-53). Vérifier que le menu affiche alors le bon niveau et le bon total. Ajouter le test de C3 (relecture T-010) : avec un total de 49 990, une victoire avec un gain de 36 affiche « Tu remportes 10 jetons ! ».
 - T-011 (relecture T-010) : tout élément ajouté à `body` hors de `#app` (dialogue, bandeau de mise à jour R-104) déclencherait `onElsewhere`. Le placer dans `#app` ou l'exclure explicitement.
+- Anti-rebond (relecture T-011, C1) : après la fermeture de tout dialogue ou bandeau qui recouvre le plateau, et après l'affichage d'un nouveau plateau, les touchers de carte sont ignorés pendant un court délai. Un double toucher ne doit jamais retourner une carte que le joueur n'a pas visée (même esprit que CL-19).
+- Hors `playing`, tout bouton de l'écran de jeu se comporte comme un toucher d'écran : il accélère en `ending` et continue en `waitingTap` (relecture T-011, C2). Valable aussi pour Mémo à l'étape 2.4.
+- Tout changement d'écran ou ouverture de dialogue sous le doigt passe par le même verrou anti-rebond (relecture T-011, C6 et C7).
 
 ## Historique
 - 2026-11-10 — Opus (cadrage) — Spécification, architecture, plan et fichiers de pilotage de Claude Code rédigés.
@@ -81,3 +85,15 @@ _(aucune)_
 - 2026-11-23 — codeur — T-010 : C10 appliquée (accélération de fin CL-20 prouvée dans 2 tests e2e ; rouge sans `skip()`, vert avec, 5 répétitions stables).
 - 2026-11-23 — humain — Recette T-010 sur iPhone et PC (`npm run dev -- --host`, en http) : aboiement, bandeau de niveau, accélération et passage à la partie suivante OK. Le HTTPS de dev est refusé par Safari (certificat auto-signé sur IP).
 - 2026-11-23 — Opus — T-010 terminée (3e relecture 🟡, C10 corrigé, recette OK) et fusionnée dans main (non poussée). Prochaine étape : T-011 (étape 2.3b).
+- 2026-11-23 — Opus — v0.2.0 publiée (main poussée, tag v0.2.0).
+- 2026-11-23 — Opus — ADR-019 (menu au lancement, question « Jouer au niveau {n} ? » après chaque partie, Non → menu), spec §5.1 et UI-01 annotées ; T-011 planifiée (étape 2.3b).
+- 2026-11-23 — codeur — T-011 : menu d'accueil, dialogue Quitter, question « Jouer au niveau n ? », Quitter la table ; `onFinalized` renommé `onGameChange` ; 20 tests e2e ajoutés, contre-épreuves a à d faites ; check OK (419 tests unitaires), e2e 210 passés.
+- 2026-11-23 — codeur — Reste : relecture de T-011, puis étape 2.4 (mémo). Le bouton Mémo est toujours inerte.
+- 2026-11-23 — relecteur — T-011 : 🔴 à reprendre. Bloquant C1 : un double toucher sur « Non » (Quitter) ou « Oui » (Jouer au niveau n ?) retourne la carte située sous le bouton. Importants : C2 (Quitter et Mémo continuent en waitingTap), C3 (test CL-20 Quitter sans preuve d'accélération), C4 (test boîte pleine en fin de partie). Mineur : C5. Choix 2 du codeur accepté.
+- 2026-11-23 : corrections de relecture T-011 (C1 à C5) appliquées : verrou anti-rebond 350 ms (`#app[data-verrou]`), boutons = toucher d'écran hors `playing`, 4 tests e2e ajoutés.
+- 2026-11-23 — relecteur — T-011, 2e relecture : 🟡. C1 à C5 conformes (contre-épreuves faites, verrou de 350 ms en temps réel accepté). C6 (important) : un double toucher sur une carte en waitingTap répond à « Jouer au niveau n ? » (dialogue ouvert sous le doigt). C7 (mineur) : un double toucher sur Oui/Non au-dessus du menu ouvre Album. C8 : compte e2e réel 230 passés / 10 ignorés.
+
+- 2026-11-23 — T-011 : corrections de 2e relecture C6 (verrou à l'ouverture d'un dialogue, Oui/Non ignorés pendant le verrou), C7 (verrou avant le menu), C8 (compte e2e). e2e : 240 passés, 10 ignorés.
+- 2026-11-23 — Opus — T-011 : C6 à C8 vérifiés (check OK, e2e 240 passés / 10 ignorés). Reste : recette humaine, puis fusion.
+- 2026-11-23 — humain — Recette T-011 sur iPhone OK ; v0.2.0 jouée aussi hors de chez soi depuis GitHub Pages, sans souci.
+- 2026-11-23 — Opus — T-011 terminée et fusionnée dans main (non poussée). Prochaine étape : étape 2.4 (mémo).

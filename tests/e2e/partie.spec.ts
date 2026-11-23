@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { formatCoins } from '../../src/ui/format';
 import { messages } from '../../src/ui/texts.fr';
-import { attendre, idsWhere, ouvrir, roundForSeed, toucher } from './aide';
+import { attendre, idsWhere, ouvrir, repondre, roundForSeed, toucher } from './aide';
 
 const SEED = 42;
 
@@ -27,6 +27,8 @@ test('R-32 R-33 R-50 partie gagnée', async ({ page }) => {
   await page.locator('.message').click();
   await expect(page.locator('.bandeau-niveau')).toContainText('Niveau 2 atteint !');
   await expect(page.locator('.bandeau-niveau')).toContainText('Bravo !');
+  await attendre(page, 'dialog');
+  await repondre(page, 'yes');
   await attendre(page, 'playing');
   await expect(page.locator('.niveau strong')).toHaveText('2');
   await expect(page.locator('[data-state=hidden]')).toHaveCount(25);
@@ -51,8 +53,10 @@ test('R-34 R-51 R-63 partie perdue', async ({ page }) => {
   await expect(page.locator('.message')).toHaveText(messages.tapToContinue);
   await expect(page.locator('[data-state=shown]')).toHaveCount(25);
   await page.locator('.message').click();
-  await attendre(page, 'playing');
+  await attendre(page, 'dialog');
   await expect(page.locator('.bandeau')).toHaveCount(0);
+  await repondre(page, 'yes');
+  await attendre(page, 'playing');
   await expect(page.locator('.niveau strong')).toHaveText('1');
   await expect(page.locator('[data-state=hidden]')).toHaveCount(25);
 });
@@ -111,6 +115,8 @@ test('CL-20 toucher pendant la fin', async ({ page }) => {
   expect(await page.evaluate(() => window.__sb?.state().cardsFlipped)).toBe(0);
   await expect(page.locator('[data-state=shown]')).toHaveCount(25);
   await page.locator('.message').click();
+  await attendre(page, 'dialog');
+  await repondre(page, 'yes');
   await attendre(page, 'playing');
   await expect(page.locator('[data-state=hidden]')).toHaveCount(25);
 });
@@ -134,6 +140,8 @@ test('C1 le toucher pendant la fin ne coupe pas UI-30 de la partie suivante', as
   await page.waitForTimeout(300);
   expect(await page.evaluate(() => window.__sb?.phase())).toBe('waitingTap');
   await page.locator('.message').click();
+  await attendre(page, 'dialog');
+  await repondre(page, 'yes');
   await attendre(page, 'playing');
   const animee = await page.evaluate(() => {
     document.querySelector<HTMLElement>('[data-state=hidden]')?.click();
@@ -152,6 +160,8 @@ test('R-52 clic sur le fond décoré (Mac) : la partie suivante démarre', async
   await toucher(page, sardine);
   await attendre(page, 'waitingTap');
   await page.mouse.click(5, 400);
+  await attendre(page, 'dialog');
+  await repondre(page, 'yes');
   await attendre(page, 'playing');
   await expect(page.locator('[data-state=hidden]')).toHaveCount(25);
 });
@@ -166,6 +176,9 @@ test('R-52 parcours au doigt : Sardine, toucher sur le message, nouvelle partie'
   await page.locator(`[data-id="${sardine}"]`).tap();
   await attendre(page, 'waitingTap');
   await page.locator('.message').tap();
+  await attendre(page, 'dialog');
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
+  await page.locator('[role=dialog] [data-action=yes]').tap();
   await attendre(page, 'playing');
   await expect(page.locator('[data-state=hidden]')).toHaveCount(25);
 });

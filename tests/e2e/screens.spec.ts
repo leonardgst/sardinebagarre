@@ -1,8 +1,13 @@
 import { test } from '@playwright/test';
-import { attendre, idsWhere, ouvrir, roundForSeed, toucher } from './aide';
+import { attendre, idsWhere, ouvrir, ouvrirMenu, roundForSeed, toucher } from './aide';
 
 const SEED = 42;
 const chemin = (profil: string, fichier: string) => `test-results/screens/${profil}/${fichier}`;
+
+test('@screens menu', async ({ page }, testInfo) => {
+  await ouvrirMenu(page, SEED);
+  await page.screenshot({ path: chemin(testInfo.project.name, '01-menu.png') });
+});
 
 test('@screens plateau neuf', async ({ page }, testInfo) => {
   await ouvrir(page, SEED);
@@ -73,4 +78,30 @@ test('@screens victoire et niveau', async ({ page }, testInfo) => {
   await page.locator('.message').click();
   await page.waitForTimeout(400);
   await page.screenshot({ path: chemin(testInfo.project.name, '08-niveau.png') });
+});
+
+test('@screens dialogue Quitter', async ({ page }, testInfo) => {
+  const ids = idsWhere(roundForSeed(SEED), (v) => v === 2 || v === 3).slice(0, 1);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await ouvrir(page, SEED, true);
+  for (const id of ids) {
+    await toucher(page, id);
+    await attendre(page, 'playing');
+  }
+  await page.locator('[data-action=quit]').click();
+  await page.screenshot({ path: chemin(testInfo.project.name, '08-dialogue-quitter.png') });
+});
+
+test('@screens question Jouer au niveau', async ({ page }, testInfo) => {
+  const multis = idsWhere(roundForSeed(SEED), (v) => v === 2 || v === 3);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await ouvrir(page, SEED, true);
+  for (const id of multis) {
+    await toucher(page, id);
+    if (id !== multis[multis.length - 1]) await attendre(page, 'playing');
+  }
+  await attendre(page, 'waitingTap');
+  await page.locator('.message').click();
+  await attendre(page, 'dialog');
+  await page.screenshot({ path: chemin(testInfo.project.name, '09-jouer-niveau.png') });
 });
