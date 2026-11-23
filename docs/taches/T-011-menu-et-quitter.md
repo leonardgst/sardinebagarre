@@ -173,4 +173,23 @@ Commit : `c426845` (feat(ui)) sur `t-011-menu-quitter`.
 - Écarts : aucun. Choix : en phase `waitingTap`, un clic sur Quitter ne fait rien (comme avant) ; le niveau du bandeau passe au nouveau niveau au début du bandeau R-66.
 
 ## Relecture
-_(verdict du relecteur, avec la date)_
+2026-11-23 — relecteur — 🔴 À reprendre.
+
+Vérifications : `npm run check` OK (419 tests, confidentialité OK) ; `npm run e2e` 210 passés, 10 ignorés ; build OK, `__sb` absent de `dist/` ; `src/logic` inchangé ; aucun `body.append` ; captures 01, 08 et 09 regardées. Contre-épreuves sur une copie hors dépôt.
+
+Règles recalculées : CL-01 (QUIT, 0 carte, niveau 6) → 1 ; R-66 victoire au niveau 1 → 2 ; défaite au niveau 1 avec 1 carte → 1, sans bandeau ; R-50 49 999 + 2 → 50 000 ; R-40 accord 1 jeton / 3 jetons.
+
+Corrections :
+- **C1** (bloquant) `src/ui/controller.ts` (`closeDialog`, `startNewRound`) : double toucher après un dialogue, le second toucher retourne la carte située sous le bouton.
+  - Reproduit : `dblclick` sur « Non » de Quitter → Sardine retournée, partie perdue (4 profils sur 5, graine 42) ; `dblclick` sur « Oui » de « Jouer au niveau n ? » → une carte du nouveau plateau retournée (mac, iphone-se). R-41 et CL-12 sont violés.
+  - À faire : ignorer les touchers de carte pendant environ 350 ms après la fermeture d'un dialogue et après l'affichage d'un nouveau plateau (par ex. horodatage `cardsLockedUntil` vérifié au début de `onCard`).
+  - Piège : un verrou sans repère fait tomber ~20 tests e2e qui touchent une carte juste après `.board`. Poser un repère observable (par ex. `#app[data-verrou]`, retiré à la fin du délai) et faire attendre `#app:not([data-verrou])` à `ouvrir()` et `repondre()` dans `tests/e2e/aide.ts`.
+  - Tests : « R-41 CL-12 double toucher sur Non : état exact » et « ADR-019 double toucher sur Oui : aucune carte retournée », rouges sans le verrou.
+- **C2** (important) `controller.ts` (`onAction`) : hors `dialog`/`menu`/`screen`, tout bouton de l'écran de jeu se comporte comme un toucher d'écran : `ending` → `skip()` ; `waitingTap` → continuer (`afterRound`) ; Quitter n'ouvre le dialogue qu'en `playing`. Test : « R-52 toucher Quitter en waitingTap → question Jouer au niveau n » (rouge aujourd'hui).
+- **C3** (important) `tests/e2e/quitter.spec.ts:177-186` « CL-20 Quitter pendant la fin n'ouvre rien » reste vert si l'on supprime `skip()` sur Quitter : exiger `waitingTap` en moins de 500 ms juste après le clic forcé, sans `reducedMotion`, comme le test C10 de `partie.spec.ts`.
+- **C4** (important) Ajouter « ADR-019 R-53 boîte pleine en fin de partie : pas de question, menu avec le message » (`setGame({coins: 49999})`, multiplicateur, Quitter, Oui, toucher → phase `menu`, `messages.boxFull`, aucun dialogue). Comportement vérifié correct, mais sans test.
+- **C5** (mineur) `controller.ts` (`afterRound`) : effacer « Touche l'écran pour continuer. » (`setMessage('')`) quand la question « Jouer au niveau n ? » s'ouvre.
+
+Choix du codeur :
+1. Quitter inerte en `waitingTap` : rejeté (C2). R-52 dit « toucher l'écran », et ce même bouton accélère déjà pendant `ending`.
+2. Niveau du bandeau mis à jour au début du bandeau R-66 : accepté. Il reste à l'ancien niveau avant le toucher, puis passe au nouveau en même temps que l'annonce, ce qui est cohérent avec « Jouer au niveau n ? » et avec le menu.

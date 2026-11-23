@@ -16,7 +16,7 @@
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
-| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | implémentée (relecture à faire) |
+| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | à reprendre (C1 à C5) |
 
 ## Questions ouvertes
 _(aucune)_
@@ -38,8 +38,10 @@ _(aucune)_
 - Identifiants de carte toujours 0..24 (`RangeError` sinon) ; `missingCoins` vaut 0 aussi quand l'album est complet : tester `nextPhoto(...) === null` d'abord.
 - Exporter la clé `sardinebagarre:save` en constante dans `storage.ts` (étape 3.1) ; prix par défaut R-115 et validation des prix dans le modèle du pack (étape 3.3).
 - Étape 3.3 : refuser un pack dont un prix n'est pas un entier ≥ 0 (un prix invalide bloque toutes les photos suivantes).
-- Étape 3.1 (relecture T-010, C4) : au chargement d'une sauvegarde dont le total est ≥ 50 000, `createController` ne doit pas lever d'exception. Il passe directement en phase `full` (R-53). Dans la branche `full`, mettre à jour le niveau affiché et afficher les messages R-66 déjà calculés. Ajouter le test de C3 (relecture T-010) : avec un total de 49 990, une victoire avec un gain de 36 affiche « Tu remportes 10 jetons ! ».
+- Étape 3.1 (relecture T-010, C4) : au chargement d'une sauvegarde dont le total est ≥ 50 000, `createController` ne doit pas lever d'exception. Depuis T-011 (ADR-019), l'app démarre sur le menu et la phase `full` n'existe plus : la boîte pleine affiche `messages.boxFull` sur le menu (R-53). Vérifier que le menu affiche alors le bon niveau et le bon total. Ajouter le test de C3 (relecture T-010) : avec un total de 49 990, une victoire avec un gain de 36 affiche « Tu remportes 10 jetons ! ».
 - T-011 (relecture T-010) : tout élément ajouté à `body` hors de `#app` (dialogue, bandeau de mise à jour R-104) déclencherait `onElsewhere`. Le placer dans `#app` ou l'exclure explicitement.
+- Anti-rebond (relecture T-011, C1) : après la fermeture de tout dialogue ou bandeau qui recouvre le plateau, et après l'affichage d'un nouveau plateau, les touchers de carte sont ignorés pendant un court délai. Un double toucher ne doit jamais retourner une carte que le joueur n'a pas visée (même esprit que CL-19).
+- Hors `playing`, tout bouton de l'écran de jeu se comporte comme un toucher d'écran : il accélère en `ending` et continue en `waitingTap` (relecture T-011, C2). Valable aussi pour Mémo à l'étape 2.4.
 
 ## Historique
 - 2026-11-10 — Opus (cadrage) — Spécification, architecture, plan et fichiers de pilotage de Claude Code rédigés.
@@ -86,3 +88,4 @@ _(aucune)_
 - 2026-11-23 — Opus — ADR-019 (menu au lancement, question « Jouer au niveau {n} ? » après chaque partie, Non → menu), spec §5.1 et UI-01 annotées ; T-011 planifiée (étape 2.3b).
 - 2026-11-23 — codeur — T-011 : menu d'accueil, dialogue Quitter, question « Jouer au niveau n ? », Quitter la table ; `onFinalized` renommé `onGameChange` ; 20 tests e2e ajoutés, contre-épreuves a à d faites ; check OK (419 tests unitaires), e2e 210 passés.
 - 2026-11-23 — codeur — Reste : relecture de T-011, puis étape 2.4 (mémo). Le bouton Mémo est toujours inerte.
+- 2026-11-23 — relecteur — T-011 : 🔴 à reprendre. Bloquant C1 : un double toucher sur « Non » (Quitter) ou « Oui » (Jouer au niveau n ?) retourne la carte située sous le bouton. Importants : C2 (Quitter et Mémo continuent en waitingTap), C3 (test CL-20 Quitter sans preuve d'accélération), C4 (test boîte pleine en fin de partie). Mineur : C5. Choix 2 du codeur accepté.
