@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | à relire |
+| Statut | terminée |
 | Étape du plan | 2.3a |
 | Branche | `t-010-jouer` |
 | Estimation | L (> 3 h), à la limite : voir le découpage dans « Périmètre » |

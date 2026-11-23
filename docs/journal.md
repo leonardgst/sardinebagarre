@@ -15,7 +15,7 @@
 | T-007 | Sérialiser, valider et relire la sauvegarde (logique pure) | terminée |
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
-| T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | planifiée |
+| T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -26,7 +26,8 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 2 (interface) : étape 2.3a, retourner une carte, gagner, perdre (controller.ts, input.ts, CL-19), à planifier en T-010.
+- Phase 2 (interface) : étape 2.3b, dialogue Quitter (R-40..R-42, CL-12) et menu d'accueil UI-01, à planifier en T-011 (voir la contrainte T-011 ci-dessous).
+- Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
 - `finalizeRound` historise `game.level` : interdire « Effacer la progression », « Vider la boîte » et « Quitter la table » pendant une partie `PLAYING` (sinon la partie est historisée au mauvais niveau).
@@ -78,3 +79,5 @@ _(aucune)_
 - 2026-11-23 — codeur — T-010 : corrections de la 2e relecture C7 (clic traité deux fois), C8, C9 appliquées ; tests e2e C7 rouges avant, verts après.
 - 2026-11-23 — relecteur — 3e relecture de T-010 : 🟡, fusion possible. C7, C8 et C9 conformes (contre-épreuve C7 faite, `force: true` justifié). C10 : borner l'attente du test CL-20 pour prouver l'accélération.
 - 2026-11-23 — codeur — T-010 : C10 appliquée (accélération de fin CL-20 prouvée dans 2 tests e2e ; rouge sans `skip()`, vert avec, 5 répétitions stables).
+- 2026-11-23 — humain — Recette T-010 sur iPhone et PC (`npm run dev -- --host`, en http) : aboiement, bandeau de niveau, accélération et passage à la partie suivante OK. Le HTTPS de dev est refusé par Safari (certificat auto-signé sur IP).
+- 2026-11-23 — Opus — T-010 terminée (3e relecture 🟡, C10 corrigé, recette OK) et fusionnée dans main (non poussée). Prochaine étape : T-011 (étape 2.3b).
