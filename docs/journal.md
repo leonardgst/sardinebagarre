@@ -16,7 +16,7 @@
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
-| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | 2e relecture 🟡 (C6 à C8 à faire) |
+| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | relue 🟢, recette à faire |
 
 ## Questions ouvertes
 _(aucune)_
@@ -94,3 +94,4 @@ _(aucune)_
 - 2026-11-23 — relecteur — T-011, 2e relecture : 🟡. C1 à C5 conformes (contre-épreuves faites, verrou de 350 ms en temps réel accepté). C6 (important) : un double toucher sur une carte en waitingTap répond à « Jouer au niveau n ? » (dialogue ouvert sous le doigt). C7 (mineur) : un double toucher sur Oui/Non au-dessus du menu ouvre Album. C8 : compte e2e réel 230 passés / 10 ignorés.
 
 - 2026-11-23 — T-011 : corrections de 2e relecture C6 (verrou à l'ouverture d'un dialogue, Oui/Non ignorés pendant le verrou), C7 (verrou avant le menu), C8 (compte e2e). e2e : 240 passés, 10 ignorés.
+- 2026-11-23 — Opus — T-011 : C6 à C8 vérifiés (check OK, e2e 240 passés / 10 ignorés). Reste : recette humaine, puis fusion.

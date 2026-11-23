@@ -218,3 +218,5 @@ Corrections :
 - C8 : le compte e2e du compte rendu précédent était faux : 230 passés et 10 ignorés avec `npm run e2e` (le 270 incluait les captures). Après ces corrections : 240 passés, 10 ignorés (50 tests × 5 profils). `npm run screens` : 40 passés.
 - `--repeat-each 5` sur quitter + menu : 650 passés.
 - Contre-épreuves faites puis annulées (`git diff src` = corrections seules) : sans verrou à l'ouverture du dialogue, le test C6 échoue (5 profils) ; sans aucun verrou, les 2 tests de double toucher de C1 échouent (Non : 4 profils, Oui : 5) ; sans verrou avant `showMenu`, le test C7 échoue (4 profils sur 5, pas de carte sous le bouton en paysage).
+
+2026-11-23 — Opus — vérification légère des corrections C6 à C8 (commit ddb2d77), prévue par la 2e relecture : diff conforme (verrou posé à l'ouverture d'un dialogue et avant le retour au menu ; Oui/Non et menu ignorés pendant le verrou). `npm run check` OK (419), `npm run e2e` 240 passés / 10 ignorés, build OK sans `__sb`. 🟢 Prête pour la recette humaine.
