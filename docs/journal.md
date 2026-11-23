@@ -16,7 +16,7 @@
 | T-008 | Compléter la couverture de la logique (revue 1.6) | terminée |
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
-| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | planifiée |
+| T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | implémentée (relecture à faire) |
 
 ## Questions ouvertes
 _(aucune)_
@@ -27,7 +27,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 2 (interface) : T-011 (étape 2.3b) planifiée, à implémenter avec `/implementer-tache T-011`.
+- Phase 2 (interface) : relecture de T-011 (étape 2.3b), puis étape 2.4 (mémo).
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -84,3 +84,5 @@ _(aucune)_
 - 2026-11-23 — Opus — T-010 terminée (3e relecture 🟡, C10 corrigé, recette OK) et fusionnée dans main (non poussée). Prochaine étape : T-011 (étape 2.3b).
 - 2026-11-23 — Opus — v0.2.0 publiée (main poussée, tag v0.2.0).
 - 2026-11-23 — Opus — ADR-019 (menu au lancement, question « Jouer au niveau {n} ? » après chaque partie, Non → menu), spec §5.1 et UI-01 annotées ; T-011 planifiée (étape 2.3b).
+- 2026-11-23 — codeur — T-011 : menu d'accueil, dialogue Quitter, question « Jouer au niveau n ? », Quitter la table ; `onFinalized` renommé `onGameChange` ; 20 tests e2e ajoutés, contre-épreuves a à d faites ; check OK (419 tests unitaires), e2e 210 passés.
+- 2026-11-23 — codeur — Reste : relecture de T-011, puis étape 2.4 (mémo). Le bouton Mémo est toujours inerte.

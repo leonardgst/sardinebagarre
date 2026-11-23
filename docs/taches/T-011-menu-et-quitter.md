@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | implémentée (relecture à faire) |
 | Étape du plan | 2.3b |
 | Branche | `t-011-menu-quitter` |
 | Estimation | M (2 à 3 h), à la limite haute : une bonne part du diff est l'adaptation des tests e2e existants |
@@ -133,17 +133,17 @@ Tests e2e Playwright, sur les 5 profils, en vrais clics (`locator().click()`), a
 Pour les tests qui ont besoin d'un plateau à un niveau donné, calculer le plateau attendu avec `roundForSeed(42, game)`, où `game` est le même état que celui passé à `setGame`.
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe (typecheck, lint, tests unitaires, contrôle de confidentialité)
-- [ ] `npm run e2e` (avec `E2E_PORT=5199` si le port 5173 est pris) : tous les tests listés ci-dessus existent et passent sur les 5 profils, ainsi que tous les tests existants adaptés. Pour les tests nouveaux qui utilisent un clic forcé ou une attente, `--repeat-each 5` est vert.
-- [ ] Contre-épreuves, faites puis annulées (`git diff src/` vide ensuite), et rapportées dans le compte rendu :
+- [x] `npm run check` passe (typecheck, lint, tests unitaires, contrôle de confidentialité)
+- [x] `npm run e2e` (avec `E2E_PORT=5199` si le port 5173 est pris) : tous les tests listés ci-dessus existent et passent sur les 5 profils, ainsi que tous les tests existants adaptés. Pour les tests nouveaux qui utilisent un clic forcé ou une attente, `--repeat-each 5` est vert.
+- [x] Contre-épreuves, faites puis annulées (`git diff src/` vide ensuite), et rapportées dans le compte rendu :
   - a. Si « Non » ne restaure pas le message précédent, `CL-12` échoue.
   - b. Si Quitter est accepté en phase `flipping`, `CL-19 Quitter…` échoue.
   - c. Si le dialogue est ajouté à `body` au lieu de `#app`, le test « dans #app » échoue.
   - d. Si `finalizeRound` est appelé après l'animation d'encaissement, `R-42 R-50` échoue (vérification de `coins` avant l'animation).
-- [ ] `npm run screens` : `01-menu.png`, `08-dialogue-quitter.png` et `09-jouer-niveau.png` sont produites sur les 5 profils et conformes à la checklist de la skill `controle-visuel` : aucun débordement ni défilement (iPhone SE compris), zones sûres respectées, boutons ≥ 44 px, dialogue lisible et centré, paysage sans débordement.
-- [ ] `grep -rn "document.body.append\|body.appendChild" src/ui` ne renvoie rien.
-- [ ] `src/logic/` n'est pas modifié (`git diff main --stat -- src/logic` vide).
-- [ ] `npm run build` passe et `__sb` est absent de `dist/`.
+- [x] `npm run screens` : `01-menu.png`, `08-dialogue-quitter.png` et `09-jouer-niveau.png` sont produites sur les 5 profils et conformes à la checklist de la skill `controle-visuel` : aucun débordement ni défilement (iPhone SE compris), zones sûres respectées, boutons ≥ 44 px, dialogue lisible et centré, paysage sans débordement.
+- [x] `grep -rn "document.body.append\|body.appendChild" src/ui` ne renvoie rien.
+- [x] `src/logic/` n'est pas modifié (`git diff main --stat -- src/logic` vide).
+- [x] `npm run build` passe et `__sb` est absent de `dist/`.
 
 ## Pièges connus
 - **Graine** : le plateau ne doit être tiré qu'au « Jouer » (et au « Oui »), jamais au lancement ni au « Non ». Sinon `roundForSeed(42)` ne correspond plus au premier plateau, et les tests existants cassent.
@@ -161,7 +161,16 @@ Pour les tests qui ont besoin d'un plateau à un niveau donné, calculer le plat
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+Commit : `c426845` (feat(ui)) sur `t-011-menu-quitter`.
+
+- Menu UI-01 (`render/menu.ts`), écrans provisoires Album/Infos/Réglages, dialogue Oui/Non modal dans `#app` (`render/dialog.ts`, focus sur Non).
+- Contrôleur : phases `menu`, `screen`, `dialog` ; la phase `full` disparaît ; `onFinalized` devient `onGameChange` (aussi appelé après `leaveTable`) ; Quitter (R-40..R-42), question « Jouer au niveau {n} ? » après le bandeau R-66, Quitter la table (R-67), boîte pleine sur le menu (R-53). Le plateau n'est tiré qu'au « Jouer » / « Oui ».
+- `Controller.round()` renvoie `RoundState | null` (aucune partie avant « Jouer ») ; le crochet debug `state()` lève une erreur sans partie. `setGame` et `dialog()` ajoutés au debug.
+- `input.ts` : `onAction(name)`. Textes dans `texts.fr.ts`.
+- Tests : 2 fichiers e2e créés (menu : 6 tests, quitter : 14 tests) ; tests existants adaptés (menu puis réponse à la question). `--repeat-each 5` sur menu + quitter : 500 passés. e2e complet : 210 passés, 10 ignorés (projets tactiles ou Mac).
+- Contre-épreuves a à d faites (chacune fait échouer le test attendu : CL-12, CL-19 Quitter, « dans #app », R-42 R-50), puis annulées (`git diff src` vide).
+- Captures : 01-menu, 08-dialogue-quitter, 09-jouer-niveau sur les 5 profils, vérifiées (iPhone SE, paysage, Mac).
+- Écarts : aucun. Choix : en phase `waitingTap`, un clic sur Quitter ne fait rien (comme avant) ; le niveau du bandeau passe au nouveau niveau au début du bandeau R-66.
 
 ## Relecture
 _(verdict du relecteur, avec la date)_
