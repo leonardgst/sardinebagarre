@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | implémentée (relecture à faire) |
 | Étape du plan | 3.1 |
 | Branche | `t-013-sauvegarde` |
 | Estimation | M (1 à 2 h) |
@@ -66,17 +66,17 @@ Chaque test écoute `pageerror` et vérifie qu'aucune erreur n'a été levée. P
 | `R-51 C3 total plafonné : 49 990 + gain ≥ 10 → « Tu remportes 10 jetons ! »` | Sauvegarde `coins: 49990` ; gagner la partie de la graine 42 (toutes les cartes 2 et 3 de `roundForSeed(42, game)`) | message « Tu remportes 10 jetons ! », total affiché 50 000, sauvegarde `coins === 50000` |
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe.
-- [ ] `npm run e2e` (avec `E2E_PORT=5199` si besoin) : tous les tests ci-dessus et tous les tests existants passent sur les 5 profils. Les tests qui rechargent pendant une animation passent avec `--repeat-each 5`.
-- [ ] Contre-épreuves faites puis annulées (`git diff src/` vide ensuite) et rapportées :
+- [x] `npm run check` passe.
+- [x] `npm run e2e` (avec `E2E_PORT=5199` si besoin) : tous les tests ci-dessus et tous les tests existants passent sur les 5 profils. Les tests qui rechargent pendant une animation passent avec `--repeat-each 5`.
+- [x] Contre-épreuves faites puis annulées (`git diff src/` vide ensuite) et rapportées :
   - a. Si `main.ts` n'appelle pas `writeSave` dans `onGameChange`, `CL-18` ou `R-55` échoue.
   - b. Si `main.ts` écrit `initialSave()` au lieu de garder `settings`/`welcomeSeen`/`packCode`, `R-101` échoue.
   - c. Si `loadSave` n'attrape pas l'exception de `getItem`, `CL-22 stockage indisponible` échoue.
   - d. Si le contrôleur ignore `initialGame`, `CL-18` échoue.
-- [ ] `grep -rn "localStorage" src` ne trouve que `src/ui/storage.ts` (et la règle Biome de `src/logic`).
-- [ ] `git diff main --stat -- src/logic` est vide.
-- [ ] `npm run build` passe et `__sb` est absent de `dist/`.
-- [ ] `npm run screens` : les captures existantes sont inchangées (aucune modification d'interface attendue, sauf le menu boîte pleine qui n'a pas de capture).
+- [x] `grep -rn "localStorage" src` ne trouve que `src/ui/storage.ts` (et la règle Biome de `src/logic`).
+- [x] `git diff main --stat -- src/logic` est vide.
+- [x] `npm run build` passe et `__sb` est absent de `dist/`.
+- [x] `npm run screens` : les captures existantes sont inchangées (aucune modification d'interface attendue, sauf le menu boîte pleine qui n'a pas de capture).
 
 ## Pièges connus
 - **Isolation des tests** : Playwright crée un contexte neuf par test, donc un `localStorage` vide. Les tests existants ne doivent pas dépendre d'une sauvegarde laissée par un autre.
@@ -90,7 +90,11 @@ Chaque test écoute `pageerror` et vérifie qu'aucune erreur n'a été levée. P
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+- `src/ui/storage.ts` (SAVE_KEY, loadSave, writeSave), branchement dans `main.ts` (écriture à chaque `onGameChange`, aucune écriture au chargement, settings/welcomeSeen/packCode conservés), `initialGame` dans le contrôleur et menu « boîte pleine » dès le lancement.
+- Tests : 13 e2e dans `tests/e2e/sauvegarde.spec.ts`, aides dans `aide.ts`. Rouge avant le code (iphone-15, `storage.ts` réduit à la constante) : 10 échecs et 3 réussites triviales (premier lancement, sauvegarde corrompue, stockage indisponible : l'ancien code ne lisait ni n'écrivait rien).
+- Vert : `npm run check` OK (419 tests) ; `npm run e2e` 395 réussis, 10 ignorés (déjà ignorés) ; `sauvegarde.spec.ts --repeat-each 5` sur les 5 profils : 325 réussis. `npm run build` OK, `__sb` absent de `dist/`. `localStorage` seulement dans `storage.ts` ; `git diff main --stat -- src/logic` vide.
+- Contre-épreuves (iphone-15, annulées ensuite) : a. sans `writeSave` : 6 échecs (R-55, R-42, R-67, R-101, R-51, CL-23) ; b. `initialSave()` au lieu de conserver : R-101 échoue ; c. `getItem` non protégé : « stockage indisponible » échoue ; d. `initialGame` ignoré : 7 échecs dont CL-18.
+- Écarts : pas de test unitaire de `storage.ts` (Vitest sans `localStorage`, couvert par l'e2e). `npm run screens` passe ; aucune modification d'interface, captures non rouvertes.
 
 ## Relecture
 _(verdict du relecteur, avec la date)_

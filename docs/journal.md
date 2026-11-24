@@ -108,3 +108,4 @@ _(aucune)_
 - 2026-11-24 — Opus — T-012 terminée et fusionnée dans main (non poussée).
 - 2026-11-24 — Opus — v0.4.0 publiée (main poussée, tag v0.4.0). Étape 2.5 couverte par les recettes iPhone : phase 2 terminée. Prochaine étape : 3.1 (sauvegarde).
 - 2026-11-24 — Opus — T-013 planifiée (étape 3.1 : storage.ts, branchement, boîte pleine au lancement, tests CL-18, CL-22, C3 de T-010).
+- 2026-11-24 — codeur — T-013 : sauvegarde branchée (storage.ts, main.ts, initialGame, boîte pleine au lancement), 13 tests e2e, contre-épreuves a à d faites ; check OK (419 tests), e2e OK. Reste : relecture.
