@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | implémentée (relecture à faire) |
+| Statut | terminée |
 | Étape du plan | 3.1 |
 | Branche | `t-013-sauvegarde` |
 | Estimation | M (1 à 2 h) |
@@ -109,3 +109,5 @@ Mineurs (non bloquants) :
 - M3. spec R-68 et CL-18 : préciser « retour au menu (ADR-019) ».
 
 2026-11-24 — Opus — M2 et M3 faits (journal, spec annotée). M1 confié au codeur.
+
+2026-11-24 — humain — Recette sur iPhone OK (persistance après fermeture, partie en cours oubliée, rechargement pendant la fin, Quitter la table). T-013 terminée.

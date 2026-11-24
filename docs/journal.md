@@ -18,7 +18,7 @@
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
 | T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
 | T-012 | Mode mémo (sélection, 4 marques, Fermer) | terminée |
-| T-013 | Brancher la sauvegarde (localStorage) sur le jeu | relue 🟢, recette à faire |
+| T-013 | Brancher la sauvegarde (localStorage) sur le jeu | terminée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -29,7 +29,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 3 : recette de T-013 (étape 3.1, sauvegarde), puis 3.2 (PWA).
+- Phase 3 : étape 3.2 (PWA), à planifier.
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -111,3 +111,5 @@ _(aucune)_
 - 2026-11-24 — codeur — T-013 : sauvegarde branchée (storage.ts, main.ts, initialGame, boîte pleine au lancement), 13 tests e2e, contre-épreuves a à d faites ; check OK (419 tests), e2e OK. Reste : relecture.
 - 2026-11-24 — relecteur — T-013 : 🟢, fusion possible. Persistance prouvée (pas d'addInitScript au rechargement), sauvegarde avant animation (contre-épreuve CL-23 rouge), R-68 respectée, boîte pleine au lancement OK. Mineurs : M1 (test CL-23 : phase et historique), M2 (journal), M3 (spec R-68/CL-18 → menu, ADR-019).
 - 2026-11-24 — Opus — T-013 : M2 et M3 faits ; M1 confié au codeur.
+- 2026-11-24 — humain — Recette T-013 (sauvegarde) sur iPhone OK.
+- 2026-11-24 — Opus — T-013 terminée et fusionnée dans main (non poussée).
