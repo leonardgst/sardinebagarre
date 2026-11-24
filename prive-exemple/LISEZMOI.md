@@ -23,7 +23,7 @@ Ce dossier est un **exemple sans aucune image**. Tes vraies photos vont dans un 
 ## Étape 3. Écrire `pack.json`
 
 1. Copie `prive-exemple/pack.json` dans `prive`.
-2. Ouvre-le avec le Bloc-notes et remplace les textes de l'exemple.
+2. Ouvre-le avec le Bloc-notes et remplace les textes de l'exemple. Enregistre-le en **UTF-8** (le choix par défaut du Bloc-notes de Windows 11), sinon les accents seront abîmés.
 
 À respecter, sinon le script refuse le fichier :
 
@@ -69,8 +69,9 @@ Sans `prix`, la photo n°1 coûte 100, puis : 200, 300, 500, 700, 1 000, 1 500, 
 
 ## Étape 7. Publier le pack seul
 
-1. Tape `git status`. Tu dois voir **uniquement** `public/pack/pack.bin` comme nouveauté. Si un fichier de `prive` apparaît, arrête-toi et demande de l'aide.
-2. Tape :
+1. Tape `npm run check` : tout doit finir sans erreur (« Contrôle de confidentialité : OK »).
+2. Tape `git status`. Tu dois voir **uniquement** `public/pack/pack.bin` comme nouveauté. Si un fichier de `prive` apparaît, arrête-toi et demande de l'aide.
+3. Tape :
    ```
    git add public/pack/pack.bin
    git commit -m "chore(pack): pack chiffré"
@@ -78,7 +79,8 @@ Sans `prix`, la photo n°1 coûte 100, puis : 200, 300, 500, 700, 1 000, 1 500, 
 
 ## Après le pack
 
-- Garde `prive/` sur ton ordinateur : sans lui, tu ne pourras pas refaire le pack.
-- Écris le code sur la carte cadeau, et nulle part ailleurs.
+- Garde `prive/` sur ton ordinateur **et fais-en une copie sur une clé USB** : sans lui, tu ne pourras pas refaire le pack.
+- Le pack est publié sur le site au prochain envoi (`git push`), ou demande à Claude de publier.
+- Note le code sur papier (et sur la carte cadeau), nulle part ailleurs.
 - Si tu changes une photo ou un message : relance l'étape 6, puis l'étape 7.
 - Si le code a fuité : choisis un nouveau code, refais le pack et publie-le.

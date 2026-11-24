@@ -319,3 +319,11 @@ Notes pour T-017 :
 - **E8, décision :** au-delà de la 12ᵉ photo, le prix est **obligatoire**. Le script refuse une photo sans prix à partir de la 13ᵉ, et rien n'est inventé.
 - **E3, décision :** la forme ASCII du code est imposée et les tirets typographiques U+2010 à U+2015 deviennent des séparateurs. Après normalisation, œ, æ et ß ne posent donc plus de problème, puisque le code imprimé ne peut pas en contenir.
 - **E12** est fait par Opus.
+
+**Opus — 2026-11-24 — vérification des corrections (commit 033e229) : 🟢.**
+- `npm run check` OK (492 tests) ; e2e annoncé à 433 passés.
+- Les tests ont été écrits après le code. Contre-épreuves faites par Opus : chaque protection supprimée fait échouer au moins un test.
+  - Codes publics acceptés : 1 test rouge.
+  - Contrôle `Array.isArray(photos)` retiré : 2 tests rouges.
+  - Forme ASCII du code non imposée : 2 tests rouges.
+- LISEZMOI complété par Opus : enregistrement en UTF-8, `npm run check` avant le commit, copie de `prive/` sur clé USB, publication, code noté sur papier.
