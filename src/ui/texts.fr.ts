@@ -147,3 +147,23 @@ export function levelChangeMessages(from: number, to: number, bravoSeen: boolean
   if (to < from) return [`Retour au niveau ${to}.`];
   return [];
 }
+
+/** UI-04, R-124 : section « Code secret » des Réglages. */
+export const packTexts = {
+  label: 'Code secret de ta carte cadeau',
+  submit: 'Valider',
+  checking: 'Vérification…',
+  accepted: 'Code accepté',
+  change: 'Changer le code',
+  wrong: 'Ce code ne marche pas. Vérifie ta carte !',
+  unavailable: 'Les photos ne sont pas encore disponibles. Réessaie plus tard.',
+  empty: 'Écris le code de ta carte cadeau.',
+  // T-015 (provisoire) : ligne du diagnostic.
+  diagAbsent: 'pack : absent',
+  diagUnavailable: 'pack : indisponible',
+} as const;
+
+/** T-015 (provisoire) : « pack : chargé (N photos, déchiffré en X ms) ». */
+export function packLoadedLabel(photos: number, ms: number): string {
+  return `pack : chargé (${photos} ${photos >= 2 ? 'photos' : 'photo'}, déchiffré en ${Math.round(ms)} ms)`;
+}

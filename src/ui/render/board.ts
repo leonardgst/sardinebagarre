@@ -39,11 +39,13 @@ export function dogHead(className: string): SVGSVGElement {
   return svg;
 }
 
-export function renderCard(
-  round: RoundState,
-  id: number,
-  options: { readonly selected?: boolean } = {},
-): HTMLElement {
+export interface CardOptions {
+  readonly selected?: boolean;
+  /** UI-14 : URL blob: de la tête de Sardine (pack) ; sinon la tête dessinée. */
+  readonly headUrl?: string | null;
+}
+
+export function renderCard(round: RoundState, id: number, options: CardOptions = {}): HTMLElement {
   const value = round.board.cells[id];
   if (round.flipped[id] && value !== undefined) {
     const card = el('div', value === 'S' ? 'card face sardine' : 'card face');
@@ -54,7 +56,13 @@ export function renderCard(
     if (value === 'S') {
       card.setAttribute('aria-label', texts.sardine);
       const medal = el('span', 'medaillon');
-      medal.append(dogHead('tete'));
+      if (options.headUrl) {
+        const photo = el('img', 'tete-photo');
+        photo.src = options.headUrl;
+        photo.alt = '';
+        photo.draggable = false;
+        medal.append(photo);
+      } else medal.append(dogHead('tete'));
       card.append(medal);
     } else {
       card.setAttribute('aria-label', cardLabel(value));
@@ -104,14 +112,18 @@ function renderHint(kind: 'row' | 'col', index: number, hint: LineHint): HTMLEle
 }
 
 /** R-01..R-04, R-82 : grille 6 × 6 (25 cartes, 10 indicateurs, 1 coin décoratif). */
-export function renderBoard(round: RoundState, selected: number | null = null): HTMLElement {
+export function renderBoard(
+  round: RoundState,
+  selected: number | null = null,
+  headUrl: string | null = null,
+): HTMLElement {
   const board = el('div', 'board');
   board.setAttribute('role', 'group');
   board.setAttribute('aria-label', texts.board);
   for (let row = 0; row < 5; row++) {
     for (let col = 0; col < 5; col++) {
       const id = row * 5 + col;
-      board.append(renderCard(round, id, { selected: id === selected }));
+      board.append(renderCard(round, id, { selected: id === selected, headUrl }));
     }
     const hint = round.board.rowHints[row];
     if (hint) board.append(renderHint('row', row, hint));

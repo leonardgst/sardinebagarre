@@ -43,7 +43,10 @@ test('UI-01 Album, Infos, Réglages puis Retour', async ({ page }) => {
   ] as const) {
     await page.locator(`[data-action=${action}]`).click();
     await expect(page.locator('.ecran h2')).toHaveText(titre);
-    await expect(page.locator('.ecran-texte')).toHaveText('Bientôt ici.');
+    // Réglages a désormais sa section « Code secret » (T-017) ; Album et Infos restent provisoires.
+    if (action !== 'settings')
+      await expect(page.locator('.ecran-texte')).toHaveText('Bientôt ici.');
+    else await expect(page.locator('.code-secret')).toBeVisible();
     expect(await page.evaluate(() => window.__sb?.phase())).toBe('screen');
     await page.getByRole('button', { name: 'Retour' }).click();
     await attendre(page, 'menu');

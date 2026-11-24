@@ -2,10 +2,13 @@ import { test } from '@playwright/test';
 import {
   attendre,
   basculerMemo,
+  CODE_TEST,
   idsWhere,
   ouvrir,
   ouvrirMenu,
+  ouvrirReglages,
   roundForSeed,
+  servirPack,
   toucher,
 } from './aide';
 
@@ -135,4 +138,38 @@ test('@screens réglages', async ({ page }, testInfo) => {
   await page.locator('[data-action=settings]').click();
   await page.locator('.ecran').waitFor();
   await page.screenshot({ path: chemin(testInfo.project.name, '11-reglages.png') });
+});
+
+test('@screens réglages : code erroné puis accepté', async ({ page }, testInfo) => {
+  await servirPack(page);
+  await ouvrirMenu(page, SEED);
+  await ouvrirReglages(page);
+  await page.locator('.code-champ').fill('faux-faux-faux-faux');
+  await page.screenshot({ path: chemin(testInfo.project.name, '11b-reglages-saisie.png') });
+  await page.locator('[data-action=submit-code]').click();
+  await page.locator('.code-etat', { hasText: 'ne marche pas' }).waitFor();
+  await page.screenshot({ path: chemin(testInfo.project.name, '11c-reglages-erreur.png') });
+  await page.locator('.code-champ').fill(CODE_TEST);
+  await page.locator('[data-action=submit-code]').click();
+  await page.locator('[data-action=change-code]').waitFor();
+  await page.screenshot({ path: chemin(testInfo.project.name, '11d-reglages-accepte.png') });
+});
+
+test('@screens carte Sardine avec la photo du pack', async ({ page }, testInfo) => {
+  const [sardine] = idsWhere(roundForSeed(SEED), (v) => v === 'S');
+  if (sardine === undefined) throw new Error('plateau inattendu');
+  await servirPack(page);
+  await ouvrirMenu(page, SEED, true);
+  await ouvrirReglages(page);
+  await page.locator('.code-champ').fill(CODE_TEST);
+  await page.locator('[data-action=submit-code]').click();
+  await page.locator('[data-action=change-code]').waitFor();
+  await page.locator('[data-action=back]').click();
+  await page.locator('[data-action=play]').click();
+  await page.locator('.board').waitFor();
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
+  await toucher(page, sardine);
+  await page.locator('.card.sardine img.tete-photo').waitFor();
+  await attendre(page, 'waitingTap');
+  await page.screenshot({ path: chemin(testInfo.project.name, '12-sardine-photo.png') });
 });

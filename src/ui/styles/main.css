@@ -187,6 +187,15 @@ body {
   width: 100%;
   height: 100%;
 }
+/* UI-14 : photo de Sardine (pack), en rond. */
+.tete-photo {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  -webkit-user-drag: none;
+}
 
 /* Marques du mémo (R-82) : 4 coins */
 .m {
@@ -553,6 +562,17 @@ body {
   gap: 14px;
   text-align: center;
 }
+/* Écrans provisoires : centrés s'ils tiennent, défilables sinon (paysage). */
+.ecran {
+  overflow-y: auto;
+  justify-content: flex-start;
+}
+.ecran > :first-child {
+  margin-top: auto;
+}
+.ecran > :last-child {
+  margin-bottom: auto;
+}
 .menu-tete {
   display: flex;
   flex-direction: column;
@@ -624,6 +644,72 @@ body {
   font-size: 15px;
   opacity: 0.8;
 }
+/* UI-04 : code secret (le corps est en user-select: none, le champ doit rester saisissable). */
+.code-secret {
+  display: grid;
+  gap: 10px;
+  text-align: center;
+}
+.code-corps {
+  display: grid;
+  gap: 10px;
+}
+.code-libelle {
+  font-size: 17px;
+  font-style: italic;
+}
+.code-champ {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 18px;
+  color: var(--encre-sombre);
+  background: var(--creme);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 2px var(--or);
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.code-champ:focus-visible {
+  outline: 3px solid var(--or-clair);
+  outline-offset: 2px;
+}
+.code-secret button {
+  min-height: 48px;
+  padding: 0 16px;
+  font-family: var(--police-chiffres);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(var(--creme), #e5cf9f);
+  color: var(--encre-sombre);
+  border: 0;
+  border-radius: 999px;
+  box-shadow:
+    inset 0 0 0 2px var(--or),
+    0 3px 0 var(--ombre);
+}
+.code-secret button:disabled {
+  opacity: 0.6;
+}
+.code-etat {
+  min-height: 1.3em;
+  font-size: 16px;
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+.code-secret[data-etat="accepted"] .code-etat {
+  order: -1;
+}
+.code-bienvenue {
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+.ecran-pack,
 .ecran-diagnostic {
   font-size: 13px;
   opacity: 0.8;

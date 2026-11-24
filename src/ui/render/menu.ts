@@ -1,5 +1,5 @@
 import { formatCoins } from '../format';
-import { playButtonLabel, texts, versionLabel } from '../texts.fr';
+import { packTexts, playButtonLabel, texts, versionLabel } from '../texts.fr';
 import { dogHead } from './board';
 
 export type ScreenName = 'album' | 'infos' | 'settings';
@@ -51,8 +51,61 @@ export function renderMenu(level: number, total: number, message: string): HTMLE
   return menu;
 }
 
+/** État de la section « Code secret » (UI-04, R-124). */
+export type CodeSectionState =
+  | { readonly kind: 'form'; readonly error?: string }
+  | { readonly kind: 'checking' }
+  | { readonly kind: 'accepted'; readonly welcome: string };
+
+/** UI-04 : saisir ou changer le code secret. Le champ est toujours vide. */
+export function renderCodeSection(state: CodeSectionState): HTMLElement {
+  const section = document.createElement('section');
+  section.className = 'code-secret';
+  section.dataset.etat = state.kind;
+  const corps = document.createElement('div');
+  corps.className = 'code-corps';
+  // Zone annoncée par VoiceOver : le contrôleur la garde et ne change que son texte.
+  const status = document.createElement('p');
+  status.className = 'code-etat';
+  status.setAttribute('aria-live', 'polite');
+  if (state.kind === 'accepted') {
+    status.textContent = packTexts.accepted;
+    const welcome = document.createElement('p');
+    welcome.className = 'code-bienvenue';
+    welcome.textContent = state.welcome;
+    corps.append(welcome, button('change-code', packTexts.change));
+  } else {
+    const label = document.createElement('label');
+    label.className = 'code-libelle';
+    label.htmlFor = 'code-secret';
+    label.textContent = packTexts.label;
+    const input = document.createElement('input');
+    input.id = 'code-secret';
+    input.className = 'code-champ';
+    input.type = 'text';
+    input.name = 'code';
+    input.setAttribute('autocapitalize', 'off');
+    input.setAttribute('autocomplete', 'off');
+    input.setAttribute('autocorrect', 'off');
+    input.setAttribute('spellcheck', 'false');
+    input.setAttribute('enterkeyhint', 'done');
+    const checking = state.kind === 'checking';
+    input.disabled = checking;
+    const submit = button('submit-code', checking ? packTexts.checking : packTexts.submit);
+    submit.disabled = checking;
+    status.textContent = state.kind === 'form' ? (state.error ?? '') : '';
+    corps.append(label, input, submit);
+  }
+  section.append(corps, status);
+  return section;
+}
+
 /** Écran provisoire (Album, Infos, Réglages) : un titre, une phrase et Retour. */
-export function renderScreen(title: string, version?: string): HTMLElement {
+export function renderScreen(
+  title: string,
+  version?: string,
+  codeSection?: HTMLElement,
+): HTMLElement {
   const screen = document.createElement('main');
   screen.className = 'menu ecran';
   const h = document.createElement('h2');
@@ -70,7 +123,10 @@ export function renderScreen(title: string, version?: string): HTMLElement {
     v.textContent = versionLabel(version);
     const d = document.createElement('p');
     d.className = 'ecran-diagnostic';
-    screen.append(h, p, v, d, nav);
+    // T-015 (provisoire) : ligne du pack, remplie par le contrôleur.
+    const pack = document.createElement('p');
+    pack.className = 'ecran-pack';
+    screen.append(h, ...(codeSection ? [codeSection] : []), v, d, pack, nav);
   }
   return screen;
 }

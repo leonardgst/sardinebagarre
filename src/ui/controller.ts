@@ -10,18 +10,21 @@ import { flip, quit, toggleMemo } from '../logic/round';
 import type { GameState, MemoMark, Rng, RoundState } from '../logic/types';
 import { play, scale, setFast, skip, tween, wait } from './anim';
 import { bark, unlockAudio } from './audio';
-import { collectOfflineInfo, formatOfflineInfo } from './diagnostic';
+import { collectOfflineInfo, formatOfflineInfo, formatPackInfo } from './diagnostic';
 import { installInput } from './input';
+import { normalizeCode } from './pack';
+import { createPackStore, type PackResult, type PackStore } from './pack-store';
 import { dogHead, renderBoard, renderCard } from './render/board';
 import { renderDialog } from './render/dialog';
 import { renderActions, renderHud, renderMessage, updateHud, updateMemoPanel } from './render/hud';
-import { renderMenu, renderScreen } from './render/menu';
+import { renderCodeSection, renderMenu, renderScreen } from './render/menu';
 import {
   firstCardMessage,
   leaveTableQuestion,
   levelChangeMessages,
   messages,
   multiplierMessage,
+  packTexts,
   pickMessage,
   playQuestion,
   quitQuestion,
@@ -45,6 +48,8 @@ export interface Controller {
   setGame(game: GameState): void;
   /** R-81 : mode mémo ouvert ou non, carte sélectionnée. */
   memo(): { readonly open: boolean; readonly selected: number | null };
+  /** R-124 : recharge le pack avec le code sauvegardé (lancement), sans message à l'écran. */
+  loadSavedPack(code: string): Promise<PackResult>;
 }
 
 export interface ControllerOptions {
@@ -56,6 +61,10 @@ export interface ControllerOptions {
   onMenu?: () => void;
   /** R-104 : appelé quand le joueur quitte le menu (partie ou écran). */
   onLeaveMenu?: () => void;
+  /** R-124 : contenu du pack (par défaut, un magasin vide qui charge `pack/pack.bin`). */
+  pack?: PackStore;
+  /** R-101, R-124 : code accepté (normalisé), ou `null` s'il ne marche plus. À sauvegarder. */
+  onPackCode?: (code: string | null) => void;
 }
 
 const FLIP_MS = 250;
@@ -81,6 +90,12 @@ export function createController(
   let dialogKind: DialogKind | null = null;
   let dialogEl: HTMLElement | null = null;
   let beforeDialog: Phase = 'menu';
+  const pack = options.pack ?? createPackStore();
+  let packBusy = false;
+  /** « Changer le code » : le champ reste affiché même si un pack est déjà chargé. */
+  let changingCode = false;
+  let packError = '';
+  let packStatus: 'absent' | 'loaded' | 'unavailable' = 'absent';
   let bravoSeen = false; // « une seule fois par session » : jamais sauvegardé.
   /** Ce que le bandeau montre : niveau et total ne bougent qu'après l'encaissement visuel. */
   const shown = { level: game.level, total: game.coins, payout: 0 };
@@ -110,12 +125,13 @@ export function createController(
   const boardEl = (): HTMLElement | null => table.querySelector<HTMLElement>('.board');
   const cardEl = (id: number): HTMLElement | null =>
     table.querySelector<HTMLElement>(`.card[data-id="${id}"]`);
+  const headUrl = (): string | null => pack.content()?.headUrl ?? null;
   const setMessage = (text: string): void => {
     message.textContent = text;
   };
   const refreshHud = (): void => updateHud(hud, shown.level, shown.payout, shown.total);
   const drawBoard = (): void => {
-    table.replaceChildren(renderBoard(cur(), memo.open ? memo.selected : null));
+    table.replaceChildren(renderBoard(cur(), memo.open ? memo.selected : null, headUrl()));
     refreshHud();
   };
 
@@ -133,7 +149,12 @@ export function createController(
   /** Redessine une seule carte (garde le curseur, évite de faire clignoter le plateau). */
   function refreshCard(id: number | null): void {
     if (id === null) return;
-    cardEl(id)?.replaceWith(renderCard(cur(), id, { selected: memo.open && memo.selected === id }));
+    cardEl(id)?.replaceWith(
+      renderCard(cur(), id, {
+        selected: memo.open && memo.selected === id,
+        headUrl: headUrl(),
+      }),
+    );
   }
 
   /** R-81 : ouvre ou ferme le mémo ; la mise en page change sous le doigt, donc verrou. */
@@ -182,9 +203,11 @@ export function createController(
 
   function showScreen(title: string, version?: string): void {
     phase = 'screen';
+    changingCode = false;
     options.onLeaveMenu?.();
-    const screen = renderScreen(title, version);
+    const screen = renderScreen(title, version, version === undefined ? undefined : codeSection());
     root.replaceChildren(screen);
+    refreshPackLine();
     const diag = screen.querySelector<HTMLElement>('.ecran-diagnostic');
     if (diag) {
       // T-015 (provisoire) : rempli après coup ; rien si l'écran a été quitté entre-temps.
@@ -201,6 +224,79 @@ export function createController(
         })
         .catch(() => {});
     }
+  }
+
+  function codeSection(): HTMLElement {
+    const content = pack.content();
+    if (packBusy) return renderCodeSection({ kind: 'checking' });
+    if (content && !changingCode)
+      return renderCodeSection({ kind: 'accepted', welcome: content.welcome });
+    return renderCodeSection({ kind: 'form', error: packError });
+  }
+
+  /** Rien n'est écrit si l'écran Réglages a été quitté entre-temps. */
+  function refreshCodeSection(): void {
+    // F5 : la zone aria-live (p.code-etat) reste en place ; seul son texte change.
+    const existing = root.querySelector<HTMLElement>('.code-secret');
+    if (existing) {
+      const next = codeSection();
+      const status = existing.querySelector('.code-etat');
+      const nextStatus = next.querySelector('.code-etat');
+      existing.querySelector('.code-corps')?.replaceWith(next.querySelector('.code-corps') as Node);
+      if (status) status.textContent = nextStatus?.textContent ?? '';
+      existing.dataset.etat = next.dataset.etat ?? '';
+    }
+    refreshPackLine();
+  }
+
+  /** T-017 (provisoire) : ligne « pack : … » du diagnostic. */
+  function refreshPackLine(): void {
+    const line = root.querySelector<HTMLElement>('.ecran-pack');
+    if (!line) return;
+    const content = pack.content();
+    const ms = pack.decryptMs();
+    line.textContent = formatPackInfo(
+      packStatus === 'loaded' && content && ms !== null
+        ? { status: 'loaded', photos: content.photos.length, ms }
+        : { status: packStatus === 'loaded' ? 'absent' : packStatus },
+    );
+  }
+
+  const errorText = (result: PackResult): string =>
+    result === 'wrong'
+      ? packTexts.wrong
+      : result === 'unavailable'
+        ? packTexts.unavailable
+        : result === 'empty'
+          ? packTexts.empty
+          : '';
+
+  /** R-124 : une seule vérification à la fois ; le résultat est appliqué même si l'écran est quitté. */
+  async function checkCode(code: string, fromLaunch: boolean): Promise<PackResult> {
+    if (packBusy) return 'empty';
+    packBusy = true;
+    packError = '';
+    refreshCodeSection();
+    const result = await pack.load(code);
+    packBusy = false;
+    if (result === 'ok') {
+      changingCode = false;
+      packStatus = 'loaded';
+      if (!fromLaunch) options.onPackCode?.(normalizeCode(code));
+    } else if (result === 'unavailable') {
+      packStatus = 'unavailable';
+    } else if (result === 'wrong' && fromLaunch) {
+      options.onPackCode?.(null); // le pack a été refait avec un autre code.
+    }
+    packError = fromLaunch ? '' : errorText(result);
+    refreshCodeSection();
+    return result;
+  }
+
+  function submitCode(): void {
+    if (packBusy) return;
+    const field = root.querySelector<HTMLInputElement>('.code-champ');
+    void checkCode(field?.value ?? '', false);
   }
 
   /** Dialogue Oui/Non modal, dans `#app`. */
@@ -246,7 +342,7 @@ export function createController(
     const old = cardEl(id);
     if (!old) return;
     await play(old, 'flip-out', FLIP_MS / 2);
-    const face = renderCard(r, id);
+    const face = renderCard(r, id, { headUrl: headUrl() });
     old.replaceWith(face);
     await play(face, 'flip-in', FLIP_MS / 2);
   }
@@ -274,7 +370,7 @@ export function createController(
     hidden.forEach((id, i) => {
       const old = cardEl(id);
       if (!old) return;
-      const face = renderCard(all, id);
+      const face = renderCard(all, id, { headUrl: headUrl() });
       face.classList.add('revele');
       face.style.setProperty(
         '--delai',
@@ -343,7 +439,7 @@ export function createController(
       phase = 'flipping';
     }
     const value = next.board.cells[id];
-    if (value === 'S') setMessage(pickMessage(messages.sardine, rngs.decor));
+    if (value === 'S') setMessage(pickMessage(pack.sardineMessages(messages.sardine), rngs.decor));
     if (value === 2 || value === 3 || value === 1) {
       if (before.cardsFlipped === 0) setMessage(firstCardMessage(value, next.payout));
       else if (value !== 1) setMessage(multiplierMessage(value, next.payout));
@@ -465,6 +561,12 @@ export function createController(
         if (!locked()) menuAction(name);
       } else if (phase === 'screen') {
         if (name === 'back') showMenu();
+        else if (name === 'submit-code') submitCode();
+        else if (name === 'change-code') {
+          packError = '';
+          changingCode = true;
+          refreshCodeSection();
+        }
       } else if (phase === 'ending') {
         skip(); // CL-20 : tout bouton de l'écran de jeu est un toucher d'écran.
       } else if (phase === 'waitingTap') {
@@ -485,6 +587,15 @@ export function createController(
     },
   });
 
+  // R-124 : la touche Entrée valide le code.
+  root.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter') return;
+    if (event.target instanceof Element && event.target.matches('.code-champ')) {
+      event.preventDefault();
+      submitCode();
+    }
+  });
+
   // R-53 : boîte pleine dès le lancement.
   showMenu(canStartRound(game) ? '' : messages.boxFull);
 
@@ -494,6 +605,7 @@ export function createController(
     phase: () => phase,
     dialog: () => dialogKind,
     memo: () => memo,
+    loadSavedPack: (code) => checkCode(code, true),
     setRound(next) {
       round = next;
       shown.payout = next.payout;

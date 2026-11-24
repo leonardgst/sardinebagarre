@@ -22,6 +22,7 @@
 | T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | terminée |
 | T-015 | Afficher un diagnostic hors ligne dans Réglages | terminée (provisoire, à retirer avant le gel) |
 | T-016 | Fabriquer et lire le pack chiffré (sans interface) | terminée |
+| T-017 | Brancher le pack chiffré dans le jeu | corrections vérifiées 🟢, prête à fusionner |
 
 ## Questions ouvertes
 _(aucune)_
@@ -145,3 +146,8 @@ _(aucune)_
 - 2026-11-24 — Opus — T-016 : E1 à E11 confiés au codeur ; décisions : prix obligatoire au-delà de la 12ᵉ photo, code ASCII imposé (tirets typographiques acceptés comme séparateurs).
 - 2026-11-24 — codeur — T-016 : corrections de relecture E1 à E11 (decodePack validé, codes publiés refusés, forme ASCII du code, tirets typographiques, validation de pack.json, prix obligatoire dès la 13e photo, saisie masquée durcie, LISEZMOI réécrit) ; check vert (492 tests).
 - 2026-11-24 — Opus — T-016 : E1 à E11 vérifiés (check 492 tests ; contre-épreuves sur les codes publics, la validation de `photos` et la forme ASCII du code) ; LISEZMOI complété.
+- 2026-11-24 — Opus — T-016 fusionnée dans main (locale, non poussée). T-017 planifiée : code dans Réglages, tête de Sardine sur la carte, messages Sardine privés, rechargement au lancement, code oublié si le pack a changé.
+- 2026-11-24 — codeur — T-017 : pack-store.ts, code secret dans Réglages, tête de Sardine en photo sur la carte révélée, messages Sardine du pack, rechargement au lancement (code faux oublié), ligne « pack » du diagnostic, Réglages défilables en paysage ; tests écrits avant le code. Reste : relecture ; vérifier `pack/pack.bin` dans le `sw.js` publié après la première publication du vrai pack (R-125).
+- 2026-11-24 — relecteur — T-017 relue : 🟡 (e2e complet 493 OK ; à corriger : « Changer le code » avec un code faux réaffiche « Code accepté » ; mineurs : alignement, test de conservation des jetons, mesure du déchiffrement seul, zone aria-live).
+- 2026-11-24 — codeur — T-017 : corrections de relecture F1 (Changer le code : message et pack conservés, drapeau changingCode), F2 (centré), F3 (progression conservée), F4 (durée = déchiffrement seul), F5 (zone aria-live gardée) ; check OK (505 tests), e2e 508 passés / 10 ignorés.
+- 2026-11-24 — Opus — T-017 : F1 à F5 vérifiés (check 505 tests, build sans `__sb`, capture 11d centrée) ; prête à fusionner.
