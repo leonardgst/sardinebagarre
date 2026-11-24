@@ -18,6 +18,7 @@
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
 | T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
 | T-012 | Mode mémo (sélection, 4 marques, Fermer) | terminée |
+| T-013 | Brancher la sauvegarde (localStorage) sur le jeu | planifiée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -28,7 +29,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 2 (interface) : étape 2.5 du plan, à planifier.
+- Phase 3 : T-013 (étape 3.1, sauvegarde), à implémenter ; puis 3.2 (PWA).
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -106,3 +107,4 @@ _(aucune)_
 - 2026-11-24 — humain — Recette T-012 (mémo) sur iPhone OK.
 - 2026-11-24 — Opus — T-012 terminée et fusionnée dans main (non poussée).
 - 2026-11-24 — Opus — v0.4.0 publiée (main poussée, tag v0.4.0). Étape 2.5 couverte par les recettes iPhone : phase 2 terminée. Prochaine étape : 3.1 (sauvegarde).
+- 2026-11-24 — Opus — T-013 planifiée (étape 3.1 : storage.ts, branchement, boîte pleine au lancement, tests CL-18, CL-22, C3 de T-010).
