@@ -92,13 +92,16 @@ export function createPackStore(deps: PackStoreDeps = {}): PackStore {
   return {
     async load(code) {
       if (normalizeCode(code) === '') return 'empty';
-      const start = now();
       let pack: DecodedPack;
+      let elapsed: number;
       try {
         const response = await fetchPack();
         if (response.status !== 200) return 'unavailable';
         const bytes = new Uint8Array(await response.arrayBuffer());
-        pack = decodePack(await decryptPack(bytes, code));
+        const start = now();
+        const plain = await decryptPack(bytes, code);
+        elapsed = now() - start;
+        pack = decodePack(plain);
       } catch (error) {
         if (error instanceof WrongCodeError) return 'wrong';
         return 'unavailable';
@@ -106,7 +109,7 @@ export function createPackStore(deps: PackStoreDeps = {}): PackStore {
       const next = build(pack);
       if (current) for (const url of urlsOf(current)) revokeUrl(url);
       current = next;
-      duration = now() - start;
+      duration = elapsed;
       return 'ok';
     },
     content: () => current,

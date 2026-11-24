@@ -111,6 +111,25 @@ describe('pack-store.ts', () => {
     TIMEOUT,
   );
 
+  it(
+    'R-T8 pack-store : la durée ne compte que le déchiffrement, pas le téléchargement',
+    async () => {
+      let horloge = 0;
+      const store = createPackStore({
+        fetchPack: async () => {
+          horloge += 100_000; // téléchargement très lent
+          return fixtureOk();
+        },
+        createUrl: () => 'blob:x',
+        revokeUrl: () => {},
+        now: () => horloge,
+      });
+      expect(await store.load(CODE)).toBe('ok');
+      expect(store.decryptMs()).toBe(0);
+    },
+    TIMEOUT,
+  );
+
   it('UI-60 mergeMessages : listes concaténées, extra absent toléré', () => {
     expect(mergeMessages(['a'], ['b', 'c'])).toEqual(['a', 'b', 'c']);
     expect(mergeMessages(['a'], undefined)).toEqual(['a']);

@@ -92,6 +92,8 @@ export function createController(
   let beforeDialog: Phase = 'menu';
   const pack = options.pack ?? createPackStore();
   let packBusy = false;
+  /** « Changer le code » : le champ reste affiché même si un pack est déjà chargé. */
+  let changingCode = false;
   let packError = '';
   let packStatus: 'absent' | 'loaded' | 'unavailable' = 'absent';
   let bravoSeen = false; // « une seule fois par session » : jamais sauvegardé.
@@ -201,6 +203,7 @@ export function createController(
 
   function showScreen(title: string, version?: string): void {
     phase = 'screen';
+    changingCode = false;
     options.onLeaveMenu?.();
     const screen = renderScreen(title, version, version === undefined ? undefined : codeSection());
     root.replaceChildren(screen);
@@ -226,13 +229,23 @@ export function createController(
   function codeSection(): HTMLElement {
     const content = pack.content();
     if (packBusy) return renderCodeSection({ kind: 'checking' });
-    if (content) return renderCodeSection({ kind: 'accepted', welcome: content.welcome });
+    if (content && !changingCode)
+      return renderCodeSection({ kind: 'accepted', welcome: content.welcome });
     return renderCodeSection({ kind: 'form', error: packError });
   }
 
   /** Rien n'est écrit si l'écran Réglages a été quitté entre-temps. */
   function refreshCodeSection(): void {
-    root.querySelector('.code-secret')?.replaceWith(codeSection());
+    // F5 : la zone aria-live (p.code-etat) reste en place ; seul son texte change.
+    const existing = root.querySelector<HTMLElement>('.code-secret');
+    if (existing) {
+      const next = codeSection();
+      const status = existing.querySelector('.code-etat');
+      const nextStatus = next.querySelector('.code-etat');
+      existing.querySelector('.code-corps')?.replaceWith(next.querySelector('.code-corps') as Node);
+      if (status) status.textContent = nextStatus?.textContent ?? '';
+      existing.dataset.etat = next.dataset.etat ?? '';
+    }
     refreshPackLine();
   }
 
@@ -267,6 +280,7 @@ export function createController(
     const result = await pack.load(code);
     packBusy = false;
     if (result === 'ok') {
+      changingCode = false;
       packStatus = 'loaded';
       if (!fromLaunch) options.onPackCode?.(normalizeCode(code));
     } else if (result === 'unavailable') {
@@ -550,7 +564,8 @@ export function createController(
         else if (name === 'submit-code') submitCode();
         else if (name === 'change-code') {
           packError = '';
-          root.querySelector('.code-secret')?.replaceWith(renderCodeSection({ kind: 'form' }));
+          changingCode = true;
+          refreshCodeSection();
         }
       } else if (phase === 'ending') {
         skip(); // CL-20 : tout bouton de l'écran de jeu est un toucher d'écran.

@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { initialGame } from '../../src/logic/game';
+import type { RoundRecord } from '../../src/logic/types';
 import { packTexts } from '../../src/ui/texts.fr';
 import {
   CODE_TEST,
@@ -116,12 +117,63 @@ test('R-124 au relancement, pack rechargé avec le code sauvegardé', async ({ p
   expect((await lireSauvegarde(page))?.packCode).toBe(CODE_TEST);
 });
 
-test('R-124 code sauvegardé devenu faux → oublié', async ({ page }) => {
+test('R-124 code sauvegardé devenu faux → oublié, progression conservée', async ({ page }) => {
   await servirPack(page);
-  await ouvrirAvecSauvegarde(page, SEED, sauvegardeTexte({}, { packCode: 'faux-faux-faux-faux' }));
+  const history: RoundRecord[] = [
+    { outcome: 'WON', cardsFlipped: 5, level: 3 },
+    { outcome: 'LOST', cardsFlipped: 2, level: 4 },
+  ];
+  await ouvrirAvecSauvegarde(
+    page,
+    SEED,
+    sauvegardeTexte({ coins: 1234, level: 4, history }, { packCode: 'faux-faux-faux-faux' }),
+  );
   await expect
     .poll(async () => (await lireSauvegarde(page))?.packCode ?? null, { timeout: 30_000 })
     .toBeNull();
+  const game = await page.evaluate(() => window.__sb?.game());
+  expect(game?.coins).toBe(1234);
+  expect(game?.level).toBe(4);
+  expect(game?.history).toEqual(history);
+  const sauvegarde = await lireSauvegarde(page);
+  expect(sauvegarde?.coins).toBe(1234);
+  expect(sauvegarde?.level).toBe(4);
+});
+
+async function accepterPuisChanger(page: Page): Promise<void> {
+  await servirPack(page);
+  await ouvrirMenu(page, SEED, true);
+  await ouvrirReglages(page);
+  await saisir(page, CODE_TEST);
+  await expect(page.locator('.code-secret')).toContainText(packTexts.accepted);
+  await page.locator('[data-action=change-code]').click();
+}
+
+async function sardineGardeLaPhoto(page: Page): Promise<void> {
+  await page.locator('[data-action=back]').click();
+  await page.locator('[data-action=play]').click();
+  await page.locator('.board').waitFor();
+  await page.locator('#app:not([data-verrou])').waitFor({ state: 'attached' });
+  await toucher(page, sardineDe());
+  await expect(page.locator('.card.sardine img.tete-photo[src^="blob:"]')).toBeVisible();
+}
+
+test('R-124 changer le code, code faux : message, code et photo conservés', async ({ page }) => {
+  await accepterPuisChanger(page);
+  await saisir(page, 'faux-faux-faux-faux');
+  const section = page.locator('.code-secret');
+  await expect(section).toContainText(packTexts.wrong);
+  await expect(page.locator('.code-champ')).toBeVisible();
+  expect((await lireSauvegarde(page))?.packCode).toBe(CODE_TEST);
+  await sardineGardeLaPhoto(page);
+});
+
+test('R-124 changer le code, champ vide : message de saisie', async ({ page }) => {
+  await accepterPuisChanger(page);
+  await page.locator('[data-action=submit-code]').click();
+  await expect(page.locator('.code-secret')).toContainText(packTexts.empty);
+  expect((await lireSauvegarde(page))?.packCode).toBe(CODE_TEST);
+  await sardineGardeLaPhoto(page);
 });
 
 test('R-126 code sauvegardé, pack indisponible : code gardé', async ({ page }) => {
@@ -163,4 +215,18 @@ test('R-124 écran quitté pendant la vérification : code quand même enregistr
   await page.locator('[data-action=back]').click();
   await expect.poll(async () => (await lireSauvegarde(page))?.packCode).toBe(CODE_TEST);
   expect(erreurs).toEqual([]);
+});
+
+test('UI-04 la zone annoncée (aria-live) reste le même élément', async ({ page }) => {
+  await servirPack(page);
+  await ouvrirMenu(page, SEED);
+  await ouvrirReglages(page);
+  await page.locator('.code-etat').evaluate((e) => {
+    e.setAttribute('data-repere', '1');
+  });
+  await saisir(page, 'faux-faux-faux-faux');
+  await expect(page.locator('.code-etat[data-repere="1"]')).toContainText(packTexts.wrong);
+  await saisir(page, CODE_TEST);
+  await expect(page.locator('.code-etat[data-repere="1"]')).toContainText(packTexts.accepted);
+  await expect(page.locator('.code-etat[aria-live="polite"]')).toHaveCount(1);
 });

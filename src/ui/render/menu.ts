@@ -61,39 +61,42 @@ export type CodeSectionState =
 export function renderCodeSection(state: CodeSectionState): HTMLElement {
   const section = document.createElement('section');
   section.className = 'code-secret';
-  if (state.kind === 'accepted') {
-    const ok = document.createElement('p');
-    ok.className = 'code-etat';
-    ok.textContent = packTexts.accepted;
-    const welcome = document.createElement('p');
-    welcome.className = 'code-bienvenue';
-    welcome.textContent = state.welcome;
-    section.append(ok, welcome, button('change-code', packTexts.change));
-    return section;
-  }
-  const label = document.createElement('label');
-  label.className = 'code-libelle';
-  label.htmlFor = 'code-secret';
-  label.textContent = packTexts.label;
-  const input = document.createElement('input');
-  input.id = 'code-secret';
-  input.className = 'code-champ';
-  input.type = 'text';
-  input.name = 'code';
-  input.setAttribute('autocapitalize', 'off');
-  input.setAttribute('autocomplete', 'off');
-  input.setAttribute('autocorrect', 'off');
-  input.setAttribute('spellcheck', 'false');
-  input.setAttribute('enterkeyhint', 'done');
-  const checking = state.kind === 'checking';
-  input.disabled = checking;
-  const submit = button('submit-code', checking ? packTexts.checking : packTexts.submit);
-  submit.disabled = checking;
+  section.dataset.etat = state.kind;
+  const corps = document.createElement('div');
+  corps.className = 'code-corps';
+  // Zone annoncée par VoiceOver : le contrôleur la garde et ne change que son texte.
   const status = document.createElement('p');
   status.className = 'code-etat';
   status.setAttribute('aria-live', 'polite');
-  status.textContent = state.kind === 'form' ? (state.error ?? '') : '';
-  section.append(label, input, submit, status);
+  if (state.kind === 'accepted') {
+    status.textContent = packTexts.accepted;
+    const welcome = document.createElement('p');
+    welcome.className = 'code-bienvenue';
+    welcome.textContent = state.welcome;
+    corps.append(welcome, button('change-code', packTexts.change));
+  } else {
+    const label = document.createElement('label');
+    label.className = 'code-libelle';
+    label.htmlFor = 'code-secret';
+    label.textContent = packTexts.label;
+    const input = document.createElement('input');
+    input.id = 'code-secret';
+    input.className = 'code-champ';
+    input.type = 'text';
+    input.name = 'code';
+    input.setAttribute('autocapitalize', 'off');
+    input.setAttribute('autocomplete', 'off');
+    input.setAttribute('autocorrect', 'off');
+    input.setAttribute('spellcheck', 'false');
+    input.setAttribute('enterkeyhint', 'done');
+    const checking = state.kind === 'checking';
+    input.disabled = checking;
+    const submit = button('submit-code', checking ? packTexts.checking : packTexts.submit);
+    submit.disabled = checking;
+    status.textContent = state.kind === 'form' ? (state.error ?? '') : '';
+    corps.append(label, input, submit);
+  }
+  section.append(corps, status);
   return section;
 }
 

@@ -648,7 +648,11 @@ body {
 .code-secret {
   display: grid;
   gap: 10px;
-  text-align: left;
+  text-align: center;
+}
+.code-corps {
+  display: grid;
+  gap: 10px;
 }
 .code-libelle {
   font-size: 17px;
@@ -697,6 +701,9 @@ body {
   font-size: 16px;
   font-style: italic;
   overflow-wrap: anywhere;
+}
+.code-secret[data-etat="accepted"] .code-etat {
+  order: -1;
 }
 .code-bienvenue {
   font-size: 17px;
