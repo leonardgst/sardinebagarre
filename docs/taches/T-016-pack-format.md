@@ -131,7 +131,9 @@ L'humain peut lancer `npm run pack` pour chiffrer `prive/` dans `public/pack/pac
 - Taille : le service worker n'embarque que les fichiers de 10 Mo au plus. Le script affiche un **avertissement** au-delà de 8 Mo.
 
 ## Questions
+- `npm i -D sharp` a été refusé par les permissions. Il faut l'autoriser (ou installer sharp à la main, avec mise à jour de `package.json` et du lock), puis lancer `npm run pack:test` pour créer la fixture.
 
 ## Compte rendu
+INCOMPLET. Écrits : `scripts/pack-lib.mjs`, `pack.mjs`, `pack-de-test.mjs`, `src/ui/pack.ts`, `prive-exemple/`, contrôle de la fixture dans le vérificateur, tests (`tests/ui/pack.test.ts`, `tests/scripts/pack.test.ts`). Non fait faute de sharp : dépendance dans `package.json` et le lock, fixture, tests d'image, `npm run check` complet, e2e, mesures de temps.
 
 ## Relecture
