@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatOfflineInfo, type OfflineInfo } from '../../src/ui/diagnostic';
+import { formatOfflineInfo, formatPackInfo, type OfflineInfo } from '../../src/ui/diagnostic';
 
 const base: OfflineInfo = {
   hasServiceWorker: true,
@@ -50,5 +50,15 @@ describe('diagnostic hors ligne', () => {
     expect(lignes).toHaveLength(3);
     expect(lignes[2]).toBe("Erreur d'enregistrement : SecurityError: x");
     expect(formatOfflineInfo(base)).toHaveLength(2);
+  });
+});
+
+describe('diagnostic : ligne du pack (T-017)', () => {
+  it('R-124 diagnostic pack : absent, indisponible, chargé', () => {
+    expect(formatPackInfo({ status: 'absent' })).toBe('pack : absent');
+    expect(formatPackInfo({ status: 'unavailable' })).toBe('pack : indisponible');
+    expect(formatPackInfo({ status: 'loaded', photos: 3, ms: 812.4 })).toBe(
+      'pack : chargé (3 photos, déchiffré en 812 ms)',
+    );
   });
 });

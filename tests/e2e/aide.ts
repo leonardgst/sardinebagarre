@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { Page } from '@playwright/test';
 import { initialGame, startRound } from '../../src/logic/game';
 import { initialSave, serialize } from '../../src/logic/save';
@@ -89,4 +91,32 @@ export function sauvegardeTexte(
 ): string {
   const base = initialSave();
   return serialize({ ...base, ...reste, game: { ...base.game, ...game } });
+}
+
+const FIXTURE_PACK = join(import.meta.dirname, '..', 'fixtures', 'pack-test.bin');
+
+/** Code du pack de test (jamais un vrai code). */
+export const CODE_TEST = 'test-test-test-test';
+
+/**
+ * Sert `pack/pack.bin` : la fixture de test, ou une réponse 404.
+ * Renvoie un compteur du nombre de requêtes reçues.
+ */
+export async function servirPack(
+  page: Page,
+  mode: 'fixture' | '404' = 'fixture',
+): Promise<{ readonly count: number }> {
+  const compteur = { count: 0 };
+  await page.route('**/pack/pack.bin', async (route) => {
+    compteur.count += 1;
+    if (mode === '404') await route.fulfill({ status: 404, body: 'absent' });
+    else await route.fulfill({ status: 200, body: readFileSync(FIXTURE_PACK) });
+  });
+  return compteur;
+}
+
+/** Ouvre Réglages depuis le menu. */
+export async function ouvrirReglages(page: Page): Promise<void> {
+  await page.locator('[data-action=settings]').click();
+  await page.locator('.ecran').waitFor();
 }

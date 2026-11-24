@@ -1,5 +1,5 @@
 import { getRegisterError } from './register-error';
-import { offlineTexts } from './texts.fr';
+import { offlineTexts, packLoadedLabel, packTexts } from './texts.fr';
 
 /** Diagnostic provisoire (T-015) : état du service worker vu de la page. */
 export interface OfflineInfo {
@@ -119,4 +119,14 @@ export function formatOfflineInfo(info: OfflineInfo): string[] {
   if (info.registerError !== null)
     lines.push(`${offlineTexts.registerError} ${info.registerError}`);
   return lines;
+}
+
+/** T-017 (provisoire) : état du pack, pour mesurer R-T8 sur iPhone. */
+export type PackInfo =
+  | { readonly status: 'absent' | 'unavailable' }
+  | { readonly status: 'loaded'; readonly photos: number; readonly ms: number };
+
+export function formatPackInfo(info: PackInfo): string {
+  if (info.status === 'loaded') return packLoadedLabel(info.photos, info.ms);
+  return info.status === 'absent' ? packTexts.diagAbsent : packTexts.diagUnavailable;
 }

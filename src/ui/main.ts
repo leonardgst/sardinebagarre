@@ -1,5 +1,6 @@
 import chienSvg from './art/chien.svg?raw';
 import { createController } from './controller';
+import { createPackStore } from './pack-store';
 import { setupPwa } from './pwa';
 import { createRngs, readSeed } from './seed';
 import { loadSave, writeSave } from './storage';
@@ -26,7 +27,13 @@ const gate = setupPwa(
     : undefined,
 );
 
+const pack = createPackStore();
 const controller = createController(root, rngs, {
+  pack,
+  onPackCode(packCode) {
+    save = { ...save, packCode };
+    writeSave(save);
+  },
   initialGame: save.game,
   onMenu: gate.menuShown,
   onLeaveMenu: gate.gameStarted,
@@ -35,6 +42,9 @@ const controller = createController(root, rngs, {
     writeSave(save);
   },
 });
+
+// R-124 : au lancement, le pack est rechargé en arrière-plan avec le code sauvegardé.
+if (save.packCode) void controller.loadSavedPack(save.packCode);
 
 if (debug) {
   const { installDebug } = await import('./debug');
