@@ -20,7 +20,7 @@
 | T-012 | Mode mémo (sélection, 4 marques, Fermer) | terminée |
 | T-013 | Brancher la sauvegarde (localStorage) sur le jeu | terminée |
 | T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | fusionnée ; recette : lancement hors ligne KO sur iPhone |
-| T-015 | Afficher un diagnostic hors ligne dans Réglages | planifiée |
+| T-015 | Afficher un diagnostic hors ligne dans Réglages | fusionnée, publiée en v0.6.1 ; relevé sur iPhone à faire |
 
 ## Questions ouvertes
 _(aucune)_
@@ -132,3 +132,4 @@ _(aucune)_
 - 2026-11-24 — codeur — T-015 : diagnostic hors ligne dans Réglages (diagnostic.ts, 4 tests unitaires, 1 e2e) ; check OK (429 tests), e2e 433 passés / 10 ignorés. Reste : publier pour lire le diagnostic sur l'iPhone.
 - 2026-11-24 — codeur — T-015 : corrections de relecture D1 (lectures protégées, .catch), D2 (valeurs internes anglaises, libellés dans texts.fr.ts), D4 (erreur d'enregistrement du service worker, register-error.ts, 3e ligne du diagnostic) ; check et e2e pwa OK.
 - 2026-11-24 — Opus — T-015 : D1, D2, D4 vérifiés (check OK, build sans `__sb`) ; prête à fusionner, publication v0.6.1 sur demande.
+- 2026-11-24 — Opus — T-015 fusionnée (e2e 433 passés) ; v0.6.1 publiée (déploiement OK). Relevé du diagnostic à faire sur iPhone, dans Safari et dans l'app installée.
