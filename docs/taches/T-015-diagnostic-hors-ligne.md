@@ -72,3 +72,14 @@ Diagnostic **provisoire** : il sera retiré ou réduit avant le gel (13/12).
 - Capture : test-results/screens/iphone-se/11-reglages.png (lisible, ligne technique sur 2 lignes ; en dev : « pas encore prêt », normal).
 
 ## Relecture
+2026-11-24 — relecteur — 🟡 approuvée avec réserves (aucun point bloquant).
+Vérifications : `npm run check` OK (429 tests) ; projet e2e `pwa` OK (8/8) ; captures `11-reglages.png` (iPhone SE et paysage) lisibles, sans débordement.
+Robustesse : le diagnostic ne peut casser ni Réglages ni le jeu (écriture seulement si l'élément est encore affiché ; absence de `caches` traitée).
+Hypothèses : les trois sont distinguées (page non contrôlée, URL hors portée, service worker non installé). Limite : si « portée aucune » persiste, le diagnostic ne dit pas pourquoi l'enregistrement a échoué (`onRegisterError`).
+
+- D1. `diagnostic.ts` : la lecture de `navigator.serviceWorker.controller` n'est pas protégée ; `controller.ts` : promesse lancée sans `.catch`. Corriger avec `safe(…)` et `.catch(() => {})`.
+- D2. Libellés écrits en dur dans `diagnostic.ts` (« app », « navigateur », « aucun », « sw ») : valeurs internes en anglais dans `OfflineInfo`, traduction dans `formatOfflineInfo` via `offlineTexts`.
+- D3. Journal : statut de T-015 à mettre à jour (fait à la fusion).
+- Facultatif : afficher aussi « waiting » quand une mise à jour attend.
+
+Opus : D1 et D2 confiés au codeur, avec D4 (ajouté par Opus, d'après la limite ci-dessus) : retenir l'erreur d'enregistrement du service worker (`onRegisterError` dans `pwa.ts`) et l'afficher dans le diagnostic. Cela évite une publication de plus si l'enregistrement échoue dans l'app installée.
