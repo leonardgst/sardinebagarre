@@ -1,15 +1,17 @@
+import { getRegisterError } from './register-error';
 import { offlineTexts } from './texts.fr';
 
 /** Diagnostic provisoire (T-015) : état du service worker vu de la page. */
 export interface OfflineInfo {
   readonly hasServiceWorker: boolean;
   readonly controlled: boolean;
-  readonly mode: 'app' | 'navigateur' | '?';
+  readonly mode: 'standalone' | 'browser' | 'unknown';
   readonly page: string;
   /** URL absolue de la portée, `null` si aucun enregistrement, `'?'` si illisible. */
   readonly scope: string | null;
-  readonly workerState: 'active' | 'waiting' | 'installing' | 'aucun' | '?';
+  readonly workerState: 'active' | 'waiting' | 'installing' | 'none' | 'unknown';
   readonly cacheCount: number | '?';
+  readonly registerError: string | null;
 }
 
 interface NavigatorStandalone {
@@ -27,23 +29,25 @@ async function safe<T, F>(read: () => T | Promise<T>, fallback: F): Promise<T | 
 
 export async function collectOfflineInfo(): Promise<OfflineInfo> {
   const hasServiceWorker = 'serviceWorker' in navigator;
-  const controlled = hasServiceWorker && navigator.serviceWorker.controller !== null;
-  const mode = await safe<OfflineInfo['mode'], '?'>(
+  const controlled = hasServiceWorker
+    ? await safe(() => navigator.serviceWorker.controller !== null, false)
+    : false;
+  const mode = await safe<OfflineInfo['mode'], 'unknown'>(
     () =>
       window.matchMedia('(display-mode: standalone)').matches ||
       (navigator as unknown as NavigatorStandalone).standalone === true
-        ? 'app'
-        : 'navigateur',
-    '?',
+        ? 'standalone'
+        : 'browser',
+    'unknown',
   );
   const page = await safe(() => location.pathname + location.search, '?');
   let scope: OfflineInfo['scope'] = null;
-  let workerState: OfflineInfo['workerState'] = 'aucun';
+  let workerState: OfflineInfo['workerState'] = 'none';
   if (hasServiceWorker) {
     const reg = await safe(() => navigator.serviceWorker.getRegistration(), '?' as const);
     if (reg === '?') {
       scope = '?';
-      workerState = '?';
+      workerState = 'unknown';
     } else if (reg !== undefined) {
       scope = reg.scope;
       workerState = reg.active
@@ -52,7 +56,7 @@ export async function collectOfflineInfo(): Promise<OfflineInfo> {
           ? 'waiting'
           : reg.installing
             ? 'installing'
-            : 'aucun';
+            : 'none';
     }
   }
   const cacheCount = await safe<number, '?'>(async () => {
@@ -63,7 +67,16 @@ export async function collectOfflineInfo(): Promise<OfflineInfo> {
     }
     return total;
   }, '?');
-  return { hasServiceWorker, controlled, mode, page, scope, workerState, cacheCount };
+  return {
+    hasServiceWorker,
+    controlled,
+    mode,
+    page,
+    scope,
+    workerState,
+    cacheCount,
+    registerError: getRegisterError(),
+  };
 }
 
 function scopePath(scope: string | null): string {
@@ -76,19 +89,34 @@ function scopePath(scope: string | null): string {
   }
 }
 
-/** Deux lignes : verdict, puis ligne technique. */
+/** Deux lignes (verdict, ligne technique), plus l'erreur d'enregistrement s'il y en a une. */
 export function formatOfflineInfo(info: OfflineInfo): string[] {
   const verdict = !info.hasServiceWorker
     ? offlineTexts.unavailable
     : info.controlled
       ? offlineTexts.active
       : offlineTexts.notReady;
+  const mode =
+    info.mode === 'standalone'
+      ? offlineTexts.app
+      : info.mode === 'browser'
+        ? offlineTexts.browser
+        : '?';
+  const state =
+    info.workerState === 'none'
+      ? offlineTexts.none
+      : info.workerState === 'unknown'
+        ? '?'
+        : info.workerState;
   const technical = [
-    info.mode,
+    mode,
     `${offlineTexts.page} ${info.page}`,
     `${offlineTexts.scope} ${scopePath(info.scope)}`,
-    `sw ${info.workerState}`,
+    `${offlineTexts.sw} ${state}`,
     `${offlineTexts.cache} ${info.cacheCount}`,
   ].join(' · ');
-  return [verdict, technical];
+  const lines = [verdict, technical];
+  if (info.registerError !== null)
+    lines.push(`${offlineTexts.registerError} ${info.registerError}`);
+  return lines;
 }

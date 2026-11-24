@@ -188,16 +188,18 @@ export function createController(
     const diag = screen.querySelector<HTMLElement>('.ecran-diagnostic');
     if (diag) {
       // T-015 (provisoire) : rempli après coup ; rien si l'écran a été quitté entre-temps.
-      void collectOfflineInfo().then((info) => {
-        if (!diag.isConnected) return;
-        diag.replaceChildren(
-          ...formatOfflineInfo(info).map((ligne) => {
-            const div = document.createElement('div');
-            div.textContent = ligne;
-            return div;
-          }),
-        );
-      });
+      void collectOfflineInfo()
+        .then((info) => {
+          if (!diag.isConnected) return;
+          diag.replaceChildren(
+            ...formatOfflineInfo(info).map((ligne) => {
+              const div = document.createElement('div');
+              div.textContent = ligne;
+              return div;
+            }),
+          );
+        })
+        .catch(() => {});
     }
   }
 

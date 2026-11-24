@@ -4,11 +4,12 @@ import { formatOfflineInfo, type OfflineInfo } from '../../src/ui/diagnostic';
 const base: OfflineInfo = {
   hasServiceWorker: true,
   controlled: true,
-  mode: 'app',
+  mode: 'standalone',
   page: '/sardinebagarre/',
   scope: 'https://x/sardinebagarre/',
   workerState: 'active',
   cacheCount: 9,
+  registerError: null,
 };
 
 describe('diagnostic hors ligne', () => {
@@ -23,7 +24,7 @@ describe('diagnostic hors ligne', () => {
   });
 
   it('ADR-001 diagnostic : enregistré mais non contrôlé → pas encore prêt', () => {
-    const [l1] = formatOfflineInfo({ ...base, controlled: false, mode: 'navigateur' });
+    const [l1] = formatOfflineInfo({ ...base, controlled: false, mode: 'browser' });
     expect(l1).toBe('Hors ligne : pas encore prêt');
   });
 
@@ -33,7 +34,7 @@ describe('diagnostic hors ligne', () => {
       hasServiceWorker: false,
       controlled: false,
       scope: null,
-      workerState: 'aucun',
+      workerState: 'none',
     });
     expect(lignes[0]).toBe('Hors ligne : indisponible');
     expect(lignes[1]).toContain('portée aucune');
@@ -42,5 +43,12 @@ describe('diagnostic hors ligne', () => {
   it('ADR-001 diagnostic : valeur illisible → ?', () => {
     const [, l2] = formatOfflineInfo({ ...base, cacheCount: '?' });
     expect(l2).toContain('réserve ?');
+  });
+
+  it('ADR-001 diagnostic : erreur d’enregistrement → 3e ligne', () => {
+    const lignes = formatOfflineInfo({ ...base, registerError: 'SecurityError: x' });
+    expect(lignes).toHaveLength(3);
+    expect(lignes[2]).toBe("Erreur d'enregistrement : SecurityError: x");
+    expect(formatOfflineInfo(base)).toHaveLength(2);
   });
 });

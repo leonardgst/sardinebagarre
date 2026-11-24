@@ -1,4 +1,5 @@
 import { registerSW } from 'virtual:pwa-register';
+import { setRegisterError } from './register-error';
 import { createUpdateGate, type UpdateGate } from './update-gate';
 
 /**
@@ -16,6 +17,7 @@ export function setupPwa(apply?: () => void): UpdateGate {
     updateSW = registerSW({
       onNeedRefresh: () => gate.needRefresh(),
       onNeedReload: () => gate.reloadRequested(),
+      onRegisterError: setRegisterError,
     });
   }
   return gate;

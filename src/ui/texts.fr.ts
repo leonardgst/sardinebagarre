@@ -30,10 +30,16 @@ export const offlineTexts = {
   active: 'Hors ligne : actif',
   notReady: 'Hors ligne : pas encore prêt',
   unavailable: 'Hors ligne : indisponible',
-  noScope: 'aucune',
+
   page: 'page',
   scope: 'portée',
   cache: 'réserve',
+  app: 'app',
+  browser: 'navigateur',
+  none: 'aucun',
+  noScope: 'aucune',
+  sw: 'sw',
+  registerError: "Erreur d'enregistrement :",
 } as const;
 
 /** UI-01 : bouton du menu. */
