@@ -83,3 +83,5 @@ Hypothèses : les trois sont distinguées (page non contrôlée, URL hors porté
 - Facultatif : afficher aussi « waiting » quand une mise à jour attend.
 
 Opus : D1 et D2 confiés au codeur, avec D4 (ajouté par Opus, d'après la limite ci-dessus) : retenir l'erreur d'enregistrement du service worker (`onRegisterError` dans `pwa.ts`) et l'afficher dans le diagnostic. Cela évite une publication de plus si l'enregistrement échoue dans l'app installée.
+
+2026-11-24 — Opus — D1, D2 et D4 vérifiés (commit c77408a) : 🟢. `npm run check` OK (430 tests), build sans `__sb`. L'erreur d'enregistrement est conservée dans `src/ui/register-error.ts` plutôt que dans `pwa.ts` (écart accepté : Vitest ne résout pas `virtual:pwa-register`).
