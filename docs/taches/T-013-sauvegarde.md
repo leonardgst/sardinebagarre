@@ -97,4 +97,14 @@ _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 - Écarts : pas de test unitaire de `storage.ts` (Vitest sans `localStorage`, couvert par l'e2e). `npm run screens` passe ; aucune modification d'interface, captures non rouvertes.
 
 ## Relecture
-_(verdict du relecteur, avec la date)_
+### Relecture du 2026-11-24 (relecteur) — 🟢 APPROUVÉ
+Vérifications : `npm run check` OK (419) · e2e OK (5 profils, 440 réussis, 10 ignorés) · tests de rechargement CL-23/CL-18/R-55 en --repeat-each 3 sur 5 profils : 45 réussis · build OK, `__sb` absent de dist/.
+Conformité : R-100 (aucune écriture au chargement, écriture à la finalisation et à « Quitter la table »), R-101 (settings/welcomeSeen/packCode conservés d'une écriture à l'autre), R-102/CL-22 (corrompue, version inconnue, champ isolé, stockage indisponible), R-55/CL-23 (sauvegarde avant `phase = 'ending'`), R-68/CL-18 (sauvegarde inchangée octet pour octet), R-53 (boîte pleine au lancement, « Jouer » inerte), R-51/C3. `localStorage` seulement dans storage.ts ; src/logic inchangé.
+Piège addInitScript évité : préparation par evaluate + reload ; R-67 et CL-23 rechargent après une écriture de l'app.
+Contre-épreuves du relecteur (annulées) : e. sauvegarde après l'animation de fin → R-55, CL-23, R-101 échouent ; f. écriture au chargement → « premier lancement » échoue ; g. gain en cours sauvegardé → CL-18 échoue.
+Mineurs (non bloquants) :
+- M1. Test CL-23 : vérifier `phase() === 'ending'` juste avant reload, puis vérifier historique (WON, niveau 1) et `stats.won === 1` après rechargement.
+- M2. journal.md : statut de T-013 et « Prochaines étapes » à mettre à jour.
+- M3. spec R-68 et CL-18 : préciser « retour au menu (ADR-019) ».
+
+2026-11-24 — Opus — M2 et M3 faits (journal, spec annotée). M1 confié au codeur.

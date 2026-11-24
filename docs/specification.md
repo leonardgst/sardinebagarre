@@ -239,7 +239,7 @@ Formulé simplement :
 - **R-67** Fidélité DS (S1) : quitter la Voltorbataille remet le niveau à 1 et vide l'historique. Ici, **fermer l'app ne le fait pas** (décision Q9 : le niveau est sauvegardé). Le menu propose « Quitter la table », qui applique R-67 après confirmation.
 
 ### 6.5 Partie interrompue (décision Q9)
-- **R-68** Si l'app est fermée (ou rechargée par iOS) pendant une partie `EN_COURS`, cette partie est **abandonnée sans trace** : son gain n'est pas encaissé, elle n'entre **pas** dans l'historique, et le niveau, l'historique et le total de jetons restent ceux d'avant la partie. Au retour, une **nouvelle partie** commence au même niveau.
+- **R-68** Si l'app est fermée (ou rechargée par iOS) pendant une partie `EN_COURS`, cette partie est **abandonnée sans trace** : son gain n'est pas encaissé, elle n'entre **pas** dans l'historique, et le niveau, l'historique et le total de jetons restent ceux d'avant la partie. Au retour, une **nouvelle partie** commence au même niveau (depuis ADR-019 : retour au menu, « Jouer » lance la partie à ce niveau).
 - Conséquence acceptée : on peut « changer de plateau » sans pénalité en fermant l'app (dans l'original, abandonner pouvait faire descendre de niveau).
 
 ---
@@ -292,7 +292,7 @@ Formulé simplement :
 | CL-15 | Victoire au niveau 7 | Reste au niveau 7 (R-65) |
 | CL-16 | Défaite au niveau 8 après 10 cartes | Niveau 7 |
 | CL-17 | 5 parties ≥ 8 cartes sans défaite, la dernière au niveau 5 | Niveau 8 |
-| CL-18 | Fermer l'app en pleine partie (niveau 5, gain 72), la rouvrir | Nouveau plateau au **niveau 5** ; total de jetons inchangé (les 72 sont perdus) ; historique inchangé (R-68) |
+| CL-18 | Fermer l'app en pleine partie (niveau 5, gain 72), la rouvrir | Menu (ADR-019), puis nouveau plateau au **niveau 5** ; total de jetons inchangé (les 72 sont perdus) ; historique inchangé (R-68) |
 | CL-19 | Double-toucher rapide sur une carte | Un seul retournement ; les entrées sont bloquées pendant l'animation de retournement |
 | CL-20 | Toucher pendant une animation de fin (révélation, défilement des jetons) | Accélère ou termine l'animation (fidèle à S1), ne déclenche aucune autre action |
 | CL-21 | Niveau 1 : les indicateurs d'une ligne sans Voltorbe | Toutes ses cartes sont sûres. Le jeu ne les retourne **pas** automatiquement |
