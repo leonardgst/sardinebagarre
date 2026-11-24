@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { encryptPlain, lireSource } from './pack-lib.mjs';
+import { encryptPlain, lireSource, verifierCode } from './pack-lib.mjs';
 
 const RACINE = fileURLToPath(new URL('..', import.meta.url));
 const CODE_TEST = 'test-test-test-test';
@@ -19,6 +19,7 @@ async function aplat(fichier, largeur, hauteur, couleur) {
   await writeFile(fichier, octets);
 }
 
+verifierCode(CODE_TEST, { autoriserCodeDeTest: true });
 const dossier = await mkdtemp(join(tmpdir(), 'sardine-pack-test-'));
 try {
   await mkdir(join(dossier, 'photos'));

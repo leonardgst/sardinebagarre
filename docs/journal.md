@@ -143,3 +143,4 @@ _(aucune)_
 - 2026-11-24 — codeur — T-016 terminée : fixture (9 355 o), dérivation ~86 ms et déchiffrement ~0,5 ms en Node, check vert (444 tests).
 - 2026-11-24 — relecteur — T-016 relue : 🟡 (aucune fuite ; à corriger : validation de `decodePack` et de `pack.json`, refus des codes publiés, code ASCII imposé, LISEZMOI pour non-développeur).
 - 2026-11-24 — Opus — T-016 : E1 à E11 confiés au codeur ; décisions : prix obligatoire au-delà de la 12ᵉ photo, code ASCII imposé (tirets typographiques acceptés comme séparateurs).
+- 2026-11-24 — codeur — T-016 : corrections de relecture E1 à E11 (decodePack validé, codes publiés refusés, forme ASCII du code, tirets typographiques, validation de pack.json, prix obligatoire dès la 13e photo, saisie masquée durcie, LISEZMOI réécrit) ; check vert (492 tests).

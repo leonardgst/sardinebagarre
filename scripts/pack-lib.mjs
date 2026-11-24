@@ -15,24 +15,33 @@ export const QUALITE_JPEG = 80;
 
 const encodeur = new TextEncoder();
 
-/** R-122 : NFD sans diacritiques, minuscules, séparateurs → un seul « - », sans « - » en bordure. */
+/** R-122 : NFD sans diacritiques, minuscules, séparateurs (dont U+2010 à U+2015) → un seul « - ». */
 export function normalizeCode(code) {
   return code
     .normalize('NFD')
     .replace(/\p{M}+/gu, '')
     .toLowerCase()
-    .replace(/[\s\-_.]+/g, '-')
+    .replace(/[\s\-_.‐-―]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
 
-/** R-123 : refuse un code de moins de 4 mots ou de moins de 16 caractères (après normalisation). */
-export function verifierCode(code) {
+/** Codes déjà publiés dans le dépôt : interdits pour un vrai pack. */
+export const CODES_PUBLICS = ['croquette-tempete-violon-sardine', 'test-test-test-test'];
+const CODE_DE_TEST = 'test-test-test-test';
+
+/**
+ * R-123 : 4 mots ASCII au moins, 16 caractères au moins après normalisation, et pas un code public.
+ * `autoriserCodeDeTest` n'est activé que par pack-de-test.mjs.
+ */
+export function verifierCode(code, { autoriserCodeDeTest = false } = {}) {
   const n = normalizeCode(code);
-  const mots = n === '' ? 0 : n.split('-').length;
-  if (mots < 4 || n.length < 16) {
+  if (!/^[a-z0-9]+(-[a-z0-9]+){3,}$/.test(n) || n.length < 16) {
     throw new Error(
-      'Code trop faible : il faut au moins 4 mots et 16 caractères (par exemple quatre mots tirés au hasard, séparés par des tirets).',
+      'Code refusé : il faut au moins 4 mots (lettres sans accent et chiffres) séparés par des tirets, 16 caractères au moins.',
     );
+  }
+  if (CODES_PUBLICS.includes(n) && !(autoriserCodeDeTest && n === CODE_DE_TEST)) {
+    throw new Error('Code refusé : ce code est publié dans le dépôt. Choisis-en un autre.');
   }
   return n;
 }
@@ -55,9 +64,9 @@ async function deriveKey(code, sel) {
 }
 
 /** R-122 : SBPACK1 + sel (16) + IV (12) + chiffré AES-GCM (étiquette comprise). */
-export async function encryptPlain(plain, code, options = {}) {
-  const sel = options.salt ?? crypto.getRandomValues(new Uint8Array(TAILLE_SEL));
-  const iv = options.iv ?? crypto.getRandomValues(new Uint8Array(TAILLE_IV));
+export async function encryptPlain(plain, code) {
+  const sel = crypto.getRandomValues(new Uint8Array(TAILLE_SEL));
+  const iv = crypto.getRandomValues(new Uint8Array(TAILLE_IV));
   const cle = await deriveKey(code, sel);
   const chiffre = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, cle, plain));
   const entete = encodeur.encode(ENTETE_EXTERNE);
@@ -163,40 +172,98 @@ export async function recadrerTete(octets, cadrage = {}) {
   );
 }
 
+const estTexte = (v) => typeof v === 'string';
+const estNombre = (v) => typeof v === 'number' && Number.isFinite(v);
+
+async function lireFichier(dossier, nom, champ) {
+  if (!estTexte(nom) || nom === '') {
+    throw new Error(`pack.json : ${champ} doit être un nom de fichier.`);
+  }
+  try {
+    return await readFile(join(dossier, nom));
+  } catch {
+    throw new Error(`pack.json : ${champ} : le fichier « ${nom} » est introuvable.`);
+  }
+}
+
 /**
  * Lit un dossier source (format `pack.json` en français) et produit le clair.
+ * Les erreurs de contenu sont des messages en français qui nomment le champ.
  * @param {string} dossier chemin du dossier source (jamais prive/ en test)
  */
 export async function lireSource(dossier) {
-  const config = JSON.parse(await readFile(join(dossier, 'pack.json'), 'utf8'));
+  let config;
+  try {
+    config = JSON.parse(await readFile(join(dossier, 'pack.json'), 'utf8'));
+  } catch (erreur) {
+    throw new Error(
+      erreur instanceof SyntaxError
+        ? `pack.json illisible : ${erreur.message} (virgule oubliée ou en trop, guillemet manquant ?)`
+        : 'pack.json est introuvable dans le dossier source.',
+    );
+  }
+  if (typeof config !== 'object' || config === null || Array.isArray(config)) {
+    throw new Error('pack.json doit contenir un objet.');
+  }
+  if (config.bienvenue !== undefined && !estTexte(config.bienvenue)) {
+    throw new Error('pack.json : « bienvenue » doit être un texte.');
+  }
   const tete = config.tete ?? {};
+  const cadrage = tete.cadrage ?? {};
+  for (const cle of ['x', 'y', 'zoom']) {
+    if (cadrage[cle] !== undefined && !estNombre(cadrage[cle])) {
+      throw new Error(`pack.json : tete.cadrage.${cle} doit être un nombre.`);
+    }
+  }
   const head = {
     bytes: await recadrerTete(
-      await readFile(join(dossier, tete.fichier ?? 'sardine-tete.jpg')),
-      tete.cadrage,
+      await lireFichier(dossier, tete.fichier ?? 'sardine-tete.jpg', 'tete.fichier'),
+      cadrage,
     ),
     type: 'image/jpeg',
   };
-  const photos = [];
   const liste = config.photos ?? [];
+  if (!Array.isArray(liste)) throw new Error('pack.json : « photos » doit être une liste.');
+  const photos = [];
   for (const [i, p] of liste.entries()) {
+    const rang = i + 1;
+    if (typeof p !== 'object' || p === null) {
+      throw new Error(`pack.json : la photo ${rang} doit être un objet.`);
+    }
+    if (p.legende !== undefined && !estTexte(p.legende)) {
+      throw new Error(`pack.json : photo ${rang} : « legende » doit être un texte.`);
+    }
+    if (p.prix !== undefined && !(Number.isInteger(p.prix) && p.prix > 0)) {
+      throw new Error(`pack.json : photo ${rang} : « prix » doit être un entier positif.`);
+    }
+    if (p.prix === undefined && i >= PRIX_PAR_DEFAUT.length) {
+      throw new Error(
+        `pack.json : photo ${rang} : « prix » est obligatoire à partir de la photo ${PRIX_PAR_DEFAUT.length + 1}.`,
+      );
+    }
     photos.push({
-      id: `p${String(i + 1).padStart(2, '0')}`,
+      id: `p${String(rang).padStart(2, '0')}`,
       caption: p.legende ?? '',
-      price: p.prix ?? PRIX_PAR_DEFAUT[i] ?? PRIX_PAR_DEFAUT[PRIX_PAR_DEFAUT.length - 1],
-      bytes: await reduirePhoto(await readFile(join(dossier, p.fichier))),
+      price: p.prix ?? PRIX_PAR_DEFAUT[i],
+      bytes: await reduirePhoto(
+        await lireFichier(dossier, p.fichier, `photo ${rang} : « fichier »`),
+      ),
       type: 'image/jpeg',
     });
   }
   const messages = {};
   for (const [cleFr, cleEn] of Object.entries(CLES_MESSAGES)) {
-    const liste = config.messages?.[cleFr];
-    if (Array.isArray(liste) && liste.length > 0) messages[cleEn] = liste;
+    const textes = config.messages?.[cleFr];
+    if (textes === undefined) continue;
+    if (!Array.isArray(textes) || !textes.every(estTexte)) {
+      throw new Error(`pack.json : messages.${cleFr} doit être une liste de textes.`);
+    }
+    if (textes.length > 0) messages[cleEn] = textes;
   }
   const contenu = { welcome: config.bienvenue ?? '', head, photos, messages };
   if (config.aboiement) {
     contenu.bark = {
-      bytes: new Uint8Array(await readFile(join(dossier, config.aboiement))),
+      bytes: new Uint8Array(await lireFichier(dossier, config.aboiement, 'aboiement')),
       type: TYPES_SON[extname(config.aboiement).toLowerCase()] ?? 'application/octet-stream',
     };
   }

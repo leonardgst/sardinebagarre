@@ -113,6 +113,105 @@ describe('pack.ts', () => {
     TIMEOUT,
   );
 
+  it('R-122 tirets typographiques U+2010 à U+2015 = séparateurs (script et jeu)', () => {
+    for (const tiret of ['‐', '‑', '‒', '–', '—', '―']) {
+      const s = `Alpha${tiret}bravo ${tiret}${tiret} charlie_delta`;
+      expect(normalizeCode(s)).toBe('alpha-bravo-charlie-delta');
+      expect(normalizeNode(s)).toBe('alpha-bravo-charlie-delta');
+    }
+  });
+
+  it(
+    'R-122 aller-retour avec aboiement',
+    async () => {
+      const contenu = {
+        ...petitContenu(),
+        bark: { bytes: new Uint8Array([9, 8, 7]), type: 'audio/mp4' },
+      };
+      const fichier = await encryptPlain(encodePlain(contenu), CODE);
+      const pack = decodePack(await decryptPack(fichier, CODE));
+      expect(pack.index.bark?.type).toBe('audio/mp4');
+      expect([...assetBytes(pack, pack.index.bark as never)]).toEqual([9, 8, 7]);
+    },
+    TIMEOUT,
+  );
+
+  describe('E1 index invalide → BadPackError', () => {
+    const clair = (index: unknown, binaire = 4): Uint8Array => {
+      const json = new TextEncoder().encode(JSON.stringify(index));
+      const sortie = new Uint8Array(11 + json.length + binaire);
+      sortie.set(new TextEncoder().encode('SBDATA1'), 0);
+      new DataView(sortie.buffer).setUint32(7, json.length, true);
+      sortie.set(json, 11);
+      return sortie;
+    };
+    const asset = { offset: 0, length: 2, type: 'image/jpeg' };
+    const valide = () => ({
+      version: 1,
+      welcome: 'x',
+      head: asset,
+      photos: [{ id: 'p01', caption: 'c', price: 100, asset }],
+      messages: { won: ['a'] },
+    });
+
+    it('R-122 index valide accepté', () => {
+      expect(() => decodePack(clair(valide()))).not.toThrow();
+    });
+
+    it.each([
+      ['en-tête SBDATA1 absent', () => new Uint8Array(30)],
+      ['contenu tronqué', () => new TextEncoder().encode('SBDATA1ab')],
+      [
+        'index tronqué',
+        () => {
+          const c = clair(valide());
+          new DataView(c.buffer).setUint32(7, 99999, true);
+          return c;
+        },
+      ],
+      [
+        'JSON illisible',
+        () => {
+          const c = clair(valide());
+          c[12] = 0x7e;
+          return c;
+        },
+      ],
+      ['index null', () => clair(null)],
+      ['version 2', () => clair({ ...valide(), version: 2 })],
+      ['welcome absent', () => clair({ ...valide(), welcome: undefined })],
+      ['head absent', () => clair({ ...valide(), head: undefined })],
+      ['asset hors zone', () => clair({ ...valide(), head: { ...asset, length: 50 } })],
+      ['photos absent', () => clair({ ...valide(), photos: undefined })],
+      ['photos pas une liste', () => clair({ ...valide(), photos: {} })],
+      ['photo null', () => clair({ ...valide(), photos: [null] })],
+      ['id numérique', () => clair({ ...valide(), photos: [{ ...valide().photos[0], id: 1 }] })],
+      [
+        'caption absente',
+        () => clair({ ...valide(), photos: [{ ...valide().photos[0], caption: 3 }] }),
+      ],
+      [
+        'prix texte',
+        () => clair({ ...valide(), photos: [{ ...valide().photos[0], price: '100' }] }),
+      ],
+      [
+        'prix négatif',
+        () => clair({ ...valide(), photos: [{ ...valide().photos[0], price: -5 }] }),
+      ],
+      [
+        'photo sans asset',
+        () => clair({ ...valide(), photos: [{ id: 'a', caption: 'b', price: 1 }] }),
+      ],
+      ['messages absent', () => clair({ ...valide(), messages: undefined })],
+      ['messages liste', () => clair({ ...valide(), messages: [] })],
+      ['messages.won pas une liste', () => clair({ ...valide(), messages: { won: 'a' } })],
+      ['messages.won avec un nombre', () => clair({ ...valide(), messages: { won: [1] } })],
+      ['bark invalide', () => clair({ ...valide(), bark: { offset: 0 } })],
+    ])('%s', (_nom, fabrique) => {
+      expect(() => decodePack(fabrique())).toThrow(BadPackError);
+    });
+  });
+
   it('R-127 fixture de test bien formée', () => {
     const octets = readFileSync(FIXTURE);
     expect(octets.subarray(0, 7).toString('latin1')).toBe('SBPACK1');

@@ -72,22 +72,20 @@ export function findViolations(paths, packHeader, readText, fixtureHeader = null
       );
     }
   }
-  if (packHeader !== null) {
-    const attendu = new TextEncoder().encode(ENTETE_PACK);
-    const ok = packHeader.length >= attendu.length && attendu.every((o, i) => packHeader[i] === o);
-    if (!ok) {
-      violations.push(`${CHEMIN_PACK} : l'en-tête ne commence pas par ${ENTETE_PACK}`);
-    }
-  }
-  if (fixtureHeader !== null) {
-    const attendu = new TextEncoder().encode(ENTETE_PACK);
-    const ok =
-      fixtureHeader.length >= attendu.length && attendu.every((o, i) => fixtureHeader[i] === o);
-    if (!ok) {
-      violations.push(`${CHEMIN_FIXTURE} : l'en-tête ne commence pas par ${ENTETE_PACK}`);
+  for (const [chemin, entete] of [
+    [CHEMIN_PACK, packHeader],
+    [CHEMIN_FIXTURE, fixtureHeader],
+  ]) {
+    if (entete !== null && !enteteValide(entete)) {
+      violations.push(`${chemin} : l'en-tête ne commence pas par ${ENTETE_PACK}`);
     }
   }
   return violations;
+}
+
+function enteteValide(octets) {
+  const attendu = new TextEncoder().encode(ENTETE_PACK);
+  return octets.length >= attendu.length && attendu.every((o, i) => octets[i] === o);
 }
 
 function lireEntetePack(chemin = CHEMIN_PACK) {

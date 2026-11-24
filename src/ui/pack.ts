@@ -53,13 +53,13 @@ const TAILLE_ETIQUETTE = 16;
 const ITERATIONS = 600_000;
 const DEBUT_CHIFFRE = ENTETE_EXTERNE.length + TAILLE_SEL + TAILLE_IV;
 
-/** R-122 : NFD sans diacritiques, minuscules, séparateurs → un seul « - », sans « - » en bordure. */
+/** R-122 : NFD sans diacritiques, minuscules, séparateurs (dont U+2010 à U+2015) → un seul « - ». */
 export function normalizeCode(code: string): string {
   return code
     .normalize('NFD')
     .replace(/\p{M}+/gu, '')
     .toLowerCase()
-    .replace(/[\s\-_.]+/g, '-')
+    .replace(/[\s\-_.‐-―]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
 
@@ -124,23 +124,48 @@ export function decodePack(plain: Uint8Array): DecodedPack {
   );
   const debutJson = debutLongueur + 4;
   if (debutJson + longueur > plain.length) throw new BadPackError('index tronqué');
-  let index: PackIndex;
+  let index: unknown;
   try {
     index = JSON.parse(new TextDecoder().decode(plain.subarray(debutJson, debutJson + longueur)));
   } catch {
     throw new BadPackError('index illisible');
   }
   const binary = plain.subarray(debutJson + longueur);
-  const assets = [index?.head, ...(index?.photos ?? []).map((p) => p?.asset)];
-  if (index?.bark) assets.push(index.bark);
-  if (
-    index?.version !== 1 ||
-    !Array.isArray(index.photos) ||
-    !assets.every((a) => assetValide(a, binary.length))
-  ) {
-    throw new BadPackError('index incohérent');
-  }
+  if (!indexValide(index, binary.length)) throw new BadPackError('index incohérent');
   return { index, binary };
+}
+
+const CLES_MESSAGES: readonly MessageKind[] = [
+  'sardine',
+  'won',
+  'suspense',
+  'levelUp',
+  'levelDown',
+];
+
+function indexValide(x: unknown, tailleBinaire: number): x is PackIndex {
+  if (typeof x !== 'object' || x === null) return false;
+  const o = x as Record<string, unknown>;
+  if (o.version !== 1 || typeof o.welcome !== 'string') return false;
+  if (!assetValide(o.head, tailleBinaire)) return false;
+  if (o.bark !== undefined && !assetValide(o.bark, tailleBinaire)) return false;
+  if (!Array.isArray(o.photos)) return false;
+  for (const p of o.photos as unknown[]) {
+    if (typeof p !== 'object' || p === null) return false;
+    const q = p as Record<string, unknown>;
+    if (typeof q.id !== 'string' || typeof q.caption !== 'string') return false;
+    if (typeof q.price !== 'number' || !Number.isInteger(q.price) || q.price <= 0) return false;
+    if (!assetValide(q.asset, tailleBinaire)) return false;
+  }
+  if (typeof o.messages !== 'object' || o.messages === null || Array.isArray(o.messages)) {
+    return false;
+  }
+  const m = o.messages as Record<string, unknown>;
+  return CLES_MESSAGES.every(
+    (cle) =>
+      m[cle] === undefined ||
+      (Array.isArray(m[cle]) && (m[cle] as unknown[]).every((t) => typeof t === 'string')),
+  );
 }
 
 /** Octets d'un asset (vue sur la zone binaire, sans copie). */
