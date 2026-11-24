@@ -59,9 +59,9 @@ describe('pack.ts', () => {
       expect(pack.index.messages.won).toEqual(['Bravo']);
       expect(pack.index.photos.map((p) => p.price)).toEqual([100, 200]);
       expect([...assetBytes(pack, pack.index.head)]).toEqual([1, 2, 3]);
-      const [p1, p2] = pack.index.photos;
-      expect([...assetBytes(pack, p1!.asset)]).toEqual([4, 5]);
-      expect([...assetBytes(pack, p2!.asset)]).toEqual([6, 7, 8, 9]);
+      const [p1, p2] = pack.index.photos.map((p) => assetBytes(pack, p.asset));
+      expect([...(p1 ?? [])]).toEqual([4, 5]);
+      expect([...(p2 ?? [])]).toEqual([6, 7, 8, 9]);
     },
     TIMEOUT,
   );

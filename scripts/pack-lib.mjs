@@ -202,3 +202,14 @@ export async function lireSource(dossier) {
   }
   return encodePlain(contenu);
 }
+
+/** Relit l'index JSON d'un clair produit par encodePlain. */
+export function lireIndex(clair) {
+  const debut = ENTETE_CLAIR.length;
+  const longueur = new DataView(clair.buffer, clair.byteOffset, clair.byteLength).getUint32(
+    debut,
+    true,
+  );
+  const json = clair.subarray(debut + 4, debut + 4 + longueur);
+  return JSON.parse(new TextDecoder().decode(json));
+}

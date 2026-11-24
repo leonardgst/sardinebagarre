@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | terminée |
 | Étape du plan | 3.3 (1ʳᵉ moitié ; l'intégration au jeu sera faite par T-017) |
 | Branche | `t-016-pack-format` |
 | Estimation | M (1–3 h) |
@@ -117,12 +117,12 @@ L'humain peut lancer `npm run pack` pour chiffrer `prive/` dans `public/pack/pac
 | `R-127 fixture de test bien formée` | `tests/fixtures/pack-test.bin` | commence par `SBPACK1` |
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe, ainsi que `E2E_PORT=5199 npm run e2e` (aucune régression).
-- [ ] `npm run pack:test` reproduit la fixture. Le contenu change à chaque fois à cause du sel, mais reste valide.
-- [ ] `npm run pack -- --source <dossier temporaire>` avec `PACK_CODE` fonctionne (test automatique).
-- [ ] Le codeur ne lance **jamais** `npm run pack` sans `--source`, car le script lirait alors `prive/`.
-- [ ] Aucune image n'est commitée hors des dossiers autorisés ; `git status` est vérifié avant chaque commit.
-- [ ] Le compte rendu note le temps de dérivation et de déchiffrement de la fixture en Node (repère pour R-T8).
+- [x] `npm run check` passe, ainsi que `E2E_PORT=5199 npm run e2e` (aucune régression).
+- [x] `npm run pack:test` reproduit la fixture. Le contenu change à chaque fois à cause du sel, mais reste valide.
+- [x] `npm run pack -- --source <dossier temporaire>` avec `PACK_CODE` fonctionne (test automatique).
+- [x] Le codeur ne lance **jamais** `npm run pack` sans `--source`, car le script lirait alors `prive/`.
+- [x] Aucune image n'est commitée hors des dossiers autorisés ; `git status` est vérifié avant chaque commit.
+- [x] Le compte rendu note le temps de dérivation et de déchiffrement de la fixture en Node (repère pour R-T8).
 
 ## Pièges connus
 - En Node 24 comme dans Vitest, `globalThis.crypto.subtle` existe : pas besoin d'importer `node:crypto` dans `pack.ts`.
@@ -131,9 +131,9 @@ L'humain peut lancer `npm run pack` pour chiffrer `prive/` dans `public/pack/pac
 - Taille : le service worker n'embarque que les fichiers de 10 Mo au plus. Le script affiche un **avertissement** au-delà de 8 Mo.
 
 ## Questions
-- `npm i -D sharp` a été refusé par les permissions. Il faut l'autoriser (ou installer sharp à la main, avec mise à jour de `package.json` et du lock), puis lancer `npm run pack:test` pour créer la fixture.
+- (résolue) sharp installé par l'humain.
 
 ## Compte rendu
-INCOMPLET. Écrits : `scripts/pack-lib.mjs`, `pack.mjs`, `pack-de-test.mjs`, `src/ui/pack.ts`, `prive-exemple/`, contrôle de la fixture dans le vérificateur, tests (`tests/ui/pack.test.ts`, `tests/scripts/pack.test.ts`). Non fait faute de sharp : dépendance dans `package.json` et le lock, fixture, tests d'image, `npm run check` complet, e2e, mesures de temps.
+Terminée. Fixture `tests/fixtures/pack-test.bin` : 9 355 octets. En Node 24 : dérivation PBKDF2 (600 000 itérations) environ 86 ms, déchiffrement AES-GCM environ 0,5 ms (repère R-T8). `npm run check` : 444 tests verts. sharp ^0.35.5 installé par l'humain. Écart : ajout de `lireIndex` dans pack-lib (remplace les décalages en dur de pack.mjs).
 
 ## Relecture

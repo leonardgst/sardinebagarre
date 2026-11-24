@@ -4,7 +4,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { encryptPlain, lireSource, verifierCode } from './pack-lib.mjs';
+import { encryptPlain, lireIndex, lireSource, verifierCode } from './pack-lib.mjs';
 
 const RACINE = fileURLToPath(new URL('..', import.meta.url));
 const SEUIL_AVERTISSEMENT = 8 * 1024 * 1024;
@@ -78,11 +78,7 @@ async function main() {
   const fichier = await encryptPlain(clair, code);
   await mkdir(dirname(sortie), { recursive: true });
   await writeFile(sortie, fichier);
-  const nbPhotos = JSON.parse(
-    new TextDecoder().decode(
-      clair.subarray(11, 11 + new DataView(clair.buffer, clair.byteOffset).getUint32(7, true)),
-    ),
-  ).photos.length;
+  const nbPhotos = lireIndex(clair).photos.length;
   console.log(
     `Pack écrit : ${nbPhotos} photo(s), ${(fichier.length / 1024).toFixed(0)} Ko, ${((Date.now() - debut) / 1000).toFixed(1)} s.`,
   );

@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import sharp from 'sharp';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { assetBytes, decodePack, decryptPack } from '../../src/ui/pack';
+import { type Asset, assetBytes, decodePack, decryptPack } from '../../src/ui/pack';
 
 const RACINE = join(import.meta.dirname, '..', '..');
 const SCRIPT = join(RACINE, 'scripts', 'pack.mjs');
@@ -65,7 +65,9 @@ describe('npm run pack', () => {
       expect(r.stdout).not.toContain(CODE);
       const pack = decodePack(await decryptPack(new Uint8Array(readFileSync(sortie)), CODE));
       expect(pack.index.photos[1]?.price).toBe(200); // R-115
-      const photo = await sharp(assetBytes(pack, pack.index.photos[0]!.asset)).metadata();
+      const photo = await sharp(
+        assetBytes(pack, (pack.index.photos[0] as { asset: Asset }).asset),
+      ).metadata();
       expect(photo.format).toBe('jpeg');
       expect(photo.width).toBeLessThanOrEqual(1280); // R-121
       const tete = await sharp(assetBytes(pack, pack.index.head)).metadata();

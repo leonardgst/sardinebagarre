@@ -140,3 +140,4 @@ _(aucune)_
 - 2026-11-24 — Opus — T-014 terminée (recette complète OK). T-015 terminée ; diagnostic provisoire conservé jusqu'au gel.
 - 2026-11-24 — Opus — T-016 planifiée (étape 3.3, 1ʳᵉ moitié) : normalisation du code (espaces, tirets, accents et majuscules indifférents), format clair `SBDATA1` + index JSON + fichiers, tête recadrée en carré de 512 px par le script.
 - 2026-11-24 — codeur — T-016 : pack-lib, pack.mjs, pack-de-test.mjs, pack.ts, prive-exemple, contrôle de la fixture écrits ; tests sans sharp verts (27). **Bloqué** : `npm i -D sharp` refusé par les permissions, donc ni fixture, ni tests d'image, ni `npm run check` complet. À autoriser par l'humain.
+- 2026-11-24 — codeur — T-016 terminée : fixture (9 355 o), dérivation ~86 ms et déchiffrement ~0,5 ms en Node, check vert (444 tests).
