@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | implémentée (relecture à faire) |
+| Statut | terminée |
 | Étape du plan | 2.4 |
 | Branche | `t-012-memo` |
 | Estimation | M (1 à 2 h) |
@@ -146,3 +146,5 @@ check OK (419), e2e 315 réussis / 10 ignorés, captures 45 (10-memo vue sur SE,
 Décision d'Opus pour C3 : bouton pressé = aspect d'une pastille allumée (fond bordeaux, chiffre crème) ; bouton non pressé = fond crème, chiffre bordeaux, liseré doré.
 
 2026-11-23 — Opus — vérification des corrections C1 à C5 (commit d0207ee) : diff conforme ; contre-épreuve C1 refaite avec le seul test « Anti-rebond double toucher sur Fermer » (rouge sans verrou à la fermeture, sur tous les profils) ; `10-memo.png` (iPhone SE) : boutons S et 2 pressés en bordeaux, comme les pastilles de la carte sélectionnée ; `npm run check` OK. 🟢 Prête pour la recette humaine.
+
+2026-11-24 — humain — Recette sur iPhone OK (8 points : panneau, sélection, marques, refus, Fermer, Quitter, nouvelle partie, doubles touchers). T-012 terminée.

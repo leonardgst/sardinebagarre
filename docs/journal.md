@@ -17,7 +17,7 @@
 | T-009 | Afficher le plateau et le bandeau (rendu statique, style Salon) | terminée |
 | T-010 | Jouer : retourner une carte, gagner, perdre, enchaîner les parties | terminée |
 | T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
-| T-012 | Mode mémo (sélection, 4 marques, Fermer) | relue 🟢, recette à faire |
+| T-012 | Mode mémo (sélection, 4 marques, Fermer) | terminée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -28,7 +28,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 2 (interface) : T-012 (étape 2.4, mémo), à implémenter.
+- Phase 2 (interface) : étape 2.5 du plan, à planifier.
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -103,3 +103,5 @@ _(aucune)_
 - 2026-11-23 — relecteur — T-012 : 🟡, fusion possible après C1 et C2 (tests manquants : anti-rebond sur Fermer, conservation et effacement de la sélection). Mineurs : C3 (couleur des boutons pressés), C4 (bits recopiés), C5 (décision 2 à compléter). Clic forcé validé par contre-épreuve ; captures SE, Pro Max et paysage conformes.
 - 2026-11-23 — codeur — T-012 : corrections de relecture C1 à C5 (tests anti-rebond Fermer et sélection, style des boutons pressés, MEMO_BITS partagé) ; check et e2e OK.
 - 2026-11-23 — Opus — T-012 : C1 à C5 vérifiés (contre-épreuve C1 refaite, capture SE vue, check OK). Reste : recette humaine, puis fusion.
+- 2026-11-24 — humain — Recette T-012 (mémo) sur iPhone OK.
+- 2026-11-24 — Opus — T-012 terminée et fusionnée dans main (non poussée).
