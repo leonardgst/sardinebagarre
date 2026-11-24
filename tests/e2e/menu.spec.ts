@@ -43,7 +43,7 @@ test('UI-01 Album, Infos, Réglages puis Retour', async ({ page }) => {
   ] as const) {
     await page.locator(`[data-action=${action}]`).click();
     await expect(page.locator('.ecran h2')).toHaveText(titre);
-    await expect(page.locator('.ecran p')).toHaveText('Bientôt ici.');
+    await expect(page.locator('.ecran-texte')).toHaveText('Bientôt ici.');
     expect(await page.evaluate(() => window.__sb?.phase())).toBe('screen');
     await page.getByRole('button', { name: 'Retour' }).click();
     await attendre(page, 'menu');
@@ -110,4 +110,12 @@ test('R-53 CL-14 boîte pleine : Jouer affiche le message et reste au menu', asy
   await expect(page.locator('.menu-message')).toHaveText(messages.boxFull);
   expect(await page.evaluate(() => window.__sb?.phase())).toBe('menu');
   await expect(page.locator('.board')).toHaveCount(0);
+});
+
+test("ADR-001 en développement, aucun service worker n'est enregistré", async ({ page }) => {
+  await ouvrirMenu(page, SEED, true);
+  const nombre = await page.evaluate(
+    async () => (await navigator.serviceWorker.getRegistrations()).length,
+  );
+  expect(nombre).toBe(0);
 });

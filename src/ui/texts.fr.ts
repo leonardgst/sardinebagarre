@@ -20,6 +20,11 @@ export const texts = {
   back: 'Retour',
 } as const;
 
+/** UI-04 : version de l'application (Réglages). */
+export function versionLabel(version: string): string {
+  return `Version ${version}`;
+}
+
 /** UI-01 : bouton du menu. */
 export function playButtonLabel(level: number): string {
   return `Jouer au niveau ${level}`;
