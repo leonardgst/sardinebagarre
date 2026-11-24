@@ -74,9 +74,14 @@ test('R-55 CL-23 recharger pendant la révélation ne perd rien', async ({ page 
   await page.waitForFunction(() => window.__sb?.phase() === 'ending');
   const coins = (await page.evaluate(() => window.__sb?.game()))?.coins ?? -1;
   expect(coins).toBeGreaterThan(0);
+  expect(await page.evaluate(() => window.__sb?.phase())).toBe('ending');
   await page.reload();
   await page.locator('.menu').waitFor();
   await verifierMenu(page, 2, coins);
+  const save = await lireSauvegarde(page);
+  expect(save?.history).toMatchObject([{ outcome: 'WON', level: 1 }]);
+  expect(save?.history).toHaveLength(1);
+  expect(save?.stats).toMatchObject({ won: 1 });
   expect(erreurs).toEqual([]);
 });
 

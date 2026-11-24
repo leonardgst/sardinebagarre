@@ -94,6 +94,7 @@ _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 - Tests : 13 e2e dans `tests/e2e/sauvegarde.spec.ts`, aides dans `aide.ts`. Rouge avant le code (iphone-15, `storage.ts` réduit à la constante) : 10 échecs et 3 réussites triviales (premier lancement, sauvegarde corrompue, stockage indisponible : l'ancien code ne lisait ni n'écrivait rien).
 - Vert : `npm run check` OK (419 tests) ; `npm run e2e` 395 réussis, 10 ignorés (déjà ignorés) ; `sauvegarde.spec.ts --repeat-each 5` sur les 5 profils : 325 réussis. `npm run build` OK, `__sb` absent de `dist/`. `localStorage` seulement dans `storage.ts` ; `git diff main --stat -- src/logic` vide.
 - Contre-épreuves (iphone-15, annulées ensuite) : a. sans `writeSave` : 6 échecs (R-55, R-42, R-67, R-101, R-51, CL-23) ; b. `initialSave()` au lieu de conserver : R-101 échoue ; c. `getItem` non protégé : « stockage indisponible » échoue ; d. `initialGame` ignoré : 7 échecs dont CL-18.
+- M1 (relecture) : le test CL-23 vérifie la phase `ending` avant le rechargement, puis l'historique (une entrée WON, niveau 1) et `stats.won === 1` ; 25 réussis avec `--repeat-each 5`, check OK.
 - Écarts : pas de test unitaire de `storage.ts` (Vitest sans `localStorage`, couvert par l'e2e). `npm run screens` passe ; aucune modification d'interface, captures non rouvertes.
 
 ## Relecture
