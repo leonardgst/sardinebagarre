@@ -129,3 +129,10 @@ test('@screens question Jouer au niveau', async ({ page }, testInfo) => {
   await attendre(page, 'dialog');
   await page.screenshot({ path: chemin(testInfo.project.name, '09-jouer-niveau.png') });
 });
+
+test('@screens réglages', async ({ page }, testInfo) => {
+  await ouvrirMenu(page, SEED);
+  await page.locator('[data-action=settings]').click();
+  await page.locator('.ecran').waitFor();
+  await page.screenshot({ path: chemin(testInfo.project.name, '11-reglages.png') });
+});

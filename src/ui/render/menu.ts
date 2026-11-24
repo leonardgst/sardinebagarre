@@ -1,5 +1,5 @@
 import { formatCoins } from '../format';
-import { playButtonLabel, texts } from '../texts.fr';
+import { playButtonLabel, texts, versionLabel } from '../texts.fr';
 import { dogHead } from './board';
 
 export type ScreenName = 'album' | 'infos' | 'settings';
@@ -52,7 +52,7 @@ export function renderMenu(level: number, total: number, message: string): HTMLE
 }
 
 /** Écran provisoire (Album, Infos, Réglages) : un titre, une phrase et Retour. */
-export function renderScreen(title: string): HTMLElement {
+export function renderScreen(title: string, version?: string): HTMLElement {
   const screen = document.createElement('main');
   screen.className = 'menu ecran';
   const h = document.createElement('h2');
@@ -63,6 +63,12 @@ export function renderScreen(title: string): HTMLElement {
   const nav = document.createElement('nav');
   nav.className = 'menu-boutons';
   nav.append(button('back', texts.back));
-  screen.append(h, p, nav);
+  if (version === undefined) screen.append(h, p, nav);
+  else {
+    const v = document.createElement('p');
+    v.className = 'ecran-version';
+    v.textContent = versionLabel(version);
+    screen.append(h, p, v, nav);
+  }
   return screen;
 }

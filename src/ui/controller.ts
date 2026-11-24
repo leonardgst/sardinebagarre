@@ -51,6 +51,10 @@ export interface ControllerOptions {
   initialGame?: GameState;
   /** Sauvegarde (R-100), appelé après `finalizeRound` et `leaveTable`. */
   onGameChange?: (game: GameState) => void;
+  /** R-104 : appelé à chaque affichage du menu. */
+  onMenu?: () => void;
+  /** R-104 : appelé quand le joueur quitte le menu (partie ou écran). */
+  onLeaveMenu?: () => void;
 }
 
 const FLIP_MS = 250;
@@ -172,11 +176,13 @@ export function createController(
     dialogEl = null;
     phase = 'menu';
     root.replaceChildren(renderMenu(game.level, game.coins, note));
+    options.onMenu?.();
   }
 
-  function showScreen(title: string): void {
+  function showScreen(title: string, version?: string): void {
     phase = 'screen';
-    root.replaceChildren(renderScreen(title));
+    options.onLeaveMenu?.();
+    root.replaceChildren(renderScreen(title, version));
   }
 
   /** Dialogue Oui/Non modal, dans `#app`. */
@@ -358,6 +364,7 @@ export function createController(
       showMenu(messages.boxFull);
       return;
     }
+    options.onLeaveMenu?.();
     round = next.round;
     shown.level = game.level;
     shown.total = game.coins;
@@ -418,7 +425,7 @@ export function createController(
       else showMenu(messages.boxFull);
     } else if (name === 'album') showScreen(texts.album);
     else if (name === 'infos') showScreen(texts.infos);
-    else if (name === 'settings') showScreen(texts.settings);
+    else if (name === 'settings') showScreen(texts.settings, __APP_VERSION__);
     else if (name === 'leave-table') openDialog('leave', leaveTableQuestion);
   }
 

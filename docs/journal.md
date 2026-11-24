@@ -19,6 +19,7 @@
 | T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
 | T-012 | Mode mémo (sélection, 4 marques, Fermer) | terminée |
 | T-013 | Brancher la sauvegarde (localStorage) sur le jeu | terminée |
+| T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | implémentée (relecture à faire) |
 
 ## Questions ouvertes
 _(aucune)_
@@ -29,7 +30,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 3 : étape 3.2 (PWA), à planifier.
+- Phase 3 : T-014 (étape 3.2, PWA), à implémenter ; puis 3.3 (pack chiffré).
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -39,6 +40,7 @@ _(aucune)_
 - Après la fin de partie, les touchers vont à l'accélération des animations (CL-20), jamais à `flip` (qui renverrait un « refus »).
 - Identifiants de carte toujours 0..24 (`RangeError` sinon) ; `missingCoins` vaut 0 aussi quand l'album est complet : tester `nextPhoto(...) === null` d'abord.
 - Exporter la clé `sardinebagarre:save` en constante dans `storage.ts` (étape 3.1) ; prix par défaut R-115 et validation des prix dans le modèle du pack (étape 3.3).
+- Étape 3.3 (relecture T-014, C6) : test e2e qui vérifie que `pack/pack.bin` est dans le précache du service worker et se charge hors ligne (au-delà de `maximumFileSizeToCacheInBytes`, 10 Mo, Workbox l'exclurait sans erreur).
 - Étape 3.3 : refuser un pack dont un prix n'est pas un entier ≥ 0 (un prix invalide bloque toutes les photos suivantes).
 - Étape 3.1 (relecture T-010, C4) : au chargement d'une sauvegarde dont le total est ≥ 50 000, `createController` ne doit pas lever d'exception. Depuis T-011 (ADR-019), l'app démarre sur le menu et la phase `full` n'existe plus : la boîte pleine affiche `messages.boxFull` sur le menu (R-53). Vérifier que le menu affiche alors le bon niveau et le bon total. Ajouter le test de C3 (relecture T-010) : avec un total de 49 990, une victoire avec un gain de 36 affiche « Tu remportes 10 jetons ! ».
 - T-011 (relecture T-010) : tout élément ajouté à `body` hors de `#app` (dialogue, bandeau de mise à jour R-104) déclencherait `onElsewhere`. Le placer dans `#app` ou l'exclure explicitement.
@@ -114,3 +116,10 @@ _(aucune)_
 - 2026-11-24 — humain — Recette T-013 (sauvegarde) sur iPhone OK.
 - 2026-11-24 — Opus — T-013 terminée et fusionnée dans main (non poussée).
 - 2026-11-24 — Opus — v0.5.0 publiée (main poussée, tag v0.5.0).
+- 2026-11-24 — Opus — T-014 planifiée (étape 3.2 : PWA ; `registerType: 'prompt'` selon R-104, le plan disait `autoUpdate` à tort ; icônes produites par Playwright).
+- 2026-11-24 — codeur — T-014 : PWA (vite-plugin-pwa 2.0.0, `registerType: 'prompt'`, porte de mise à jour R-104, icônes produites par `npm run icones`, version dans Réglages, projet Playwright `pwa` en production) ; contre-épreuves a à c faites ; check OK (423 tests), e2e OK.
+- 2026-11-24 — codeur — Reste : relecture de T-014, puis recette iPhone (installation sur l'écran d'accueil, mode avion) ; la mise à jour automatique ne pourra être vue qu'après la publication suivante.
+- 2026-11-24 — relecteur — T-014 relue : 🟡 approuvée avec réserves (check, e2e complet 5 profils + `pwa` et captures OK ; à corriger : test du branchement R-104 dans le contrôleur, `reuseExistingServer: false` pour la preview ; mineurs : rechargement conditionnel au menu, §14-6 → §15-6, plan.md `autoUpdate`).
+- 2026-11-24 — Opus — T-014 : C5 fait (plan.md), C6 reporté dans les contraintes (étape 3.3), C1 à C4 confiés au codeur.
+- 2026-11-24 — codeur — T-014 : corrections de relecture C1 à C4 (porte R-104 testée dans le contrôleur via `__sb`, rechargement conditionné au menu, preview sans réutilisation, §15-6) ; check et e2e OK.
+- 2026-11-24 — Opus — T-014 : C1 à C4 vérifiés (check OK, build sans `__sb`). Recette sur le site publié (HTTPS nécessaire).

@@ -620,6 +620,10 @@ body {
   font-size: 18px;
   font-style: italic;
 }
+.ecran-version {
+  font-size: 15px;
+  opacity: 0.8;
+}
 
 /* Dialogue Oui/Non modal */
 .voile {
