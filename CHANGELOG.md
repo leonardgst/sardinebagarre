@@ -1,5 +1,8 @@
 # Journal des versions
 
+## v0.6.1 — 2026-11-24
+- Diagnostic provisoire dans Réglages : état du hors ligne (service worker, adresse lancée, portée, fichiers en réserve, erreur d'enregistrement éventuelle), pour comprendre pourquoi l'app installée ne démarre pas en mode avion sur iPhone.
+
 ## v0.6.0 — 2026-11-24
 - Application installable : icône (tête de chien originale), plein écran, balises pour l'écran d'accueil de l'iPhone.
 - Jouable hors ligne après une première visite (service worker, précache de tout le jeu).
