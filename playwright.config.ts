@@ -44,7 +44,8 @@ export default defineConfig({
     {
       command: `npx vite build && npx vite preview --port ${previewPort} --strictPort`,
       url: previewBase,
-      reuseExistingServer: !process.env.CI,
+      // Jamais de réutilisation : 4173 est aussi le port de `npm run preview` (ancien build possible).
+      reuseExistingServer: false,
       timeout: 120_000,
     },
   ],

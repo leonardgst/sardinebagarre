@@ -117,6 +117,13 @@ _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 - Aucun test unitaire de `pwa.ts` (dépend du module virtuel) ; l'enregistrement est couvert par le test e2e SW. Le rechargement automatique sur le menu après publication d'une nouvelle version n'est pas testé en e2e (demanderait deux builds) : à vérifier à la recette sur iPhone après la prochaine publication.
 
 
+### Corrections de relecture (C1 à C4)
+- C1 : `setupPwa(apply?)` ; en développement avec `?debug=1`, `apply` factice qui compte ; `__sb.needRefresh()` et `__sb.applyCount()`. `tests/e2e/miseajour.spec.ts` (5 tests, 5 profils) : menu, partie puis Non, Infos puis Retour, dialogue Quitter la table, boîte pleine. Contre-épreuve : sans `options.onLeaveMenu?.()` dans `startNewRound`, 2 tests sur 5 échouent (partie puis Non, boîte pleine) ; annulée, diff vide.
+- C2 : `reuseExistingServer: false` pour le serveur de preview.
+- C3 : `registerSW` accepte `onNeedReload` ; la porte a `reloadRequested()` (le rechargement attend le menu, une seule fois), 2 tests Vitest ajoutés.
+- C4 : « §15-6 » dans `pwa.spec.ts`.
+- Résultats : check OK (425 tests) ; e2e complet 432 passés, 10 ignorés ; `--repeat-each 5` sur `miseajour` et `pwa` stable.
+
 ## Relecture
 **2026-11-24 — relecteur — 🟡 approuvé avec réserves.** `npm run check` OK (423 tests) ; `E2E_PORT=5199 npm run e2e` complet OK (407 passés, 10 ignorés, 5 profils + `pwa`) ; `npm run screens` OK (50), `11-reglages.png` vue sur iPhone SE et en paysage. Icônes : 4 PNG opaques (alpha minimal 255), apple-touch-icon en 180 px, tête dans la zone sûre de l'icône maskable. Manifeste, chemins sous `/sardinebagarre/`, `sw.js` (sans `clientsClaim`, `pack.bin` absent sans erreur), aucun service worker en développement, `__sb` absent de `dist/` : conformes. `npm audit` : acceptable (4 vulnérabilités modérées dans `workbox-build`, outil de build ; 0 avec `--omit=dev`).
 Contre-épreuve du relecteur : sans `options.onLeaveMenu?.()` dans `startNewRound`, tout reste vert (check et `pwa`). Le branchement R-104 du contrôleur n'est pas testé. Annulée, diff vide.

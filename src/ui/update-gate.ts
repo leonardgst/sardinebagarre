@@ -6,17 +6,33 @@ export interface UpdateGate {
   menuShown(): void;
   /** Le joueur a quitté le menu (partie ou écran). */
   gameStarted(): void;
+  /** Le nouveau service worker contrôle la page : un rechargement est demandé. */
+  reloadRequested(): void;
 }
 
-export function createUpdateGate({ apply }: { readonly apply: () => void }): UpdateGate {
+export function createUpdateGate({
+  apply,
+  reload = () => {},
+}: {
+  readonly apply: () => void;
+  readonly reload?: () => void;
+}): UpdateGate {
   let onMenu = false;
   let pending = false;
   let applied = false;
+  let reloadPending = false;
 
   function tryApply(): void {
     if (!pending || !onMenu || applied) return;
     applied = true;
     apply();
+  }
+
+  /** Le rechargement attend lui aussi le menu (le joueur a pu lancer une partie entre-temps). */
+  function tryReload(): void {
+    if (!reloadPending || !onMenu) return;
+    reloadPending = false;
+    reload();
   }
 
   return {
@@ -27,9 +43,14 @@ export function createUpdateGate({ apply }: { readonly apply: () => void }): Upd
     menuShown() {
       onMenu = true;
       tryApply();
+      tryReload();
     },
     gameStarted() {
       onMenu = false;
+    },
+    reloadRequested() {
+      reloadPending = true;
+      tryReload();
     },
   };
 }

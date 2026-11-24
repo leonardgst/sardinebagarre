@@ -17,7 +17,7 @@ interface Manifeste {
   icons: { src: string; sizes: string; type: string; purpose?: string }[];
 }
 
-test('§14-6 manifeste valide', async ({ page, request }) => {
+test('§15-6 manifeste valide', async ({ page, request }) => {
   await page.goto('./');
   const href = await page.locator('link[rel=manifest]').getAttribute('href');
   expect(href).toBeTruthy();
@@ -39,7 +39,7 @@ test('§14-6 manifeste valide', async ({ page, request }) => {
   }
 });
 
-test('§14-6 icône Apple 180 px', async ({ page }) => {
+test('§15-6 icône Apple 180 px', async ({ page }) => {
   await page.goto('./');
   const href = await page.locator('link[rel=apple-touch-icon]').getAttribute('href');
   expect(href).toBeTruthy();

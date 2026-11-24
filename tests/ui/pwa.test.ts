@@ -39,4 +39,25 @@ describe('porte de mise à jour (R-104)', () => {
     gate.needRefresh();
     expect(apply).toHaveBeenCalledTimes(1);
   });
+
+  it('R-104 rechargement demandé hors menu : attend le menu', () => {
+    const reload = vi.fn();
+    const gate = createUpdateGate({ apply: vi.fn(), reload });
+    gate.menuShown();
+    gate.gameStarted();
+    gate.reloadRequested();
+    expect(reload).not.toHaveBeenCalled();
+    gate.menuShown();
+    expect(reload).toHaveBeenCalledTimes(1);
+    gate.menuShown();
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it('R-104 rechargement demandé sur le menu : tout de suite', () => {
+    const reload = vi.fn();
+    const gate = createUpdateGate({ apply: vi.fn(), reload });
+    gate.menuShown();
+    gate.reloadRequested();
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
 });

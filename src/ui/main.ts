@@ -15,7 +15,16 @@ document.body.insertAdjacentHTML('afterbegin', chienSvg);
 // R-100 : pas d'écriture au chargement ; la sauvegarde corrigée sera écrite au prochain changement.
 let save = loadSave().save;
 
-const gate = setupPwa();
+// Tests de la porte R-104 en développement (`?debug=1`) : `apply` factice qui compte.
+const debug = dev && new URLSearchParams(location.search).get('debug') === '1';
+const applyCalls = { count: 0 };
+const gate = setupPwa(
+  debug
+    ? () => {
+        applyCalls.count += 1;
+      }
+    : undefined,
+);
 
 const controller = createController(root, rngs, {
   initialGame: save.game,
@@ -27,7 +36,7 @@ const controller = createController(root, rngs, {
   },
 });
 
-if (dev && new URLSearchParams(location.search).get('debug') === '1') {
+if (debug) {
   const { installDebug } = await import('./debug');
-  installDebug(controller);
+  installDebug(controller, { gate, applyCalls });
 }
