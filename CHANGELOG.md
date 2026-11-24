@@ -1,5 +1,11 @@
 # Journal des versions
 
+## v0.5.0 — 2026-11-24
+- Sauvegarde sur l'appareil : jetons, niveau, historique et records survivent à la fermeture de l'app.
+- La partie en cours n'est pas sauvegardée : au retour, menu au même niveau, gain en cours perdu (R-68).
+- Fin de partie enregistrée avant les animations : fermer pendant la révélation ne fait rien perdre.
+- Sauvegarde abîmée ou stockage indisponible : le jeu démarre quand même ; boîte pleine signalée dès le menu.
+
 ## v0.4.0 — 2026-11-24
 - Mode mémo : bouton « Mémo », sélection d'une carte sans la retourner, 4 marques (S, 1, 2, 3) combinables.
 - Marques visibles en permanence dans les coins des cartes, effacées quand la carte est retournée.

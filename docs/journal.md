@@ -113,3 +113,4 @@ _(aucune)_
 - 2026-11-24 — Opus — T-013 : M2 et M3 faits ; M1 confié au codeur.
 - 2026-11-24 — humain — Recette T-013 (sauvegarde) sur iPhone OK.
 - 2026-11-24 — Opus — T-013 terminée et fusionnée dans main (non poussée).
+- 2026-11-24 — Opus — v0.5.0 publiée (main poussée, tag v0.5.0).
