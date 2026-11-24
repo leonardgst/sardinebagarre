@@ -155,3 +155,9 @@ Mineur :
 - **F5 — annonce VoiceOver.** La zone `aria-live` est recréée à chaque rendu, donc VoiceOver risque de ne rien annoncer. Garder le même élément et ne changer que son texte.
 
 **Opus — 2026-11-24 :** F1 à F5 sont confiés au codeur.
+
+**Opus — 2026-11-24 — vérification des corrections (commit 70d0ce3) : 🟢.**
+- `npm run check` OK (505 tests) ; e2e complet annoncé à 508 passés.
+- F1 : deux tests e2e rouges avant la correction.
+- Build sans `__sb`.
+- Capture 11d sur iPhone SE : section centrée.

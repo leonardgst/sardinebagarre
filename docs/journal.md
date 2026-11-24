@@ -22,7 +22,7 @@
 | T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | terminée |
 | T-015 | Afficher un diagnostic hors ligne dans Réglages | terminée (provisoire, à retirer avant le gel) |
 | T-016 | Fabriquer et lire le pack chiffré (sans interface) | terminée |
-| T-017 | Brancher le pack chiffré dans le jeu | implémentée, relecture 🟡 (F1 à F5 à corriger) |
+| T-017 | Brancher le pack chiffré dans le jeu | corrections vérifiées 🟢, prête à fusionner |
 
 ## Questions ouvertes
 _(aucune)_
@@ -150,3 +150,4 @@ _(aucune)_
 - 2026-11-24 — codeur — T-017 : pack-store.ts, code secret dans Réglages, tête de Sardine en photo sur la carte révélée, messages Sardine du pack, rechargement au lancement (code faux oublié), ligne « pack » du diagnostic, Réglages défilables en paysage ; tests écrits avant le code. Reste : relecture ; vérifier `pack/pack.bin` dans le `sw.js` publié après la première publication du vrai pack (R-125).
 - 2026-11-24 — relecteur — T-017 relue : 🟡 (e2e complet 493 OK ; à corriger : « Changer le code » avec un code faux réaffiche « Code accepté » ; mineurs : alignement, test de conservation des jetons, mesure du déchiffrement seul, zone aria-live).
 - 2026-11-24 — codeur — T-017 : corrections de relecture F1 (Changer le code : message et pack conservés, drapeau changingCode), F2 (centré), F3 (progression conservée), F4 (durée = déchiffrement seul), F5 (zone aria-live gardée) ; check OK (505 tests), e2e 508 passés / 10 ignorés.
+- 2026-11-24 — Opus — T-017 : F1 à F5 vérifiés (check 505 tests, build sans `__sb`, capture 11d centrée) ; prête à fusionner.
