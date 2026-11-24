@@ -19,6 +19,7 @@
 | T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
 | T-012 | Mode mémo (sélection, 4 marques, Fermer) | terminée |
 | T-013 | Brancher la sauvegarde (localStorage) sur le jeu | terminée |
+| T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | planifiée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -29,7 +30,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 3 : étape 3.2 (PWA), à planifier.
+- Phase 3 : T-014 (étape 3.2, PWA), à implémenter ; puis 3.3 (pack chiffré).
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -114,3 +115,4 @@ _(aucune)_
 - 2026-11-24 — humain — Recette T-013 (sauvegarde) sur iPhone OK.
 - 2026-11-24 — Opus — T-013 terminée et fusionnée dans main (non poussée).
 - 2026-11-24 — Opus — v0.5.0 publiée (main poussée, tag v0.5.0).
+- 2026-11-24 — Opus — T-014 planifiée (étape 3.2 : PWA ; `registerType: 'prompt'` selon R-104, le plan disait `autoUpdate` à tort ; icônes produites par Playwright).
