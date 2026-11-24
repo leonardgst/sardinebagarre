@@ -99,6 +99,16 @@ test('UI-04 version affichée dans Réglages', async ({ page }) => {
   await expect(page.locator('.ecran')).toContainText(`Version ${version}`);
 });
 
+test('ADR-001 Réglages affiche le diagnostic hors ligne actif', async ({ page }) => {
+  await page.goto('./');
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.reload();
+  await page.locator('.menu').waitFor();
+  await page.locator('[data-action=settings]').click();
+  await expect(page.locator('.ecran-diagnostic')).toContainText('Hors ligne : actif');
+  await expect(page.locator('.ecran-diagnostic')).toContainText('navigateur');
+});
+
 test('R-129 non-indexation conservée', async ({ page, request }) => {
   await page.goto('./');
   await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', 'noindex');

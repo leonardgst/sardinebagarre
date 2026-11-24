@@ -129,3 +129,4 @@ _(aucune)_
 - 2026-11-24 — Opus — Diagnostic : site publié conforme (précache 9 fichiers, tous 200 sans redirection ; sw.js, portée et start_url `/sardinebagarre/`) ; le test e2e hors ligne passe sur WebKit bureau. Cause propre à l'iPhone, à préciser.
 - 2026-11-24 — humain — Précisions : alerte iOS « Désactivez le mode avion… » puis « Safari ne peut pas ouvrir la page » ; même résultat après plusieurs lancements en ligne ; dans un onglet Safari en mode avion, le jeu se lance et se joue.
 - 2026-11-24 — Opus — T-015 planifiée : diagnostic provisoire dans Réglages (page contrôlée ?, URL lancée, portée, réserve) pour comprendre l'écart app installée / onglet Safari.
+- 2026-11-24 — codeur — T-015 : diagnostic hors ligne dans Réglages (diagnostic.ts, 4 tests unitaires, 1 e2e) ; check OK (429 tests), e2e 433 passés / 10 ignorés. Reste : publier pour lire le diagnostic sur l'iPhone.

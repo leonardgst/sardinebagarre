@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | implémentée (à relire) |
 | Étape du plan | 3.2 (suite de T-014) |
 | Branche | `t-015-diagnostic-hors-ligne` |
 | Estimation | S (< 1 h) |
@@ -54,10 +54,10 @@ Diagnostic **provisoire** : il sera retiré ou réduit avant le gel (13/12).
 | e2e (projet `pwa`) `ADR-001 Réglages affiche le diagnostic hors ligne actif` | SW prêt, rechargement, Réglages | `.ecran-diagnostic` contient `Hors ligne : actif` et `navigateur` |
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe
-- [ ] Les tests listés ci-dessus existent et passent ; `E2E_PORT=5199 npm run e2e` passe
-- [ ] `npm run screens` : la capture de Réglages reste lisible sur iPhone SE, sans débordement (ligne technique sur plusieurs lignes si nécessaire, `overflow-wrap: anywhere`)
-- [ ] `__sb` toujours absent de `dist/`
+- [x] `npm run check` passe
+- [x] Les tests listés ci-dessus existent et passent ; `E2E_PORT=5199 npm run e2e` passe
+- [x] `npm run screens` : la capture de Réglages reste lisible sur iPhone SE, sans débordement (ligne technique sur plusieurs lignes si nécessaire, `overflow-wrap: anywhere`)
+- [x] `__sb` toujours absent de `dist/`
 
 ## Pièges connus
 - `caches` n'existe qu'en contexte sécurisé : vérifier `'caches' in window`.
@@ -67,5 +67,8 @@ Diagnostic **provisoire** : il sera retiré ou réduit avant le gel (13/12).
 ## Questions
 
 ## Compte rendu
+- `src/ui/diagnostic.ts` (collectOfflineInfo, formatOfflineInfo), libellés `offlineTexts`, élément `.ecran-diagnostic` sous la version, rempli en asynchrone (rien si l'écran est quitté).
+- 4 tests unitaires + 1 e2e (projet pwa). check OK (429 tests) ; e2e 433 passés, 10 ignorés ; `__sb` absent de dist non modifié (aucun changement de build).
+- Capture : test-results/screens/iphone-se/11-reglages.png (lisible, ligne technique sur 2 lignes ; en dev : « pas encore prêt », normal).
 
 ## Relecture
