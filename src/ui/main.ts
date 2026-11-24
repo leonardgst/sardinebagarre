@@ -1,6 +1,7 @@
 import chienSvg from './art/chien.svg?raw';
 import { createController } from './controller';
 import { createRngs, readSeed } from './seed';
+import { loadSave, writeSave } from './storage';
 import './styles/main.css';
 
 const dev = import.meta.env.DEV;
@@ -10,7 +11,16 @@ const root = document.getElementById('app');
 if (!root) throw new Error('Conteneur #app introuvable.');
 document.body.insertAdjacentHTML('afterbegin', chienSvg);
 
-const controller = createController(root, rngs);
+// R-100 : pas d'écriture au chargement ; la sauvegarde corrigée sera écrite au prochain changement.
+let save = loadSave().save;
+
+const controller = createController(root, rngs, {
+  initialGame: save.game,
+  onGameChange(game) {
+    save = { ...save, game }; // conserve settings, welcomeSeen et packCode.
+    writeSave(save);
+  },
+});
 
 if (dev && new URLSearchParams(location.search).get('debug') === '1') {
   const { installDebug } = await import('./debug');

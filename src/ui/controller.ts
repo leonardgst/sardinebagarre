@@ -47,7 +47,9 @@ export interface Controller {
 }
 
 export interface ControllerOptions {
-  /** Point d'extension de la sauvegarde (étape 3.1), appelé après `finalizeRound` et `leaveTable`. */
+  /** État de jeu chargé depuis la sauvegarde (R-100) ; sinon un premier lancement. */
+  initialGame?: GameState;
+  /** Sauvegarde (R-100), appelé après `finalizeRound` et `leaveTable`. */
   onGameChange?: (game: GameState) => void;
 }
 
@@ -68,7 +70,7 @@ export function createController(
   rngs: { readonly board: Rng; readonly decor: Rng },
   options: ControllerOptions = {},
 ): Controller {
-  let game = initialGame();
+  let game = freezeGame(options.initialGame ?? initialGame());
   let round: RoundState | null = null;
   let phase: Phase = 'menu';
   let dialogKind: DialogKind | null = null;
@@ -458,7 +460,8 @@ export function createController(
     },
   });
 
-  showMenu();
+  // R-53 : boîte pleine dès le lancement.
+  showMenu(canStartRound(game) ? '' : messages.boxFull);
 
   return {
     game: () => game,
