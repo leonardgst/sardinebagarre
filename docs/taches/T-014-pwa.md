@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | implémentée (relecture à faire) |
 | Étape du plan | 3.2 |
 | Branche | `t-014-pwa` |
 | Estimation | M (2 à 3 h) |
@@ -74,17 +74,17 @@ Le jeu s'installe sur l'écran d'accueil de l'iPhone (et dans le Dock du Mac) av
 | `R-129 non-indexation conservée` | `index.html` et `robots.txt` | `noindex` présent, `Disallow: /` |
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe (avec les tests Vitest de la porte).
-- [ ] `npm run e2e` (avec `E2E_PORT=5199` si besoin) : tous les tests existants passent sur les 5 profils, et les tests `pwa` passent sur le projet `pwa`. Les tests hors ligne passent avec `--repeat-each 5`.
-- [ ] Contre-épreuves faites puis annulées (`git diff src/ vite.config.ts` vide ensuite) et rapportées :
+- [x] `npm run check` passe (avec les tests Vitest de la porte).
+- [x] `npm run e2e` (avec `E2E_PORT=5199` si besoin) : tous les tests existants passent sur les 5 profils, et les tests `pwa` passent sur le projet `pwa`. Les tests hors ligne passent avec `--repeat-each 5`.
+- [x] Contre-épreuves faites puis annulées (`git diff src/ vite.config.ts` vide ensuite) et rapportées :
   - a. Sans `navigateFallback` ni précache de `index.html` (ou sans le plugin), le test hors ligne échoue.
   - b. Si la porte applique la mise à jour sans attendre le menu, le test Vitest « pendant une partie » échoue.
   - c. Si une icône est déclarée avec un chemin absolu `/icons/...` (sans la base), le test du manifeste échoue.
-- [ ] `npm run build` passe ; `dist/` contient `manifest.webmanifest`, `sw.js` et les icônes ; `__sb` est absent de `dist/`. Taille de `dist/` signalée.
-- [ ] En développement (`npm run dev`), **aucun** service worker n'est enregistré (vérifié par un test ou dans le compte rendu), pour ne pas gêner les tests existants.
-- [ ] `npm run screens` : les captures existantes restent conformes ; ajouter `11-reglages.png` (5 profils).
-- [ ] `node scripts/verifier-confidentialite.mjs` accepte les nouvelles images (elles sont dans `public/icons/`).
-- [ ] La CI (`ci.yml`) lance le projet `pwa` ; si Chromium est nécessaire, il est installé dans la CI.
+- [x] `npm run build` passe ; `dist/` contient `manifest.webmanifest`, `sw.js` et les icônes ; `__sb` est absent de `dist/`. Taille de `dist/` signalée.
+- [x] En développement (`npm run dev`), **aucun** service worker n'est enregistré (vérifié par un test ou dans le compte rendu), pour ne pas gêner les tests existants.
+- [x] `npm run screens` : les captures existantes restent conformes ; ajouter `11-reglages.png` (5 profils).
+- [x] `node scripts/verifier-confidentialite.mjs` accepte les nouvelles images (elles sont dans `public/icons/`).
+- [x] La CI (`ci.yml`) lance le projet `pwa` ; si Chromium est nécessaire, il est installé dans la CI.
 
 ## Pièges connus
 - **Base `/sardinebagarre/`** : `start_url`, `scope`, icônes et enregistrement du service worker doivent tous être sous la base. Un chemin absolu `/…` casse l'installation sur GitHub Pages.
@@ -99,7 +99,23 @@ Le jeu s'installe sur l'écran d'accueil de l'iPhone (et dans le Dock du Mac) av
 _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 ## Compte rendu
-_(rempli par le codeur à la fin : ce qui a été fait, commits, écarts)_
+**Fait** (branche `t-014-pwa`) : `vite-plugin-pwa` 2.0.0 (compatible Vite 8 ; `workbox-build` et `workbox-window` arrivent en dépendances de pair, installés automatiquement), manifeste généré (sous `/sardinebagarre/`), précache `js/css/html/svg/png/webmanifest/bin` + `navigateFallback`, 4 icônes produites par `npm run icones` (WebKit de Playwright, tête `chien.svg` ; `icon-512` et `icon-maskable-512` vérifiées à l'œil), balises Apple, `src/ui/update-gate.ts` (porte pure R-104) et `src/ui/pwa.ts` (enregistrement en production seulement), options `onMenu` et `onLeaveMenu` du contrôleur, version dans Réglages (`__APP_VERSION__`), projet Playwright `pwa` (WebKit prend bien en charge les service workers : pas besoin de Chromium), CI inchangée sauf un commentaire (`npm run e2e` lance déjà le projet `pwa`, WebKit déjà installé).
+
+**Preuve rouge** : Vitest, `tests/ui/pwa.test.ts` échoue (module `update-gate` absent) ; e2e `pwa` avant le code : 6 échecs sur 7 (manifeste, icône Apple, SW, hors ligne x2, version) ; seul `R-129` passait (déjà en place).
+
+**Contre-épreuves** (annulées ensuite ; `vite.config.ts` et `update-gate.ts` restaurés, diff identique) :
+- a. Sans `html` dans le précache ni `navigateFallback` : les 2 tests hors ligne échouent (« WebKit encountered an internal error » au rechargement).
+- b. Porte qui ignore le menu : le test « pendant une partie : attend le menu » échoue, les 3 autres passent.
+- c. Icône déclarée en `/icons/icon-512.png` : le test du manifeste échoue (404).
+
+**Résultats** : `npm run check` OK (423 tests, +4). `npm run e2e` : 402 passés / 10 ignorés, sauf `UI-01 Album, Infos, Réglages` (5 profils) dont le sélecteur `.ecran p` devenait ambigu avec la ligne de version ; corrigé en `.ecran-texte`, re-vérifié sur iphone-15. Tests `pwa` : 7 passés, 35 passés avec `--repeat-each 5`. `npm run screens` : 50 passés, `11-reglages.png` ajouté (5 profils, iphone-15 vérifiée). `npm run build` : `dist/` contient `manifest.webmanifest`, `sw.js`, icônes ; `__sb` absent ; taille 146 Ko (précache 13 entrées, 95,8 Ko). Test e2e ajouté : aucun service worker en développement (`menu.spec.ts`).
+
+**Écarts / à noter** :
+- `onLeaveMenu` ajouté en plus de `onMenu` : la porte a besoin de savoir que le joueur quitte le menu (partie ou écran Infos/Album/Réglages). Un dialogue ouvert depuis le menu (Quitter la table) ne compte pas comme quitter.
+- Le serveur du projet `pwa` fait `npx vite build && npx vite preview` (sans `tsc`, déjà couvert par `check`) ; avec `reuseExistingServer` hors CI, un preview déjà lancé sur 4173 serait réutilisé avec son ancien build.
+- `npm audit` signale 4 vulnérabilités modérées, toutes dans `glob`/`minimatch` via `workbox-build` (outil de build, pas dans le code livré). Le seul correctif proposé est de rétrograder le plugin en 1.1.0 ; non fait.
+- Aucun test unitaire de `pwa.ts` (dépend du module virtuel) ; l'enregistrement est couvert par le test e2e SW. Le rechargement automatique sur le menu après publication d'une nouvelle version n'est pas testé en e2e (demanderait deux builds) : à vérifier à la recette sur iPhone après la prochaine publication.
+
 
 ## Relecture
 _(verdict du relecteur, avec la date)_

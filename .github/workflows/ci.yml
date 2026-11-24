@@ -20,6 +20,7 @@ jobs:
       # check = types + lint + tests unitaires + contrôle de confidentialité (scripts/verifier-confidentialite.mjs)
       - run: npm run check
       - run: npm run build
+      # Les tests e2e incluent le projet `pwa` (production : build + vite preview, service worker réel, WebKit).
       - name: Tests de bout en bout (WebKit)
         run: |
           npx playwright install --with-deps webkit

@@ -19,7 +19,7 @@
 | T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
 | T-012 | Mode mémo (sélection, 4 marques, Fermer) | terminée |
 | T-013 | Brancher la sauvegarde (localStorage) sur le jeu | terminée |
-| T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | planifiée |
+| T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | implémentée (relecture à faire) |
 
 ## Questions ouvertes
 _(aucune)_
@@ -116,3 +116,5 @@ _(aucune)_
 - 2026-11-24 — Opus — T-013 terminée et fusionnée dans main (non poussée).
 - 2026-11-24 — Opus — v0.5.0 publiée (main poussée, tag v0.5.0).
 - 2026-11-24 — Opus — T-014 planifiée (étape 3.2 : PWA ; `registerType: 'prompt'` selon R-104, le plan disait `autoUpdate` à tort ; icônes produites par Playwright).
+- 2026-11-24 — codeur — T-014 : PWA (vite-plugin-pwa 2.0.0, `registerType: 'prompt'`, porte de mise à jour R-104, icônes produites par `npm run icones`, version dans Réglages, projet Playwright `pwa` en production) ; contre-épreuves a à c faites ; check OK (423 tests), e2e OK.
+- 2026-11-24 — codeur — Reste : relecture de T-014, puis recette iPhone (installation sur l'écran d'accueil, mode avion) ; la mise à jour automatique ne pourra être vue qu'après la publication suivante.
