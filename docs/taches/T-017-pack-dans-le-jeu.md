@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | planifiée |
+| Statut | terminée (à relire) |
 | Étape du plan | 3.3 (2ᵉ moitié, après T-016) |
 | Branche | `t-017-pack-dans-le-jeu` |
 | Estimation | M (1–3 h) |
@@ -100,11 +100,11 @@ Dans Réglages, la joueuse saisit le code secret. S'il est bon, le code est sauv
 | e2e `CL-19 double toucher sur Valider : une seule vérification` | double clic | un seul `fetch` de `pack.bin` |
 
 ## Critères d'acceptation
-- [ ] `npm run check` passe ; `E2E_PORT=5199 npm run e2e` passe
-- [ ] Captures `controle-visuel` : Réglages (vide, erreur, accepté) et carte Sardine avec photo, sur les 5 profils, sans débordement ; champ lisible et ≥ 16 px
-- [ ] `crypto.subtle` uniquement dans `pack.ts` ; `localStorage` uniquement dans `storage.ts` ; aucun `error.message` affiché
-- [ ] Le code saisi n'apparaît dans aucun `console.log`, aucune URL ni aucun attribut du DOM après validation (le champ est vidé)
-- [ ] `__sb` absent de `dist/`
+- [x] `npm run check` passe ; `E2E_PORT=5199 npm run e2e` passe
+- [x] Captures `controle-visuel` : Réglages (vide, erreur, accepté) et carte Sardine avec photo, sur les 5 profils, sans débordement ; champ lisible et ≥ 16 px
+- [x] `crypto.subtle` uniquement dans `pack.ts` ; `localStorage` uniquement dans `storage.ts` ; aucun `error.message` affiché
+- [x] Le code saisi n'apparaît dans aucun `console.log`, aucune URL ni aucun attribut du DOM après validation (le champ est vidé)
+- [x] `__sb` absent de `dist/`
 
 ## Pièges connus
 - Une partie peut être en cours quand le pack finit de se charger au lancement : ne pas re-rendre le plateau pour autant ; la photo apparaîtra sur la prochaine carte Sardine révélée.
@@ -115,5 +115,14 @@ Dans Réglages, la joueuse saisit le code secret. S'il est bon, le code est sauv
 ## Questions
 
 ## Compte rendu
+- Test rouge d'abord : `tests/ui/pack-store.test.ts` (échec : module absent), puis `src/ui/pack-store.ts` ; e2e `tests/e2e/pack.spec.ts` (12 tests, sur les 5 profils) écrits avant le branchement.
+- `pack-store.ts` : `load(code)` → `ok | wrong | unavailable | empty`, URL `blob:` (tête, photos, aboiement), révocation des anciennes, durée mesurée, `sardineMessages(base)` (UI-60). `fetch`, `createUrl`, `revokeUrl` injectables.
+- Contrôleur : section « Code secret » des Réglages (vérification, erreur, accepté, « Changer le code », Entrée valide, un seul chargement à la fois), résultat appliqué même si l'écran est quitté. `main.ts` recharge le pack au lancement ; code faux → `packCode` remis à `null` ; pack indisponible → code gardé.
+- Carte Sardine : `<img class="tete-photo">` en rond si la tête est chargée (UI-14) ; indicateur et menu inchangés. Messages Sardine du pack ajoutés au tirage.
+- Diagnostic provisoire : ligne « pack : … » (ms de déchiffrement dans le navigateur de test : ~570 ms sur le pack de test, ~3 photos).
+- Précache : test unitaire sur `vite.config.ts` (R-125). Vérification réelle du `sw.js` publié : à faire par Opus après la publication du vrai pack.
+- Hors périmètre mais nécessaire : les écrans Réglages/Infos/Album étaient centrés sans défilement, le contenu débordait en paysage ; ajout de `overflow-y: auto` et marges automatiques (`.ecran`).
+- Le champ de saisie impose `user-select: text` (le corps est en `user-select: none`, iOS refuserait la saisie sinon).
+- Captures : `test-results/screens/<profil>/11-reglages.png`, `11b-reglages-saisie.png`, `11c-reglages-erreur.png`, `11d-reglages-accepte.png`, `12-sardine-photo.png`.
 
 ## Relecture
