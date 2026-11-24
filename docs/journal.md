@@ -22,6 +22,7 @@
 | T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | terminée |
 | T-015 | Afficher un diagnostic hors ligne dans Réglages | terminée (provisoire, à retirer avant le gel) |
 | T-016 | Fabriquer et lire le pack chiffré (sans interface) | terminée |
+| T-017 | Brancher le pack chiffré dans le jeu | planifiée |
 
 ## Questions ouvertes
 _(aucune)_
@@ -145,3 +146,4 @@ _(aucune)_
 - 2026-11-24 — Opus — T-016 : E1 à E11 confiés au codeur ; décisions : prix obligatoire au-delà de la 12ᵉ photo, code ASCII imposé (tirets typographiques acceptés comme séparateurs).
 - 2026-11-24 — codeur — T-016 : corrections de relecture E1 à E11 (decodePack validé, codes publiés refusés, forme ASCII du code, tirets typographiques, validation de pack.json, prix obligatoire dès la 13e photo, saisie masquée durcie, LISEZMOI réécrit) ; check vert (492 tests).
 - 2026-11-24 — Opus — T-016 : E1 à E11 vérifiés (check 492 tests ; contre-épreuves sur les codes publics, la validation de `photos` et la forme ASCII du code) ; LISEZMOI complété.
+- 2026-11-24 — Opus — T-016 fusionnée dans main (locale, non poussée). T-017 planifiée : code dans Réglages, tête de Sardine sur la carte, messages Sardine privés, rechargement au lancement, code oublié si le pack a changé.
