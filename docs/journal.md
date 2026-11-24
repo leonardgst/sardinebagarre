@@ -21,7 +21,7 @@
 | T-013 | Brancher la sauvegarde (localStorage) sur le jeu | terminée |
 | T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | terminée |
 | T-015 | Afficher un diagnostic hors ligne dans Réglages | terminée (provisoire, à retirer avant le gel) |
-| T-016 | Fabriquer et lire le pack chiffré (sans interface) | corrections vérifiées 🟢, prête à fusionner |
+| T-016 | Fabriquer et lire le pack chiffré (sans interface) | terminée |
 
 ## Questions ouvertes
 _(aucune)_
