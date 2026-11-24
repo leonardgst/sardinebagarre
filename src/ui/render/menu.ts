@@ -68,7 +68,9 @@ export function renderScreen(title: string, version?: string): HTMLElement {
     const v = document.createElement('p');
     v.className = 'ecran-version';
     v.textContent = versionLabel(version);
-    screen.append(h, p, v, nav);
+    const d = document.createElement('p');
+    d.className = 'ecran-diagnostic';
+    screen.append(h, p, v, d, nav);
   }
   return screen;
 }

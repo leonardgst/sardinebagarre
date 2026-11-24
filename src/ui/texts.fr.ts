@@ -25,6 +25,23 @@ export function versionLabel(version: string): string {
   return `Version ${version}`;
 }
 
+/** T-015 : diagnostic hors ligne provisoire (Réglages). */
+export const offlineTexts = {
+  active: 'Hors ligne : actif',
+  notReady: 'Hors ligne : pas encore prêt',
+  unavailable: 'Hors ligne : indisponible',
+
+  page: 'page',
+  scope: 'portée',
+  cache: 'réserve',
+  app: 'app',
+  browser: 'navigateur',
+  none: 'aucun',
+  noScope: 'aucune',
+  sw: 'sw',
+  registerError: "Erreur d'enregistrement :",
+} as const;
+
 /** UI-01 : bouton du menu. */
 export function playButtonLabel(level: number): string {
   return `Jouer au niveau ${level}`;

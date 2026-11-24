@@ -10,6 +10,7 @@ import { flip, quit, toggleMemo } from '../logic/round';
 import type { GameState, MemoMark, Rng, RoundState } from '../logic/types';
 import { play, scale, setFast, skip, tween, wait } from './anim';
 import { bark, unlockAudio } from './audio';
+import { collectOfflineInfo, formatOfflineInfo } from './diagnostic';
 import { installInput } from './input';
 import { dogHead, renderBoard, renderCard } from './render/board';
 import { renderDialog } from './render/dialog';
@@ -182,7 +183,24 @@ export function createController(
   function showScreen(title: string, version?: string): void {
     phase = 'screen';
     options.onLeaveMenu?.();
-    root.replaceChildren(renderScreen(title, version));
+    const screen = renderScreen(title, version);
+    root.replaceChildren(screen);
+    const diag = screen.querySelector<HTMLElement>('.ecran-diagnostic');
+    if (diag) {
+      // T-015 (provisoire) : rempli après coup ; rien si l'écran a été quitté entre-temps.
+      void collectOfflineInfo()
+        .then((info) => {
+          if (!diag.isConnected) return;
+          diag.replaceChildren(
+            ...formatOfflineInfo(info).map((ligne) => {
+              const div = document.createElement('div');
+              div.textContent = ligne;
+              return div;
+            }),
+          );
+        })
+        .catch(() => {});
+    }
   }
 
   /** Dialogue Oui/Non modal, dans `#app`. */
