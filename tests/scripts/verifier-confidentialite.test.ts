@@ -107,6 +107,22 @@ describe('verifier-confidentialite', () => {
     expect(findViolations(['public/pack/pack.bin'], octets('SB'), svgSain)).toHaveLength(1);
   });
 
+  it('R-127 fixture de test bien formée → aucune violation', () => {
+    expect(findViolations([], null, svgSain, octets('SBPACK1', 9))).toEqual([]);
+  });
+
+  it('R-127 fixture de test sans en-tête SBPACK1 → violation', () => {
+    const r = findViolations([], null, svgSain, octets('XXPACK1'));
+    expect(r).toHaveLength(1);
+    expect(r[0]).toContain('pack-test.bin');
+  });
+
+  it('R-127 prive-exemple/ sans image accepté', () => {
+    expect(
+      findViolations(['prive-exemple/pack.json', 'prive-exemple/LISEZMOI.md'], null, svgSain),
+    ).toEqual([]);
+  });
+
   it('R-127 photo ProRAW .dng bloquée', () => {
     const r = findViolations(['src/IMG_0002.DNG'], null, svgSain);
     expect(r).toHaveLength(1);

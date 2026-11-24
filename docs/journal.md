@@ -21,6 +21,7 @@
 | T-013 | Brancher la sauvegarde (localStorage) sur le jeu | terminée |
 | T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | terminée |
 | T-015 | Afficher un diagnostic hors ligne dans Réglages | terminée (provisoire, à retirer avant le gel) |
+| T-016 | Fabriquer et lire le pack chiffré (sans interface) | corrections vérifiées 🟢, prête à fusionner |
 
 ## Questions ouvertes
 _(aucune)_
@@ -34,7 +35,7 @@ _(aucune)_
 - Phase 3 : étape 3.3 (pack chiffré). À la publication suivante, vérifier sur iPhone que la mise à jour s'applique sur le menu (R-104).
 - Avant le gel (13/12) : retirer ou réduire le diagnostic hors ligne de Réglages (T-015).
 - Recette sur iPhone : toujours installer l'app depuis https://leonardgst.github.io/sardinebagarre/, jamais depuis l'adresse du serveur de développement (192.168.x.x) : en http, pas de service worker, donc pas de hors ligne.
-- Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
+- Étape 3.3 découpée : T-016 (format, script, déchiffrement, sans interface) puis T-017 (intégration : saisie du code, tête sur la carte, messages privés, préchargement). Le HTTPS de développement sur iPhone n'est plus un prérequis : le pack se teste sur ordinateur (`localhost` est un contexte sécurisé) et sur le site publié.
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
 - `finalizeRound` historise `game.level` : interdire « Effacer la progression », « Vider la boîte » et « Quitter la table » pendant une partie `PLAYING` (sinon la partie est historisée au mauvais niveau).
@@ -137,3 +138,10 @@ _(aucune)_
 - 2026-11-24 — Opus — T-015 fusionnée (e2e 433 passés) ; v0.6.1 publiée (déploiement OK). Relevé du diagnostic à faire sur iPhone, dans Safari et dans l'app installée.
 - 2026-11-24 — humain — Relevé v0.6.1 : l'icône de l'écran d'accueil avait été installée depuis le serveur de développement (http://192.168.1.14), d'où l'échec hors ligne de la recette T-014 (http : pas de service worker). App réinstallée depuis le site publié : « Hors ligne : actif · app » ; niveau 1 en ligne, mode avion, app fermée puis relancée, niveau 2 joué hors ligne. ✔
 - 2026-11-24 — Opus — T-014 terminée (recette complète OK). T-015 terminée ; diagnostic provisoire conservé jusqu'au gel.
+- 2026-11-24 — Opus — T-016 planifiée (étape 3.3, 1ʳᵉ moitié) : normalisation du code (espaces, tirets, accents et majuscules indifférents), format clair `SBDATA1` + index JSON + fichiers, tête recadrée en carré de 512 px par le script.
+- 2026-11-24 — codeur — T-016 : pack-lib, pack.mjs, pack-de-test.mjs, pack.ts, prive-exemple, contrôle de la fixture écrits ; tests sans sharp verts (27). **Bloqué** : `npm i -D sharp` refusé par les permissions, donc ni fixture, ni tests d'image, ni `npm run check` complet. À autoriser par l'humain.
+- 2026-11-24 — codeur — T-016 terminée : fixture (9 355 o), dérivation ~86 ms et déchiffrement ~0,5 ms en Node, check vert (444 tests).
+- 2026-11-24 — relecteur — T-016 relue : 🟡 (aucune fuite ; à corriger : validation de `decodePack` et de `pack.json`, refus des codes publiés, code ASCII imposé, LISEZMOI pour non-développeur).
+- 2026-11-24 — Opus — T-016 : E1 à E11 confiés au codeur ; décisions : prix obligatoire au-delà de la 12ᵉ photo, code ASCII imposé (tirets typographiques acceptés comme séparateurs).
+- 2026-11-24 — codeur — T-016 : corrections de relecture E1 à E11 (decodePack validé, codes publiés refusés, forme ASCII du code, tirets typographiques, validation de pack.json, prix obligatoire dès la 13e photo, saisie masquée durcie, LISEZMOI réécrit) ; check vert (492 tests).
+- 2026-11-24 — Opus — T-016 : E1 à E11 vérifiés (check 492 tests ; contre-épreuves sur les codes publics, la validation de `photos` et la forme ASCII du code) ; LISEZMOI complété.
