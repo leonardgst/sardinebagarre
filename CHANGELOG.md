@@ -1,5 +1,13 @@
 # Journal des versions
 
+## v0.7.0 — 2026-11-24
+- Pack personnel chiffré : `npm run pack` (réservé à l'humain) chiffre `prive/` en `public/pack/pack.bin` (AES-GCM, PBKDF2 600 000 itérations) ; mode d'emploi dans `prive-exemple/LISEZMOI.md`.
+- Réglages : saisie du code secret (majuscules, accents et espaces indifférents), message de bienvenue du pack, « Changer le code ».
+- Carte Sardine : photo ronde de la tête de Sardine quand le pack est chargé, tête dessinée sinon.
+- Messages privés « Sardine » ajoutés aux messages publics.
+- Pack rechargé à chaque lancement ; code oublié si le pack a été refait avec un autre code.
+- Diagnostic provisoire : durée du déchiffrement.
+
 ## v0.6.1 — 2026-11-24
 - Diagnostic provisoire dans Réglages : état du hors ligne (service worker, adresse lancée, portée, fichiers en réserve, erreur d'enregistrement éventuelle), pour comprendre pourquoi l'app installée ne démarre pas en mode avion sur iPhone.
 

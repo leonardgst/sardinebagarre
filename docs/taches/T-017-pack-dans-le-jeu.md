@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | terminée (à relire) |
+| Statut | terminée |
 | Étape du plan | 3.3 (2ᵉ moitié, après T-016) |
 | Branche | `t-017-pack-dans-le-jeu` |
 | Estimation | M (1–3 h) |

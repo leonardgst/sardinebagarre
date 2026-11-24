@@ -22,7 +22,7 @@
 | T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | terminée |
 | T-015 | Afficher un diagnostic hors ligne dans Réglages | terminée (provisoire, à retirer avant le gel) |
 | T-016 | Fabriquer et lire le pack chiffré (sans interface) | terminée |
-| T-017 | Brancher le pack chiffré dans le jeu | corrections vérifiées 🟢, prête à fusionner |
+| T-017 | Brancher le pack chiffré dans le jeu | fusionnée, publiée en v0.7.0 ; recette avec le vrai pack à faire |
 
 ## Questions ouvertes
 _(aucune)_
@@ -151,3 +151,4 @@ _(aucune)_
 - 2026-11-24 — relecteur — T-017 relue : 🟡 (e2e complet 493 OK ; à corriger : « Changer le code » avec un code faux réaffiche « Code accepté » ; mineurs : alignement, test de conservation des jetons, mesure du déchiffrement seul, zone aria-live).
 - 2026-11-24 — codeur — T-017 : corrections de relecture F1 (Changer le code : message et pack conservés, drapeau changingCode), F2 (centré), F3 (progression conservée), F4 (durée = déchiffrement seul), F5 (zone aria-live gardée) ; check OK (505 tests), e2e 508 passés / 10 ignorés.
 - 2026-11-24 — Opus — T-017 : F1 à F5 vérifiés (check 505 tests, build sans `__sb`, capture 11d centrée) ; prête à fusionner.
+- 2026-11-24 — Opus — T-017 fusionnée (e2e 508 passés) ; v0.7.0 publiée (T-016 + T-017). Reste : l'humain fabrique le vrai pack ; Opus vérifie ensuite `pack/pack.bin` dans le `sw.js` publié (R-125, C6) ; mesure du déchiffrement sur iPhone (R-T8).
