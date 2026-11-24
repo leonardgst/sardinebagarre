@@ -16,7 +16,7 @@ Le jeu s'installe sur l'écran d'accueil de l'iPhone (et dans le Dock du Mac) av
 - `R-104` : service worker en `registerType: 'prompt'` (vite-plugin-pwa). Jamais de mise à jour pendant une partie. Rechargement automatique quand le joueur est sur le menu : tout de suite s'il y est, sinon dès qu'il y revient. **La spec fait foi** : le plan (étape 3.2) dit `autoUpdate`, c'est une erreur du plan.
 - `R-129` : `noindex` et `robots.txt` (déjà en place depuis T-001, à conserver).
 - `UI-04` : la version de l'app est affichée dans Réglages.
-- Spec §14, critère 6 : manifeste valide, icônes 180 px (Apple) et 512 px.
+- Spec §15, critère 6 : manifeste valide, icônes 180 px (Apple) et 512 px.
 - `ADR-001` (PWA), `ADR-002` (GitHub Pages, base `/sardinebagarre/`), `ADR-007` (dessins originaux seulement).
 - CLAUDE.md : tous les chemins publics passent par `import.meta.env.BASE_URL` ; images seulement dans `public/icons/` et `src/ui/art/`.
 
@@ -65,8 +65,8 @@ Le jeu s'installe sur l'écran d'accueil de l'iPhone (et dans le Dock du Mac) av
 **e2e (`tests/e2e/pwa.spec.ts`, projet `pwa`, version de production)**
 | Nom du test | Scénario | Attendu |
 |---|---|---|
-| `§14-6 manifeste valide` | Lire le `<link rel="manifest">` et charger le fichier | `name`, `short_name`, `display: 'standalone'`, `start_url` et `scope` sous `/sardinebagarre/`, une icône 512 et une `maskable`, et chaque URL d'icône répond 200 avec `image/png` |
-| `§14-6 icône Apple 180 px` | Charger le `apple-touch-icon` | réponse 200, image 180 × 180 |
+| `§15-6 manifeste valide` | Lire le `<link rel="manifest">` et charger le fichier | `name`, `short_name`, `display: 'standalone'`, `start_url` et `scope` sous `/sardinebagarre/`, une icône 512 et une `maskable`, et chaque URL d'icône répond 200 avec `image/png` |
+| `§15-6 icône Apple 180 px` | Charger le `apple-touch-icon` | réponse 200, image 180 × 180 |
 | `R-104 le service worker est enregistré et contrôle la page` | Ouvrir, attendre `navigator.serviceWorker.ready`, recharger | `navigator.serviceWorker.controller` non nul |
 | `ADR-001 hors ligne : le jeu se lance et se joue` | Après le test précédent, `context.setOffline(true)`, recharger | menu affiché, « Jouer » lance un plateau de 25 cartes, une carte se retourne |
 | `R-100 hors ligne : la sauvegarde reste lue` | Finir une partie en ligne, passer hors ligne, recharger | même total et même niveau sur le menu |
@@ -118,4 +118,14 @@ _(remplies par le codeur s'il bloque ; l'humain ou Opus répond ici)_
 
 
 ## Relecture
-_(verdict du relecteur, avec la date)_
+**2026-11-24 — relecteur — 🟡 approuvé avec réserves.** `npm run check` OK (423 tests) ; `E2E_PORT=5199 npm run e2e` complet OK (407 passés, 10 ignorés, 5 profils + `pwa`) ; `npm run screens` OK (50), `11-reglages.png` vue sur iPhone SE et en paysage. Icônes : 4 PNG opaques (alpha minimal 255), apple-touch-icon en 180 px, tête dans la zone sûre de l'icône maskable. Manifeste, chemins sous `/sardinebagarre/`, `sw.js` (sans `clientsClaim`, `pack.bin` absent sans erreur), aucun service worker en développement, `__sb` absent de `dist/` : conformes. `npm audit` : acceptable (4 vulnérabilités modérées dans `workbox-build`, outil de build ; 0 avec `--omit=dev`).
+Contre-épreuve du relecteur : sans `options.onLeaveMenu?.()` dans `startNewRound`, tout reste vert (check et `pwa`). Le branchement R-104 du contrôleur n'est pas testé. Annulée, diff vide.
+Corrections :
+1. (Important) Tester le branchement de la porte dans le contrôleur : en développement, exposer dans `__sb` `needRefresh()` et un compteur d'`apply` (`apply` injectable dans `setupPwa`) ; test e2e sur ces chemins : partie, fin → Non, Infos → Retour, dialogue « Quitter la table », boîte pleine. Il doit échouer avec la contre-épreuve ci-dessus.
+2. (Important) `playwright.config.ts` : `reuseExistingServer: false` pour le serveur de preview (4173 est aussi le port de `npm run preview` ; sinon on risque de tester un ancien build).
+3. (Mineur) `pwa.ts` : le rechargement suit `controlling` sans condition. Le rendre conditionnel au menu (`onNeedReload` qui demande à la porte), pour couvrir le toucher sur « Jouer » juste après `apply()` et le cas de deux onglets ouverts.
+4. (Mineur) Renommer « §15-6 » en « §15-6 » dans `pwa.spec.ts` et dans la fiche.
+5. (Mineur) `docs/plan.md:180` : `autoUpdate` → `prompt` (R-104).
+6. (À reporter dans T-015) Test e2e : `pack/pack.bin` est dans le précache et se charge hors ligne (au-delà de 10 Mo, Workbox l'exclurait sans bruit).
+
+2026-11-24 — Opus — C4 (fiche), C5 et C6 (reporté dans les contraintes du journal) faits. C1 à C4 (code et tests) confiés au codeur.
