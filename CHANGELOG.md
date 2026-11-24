@@ -1,5 +1,11 @@
 # Journal des versions
 
+## v0.4.0 — 2026-11-24
+- Mode mémo : bouton « Mémo », sélection d'une carte sans la retourner, 4 marques (S, 1, 2, 3) combinables.
+- Marques visibles en permanence dans les coins des cartes, effacées quand la carte est retournée.
+- Refus visuel sur une carte déjà retournée ; « Quitter » reste accessible mémo ouvert.
+- Protection contre les doubles touchers à l'ouverture et à la fermeture du mémo (330 tests de navigateur).
+
 ## v0.3.0 — 2026-11-23
 - Menu d'accueil au lancement (Jouer, Album, Infos, Réglages).
 - Bouton Quitter pendant la partie : dialogue de confirmation, abandon avec encaissement des jetons gagnés.

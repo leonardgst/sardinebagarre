@@ -105,3 +105,4 @@ _(aucune)_
 - 2026-11-23 — Opus — T-012 : C1 à C5 vérifiés (contre-épreuve C1 refaite, capture SE vue, check OK). Reste : recette humaine, puis fusion.
 - 2026-11-24 — humain — Recette T-012 (mémo) sur iPhone OK.
 - 2026-11-24 — Opus — T-012 terminée et fusionnée dans main (non poussée).
+- 2026-11-24 — Opus — v0.4.0 publiée (main poussée, tag v0.4.0). Étape 2.5 couverte par les recettes iPhone : phase 2 terminée. Prochaine étape : 3.1 (sauvegarde).
