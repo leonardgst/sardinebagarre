@@ -126,3 +126,32 @@ Dans Réglages, la joueuse saisit le code secret. S'il est bon, le code est sauv
 - Captures : `test-results/screens/<profil>/11-reglages.png`, `11b-reglages-saisie.png`, `11c-reglages-erreur.png`, `11d-reglages-accepte.png`, `12-sardine-photo.png`.
 
 ## Relecture
+**Relecteur — 2026-11-24 — 🟡 approuvé avec réserves.**
+
+Vérifications :
+- `npm run check` : OK, 504 tests.
+- e2e complet : OK, 493 réussis, 10 ignorés.
+- Captures 11c, 11d et 12 vues : aucun débordement.
+- `__sb` : absent de `dist/`.
+
+Confidentialité OK :
+- le champ est vidé dès la vérification ;
+- aucun `console` ni `error.message` ;
+- `crypto.subtle` n'apparaît que dans `pack.ts`.
+
+Concurrence et robustesse OK : partie en cours, double toucher, écran quitté, révocation des URL après un succès seulement.
+
+Écarts annoncés par le codeur : tous acceptés.
+
+Important :
+- **F1 — `controller.ts`, `codeSection`.** Après « Changer le code », un code faux, vide ou indisponible réaffiche « Code accepté » sans message, car `pack.content()` est testé avant `packError`.
+  - Correction : drapeau `changingCode`.
+  - Tests e2e : changement de code faux puis vide, depuis un pack déjà chargé. Le message est affiché, `packCode` reste inchangé et la photo reste sur la carte Sardine.
+
+Mineur :
+- **F2 — alignement.** `.code-secret` est aligné à gauche alors que l'écran est centré. Passer en `text-align: center`.
+- **F3 — test « code devenu faux → oublié ».** Il doit aussi vérifier que jetons, niveau et historique sont conservés.
+- **F4 — mesure du temps.** La durée inclut le téléchargement et la création des URL. Ne mesurer que `decryptPack` (R-T8).
+- **F5 — annonce VoiceOver.** La zone `aria-live` est recréée à chaque rendu, donc VoiceOver risque de ne rien annoncer. Garder le même élément et ne changer que son texte.
+
+**Opus — 2026-11-24 :** F1 à F5 sont confiés au codeur.
