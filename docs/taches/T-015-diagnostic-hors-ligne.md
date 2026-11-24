@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | implémentée (à relire) |
+| Statut | terminée (diagnostic à retirer ou réduire avant le gel du 13/12) |
 | Étape du plan | 3.2 (suite de T-014) |
 | Branche | `t-015-diagnostic-hors-ligne` |
 | Estimation | S (< 1 h) |

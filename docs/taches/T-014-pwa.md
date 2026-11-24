@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | implémentée (relecture à faire) |
+| Statut | terminée |
 | Étape du plan | 3.2 |
 | Branche | `t-014-pwa` |
 | Estimation | M (2 à 3 h) |

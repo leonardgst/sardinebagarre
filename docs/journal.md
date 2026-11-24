@@ -19,8 +19,8 @@
 | T-011 | Menu d'accueil, dialogue Quitter, question « Jouer au niveau {n} ? » | terminée |
 | T-012 | Mode mémo (sélection, 4 marques, Fermer) | terminée |
 | T-013 | Brancher la sauvegarde (localStorage) sur le jeu | terminée |
-| T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | fusionnée ; recette : lancement hors ligne KO sur iPhone |
-| T-015 | Afficher un diagnostic hors ligne dans Réglages | fusionnée, publiée en v0.6.1 ; relevé sur iPhone à faire |
+| T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | terminée |
+| T-015 | Afficher un diagnostic hors ligne dans Réglages | terminée (provisoire, à retirer avant le gel) |
 
 ## Questions ouvertes
 _(aucune)_
@@ -31,7 +31,9 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 3 : T-014, comprendre pourquoi l'app installée ne démarre pas en mode avion sur iPhone (recette v0.6.0, point 3) ; à la publication suivante, vérifier la mise à jour sur le menu (R-104). Puis 3.3 (pack chiffré).
+- Phase 3 : étape 3.3 (pack chiffré). À la publication suivante, vérifier sur iPhone que la mise à jour s'applique sur le menu (R-104).
+- Avant le gel (13/12) : retirer ou réduire le diagnostic hors ligne de Réglages (T-015).
+- Recette sur iPhone : toujours installer l'app depuis https://leonardgst.github.io/sardinebagarre/, jamais depuis l'adresse du serveur de développement (192.168.x.x) : en http, pas de service worker, donc pas de hors ligne.
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -133,3 +135,5 @@ _(aucune)_
 - 2026-11-24 — codeur — T-015 : corrections de relecture D1 (lectures protégées, .catch), D2 (valeurs internes anglaises, libellés dans texts.fr.ts), D4 (erreur d'enregistrement du service worker, register-error.ts, 3e ligne du diagnostic) ; check et e2e pwa OK.
 - 2026-11-24 — Opus — T-015 : D1, D2, D4 vérifiés (check OK, build sans `__sb`) ; prête à fusionner, publication v0.6.1 sur demande.
 - 2026-11-24 — Opus — T-015 fusionnée (e2e 433 passés) ; v0.6.1 publiée (déploiement OK). Relevé du diagnostic à faire sur iPhone, dans Safari et dans l'app installée.
+- 2026-11-24 — humain — Relevé v0.6.1 : l'icône de l'écran d'accueil avait été installée depuis le serveur de développement (http://192.168.1.14), d'où l'échec hors ligne de la recette T-014 (http : pas de service worker). App réinstallée depuis le site publié : « Hors ligne : actif · app » ; niveau 1 en ligne, mode avion, app fermée puis relancée, niveau 2 joué hors ligne. ✔
+- 2026-11-24 — Opus — T-014 terminée (recette complète OK). T-015 terminée ; diagnostic provisoire conservé jusqu'au gel.
