@@ -21,7 +21,7 @@
 | T-013 | Brancher la sauvegarde (localStorage) sur le jeu | terminée |
 | T-014 | Rendre le jeu installable et jouable hors ligne (PWA) | terminée |
 | T-015 | Afficher un diagnostic hors ligne dans Réglages | terminée (provisoire, à retirer avant le gel) |
-| T-016 | Fabriquer et lire le pack chiffré (sans interface) | planifiée |
+| T-016 | Fabriquer et lire le pack chiffré (sans interface) | implémentée, relecture 🟡 (E1 à E11 à corriger) |
 
 ## Questions ouvertes
 _(aucune)_
@@ -141,3 +141,5 @@ _(aucune)_
 - 2026-11-24 — Opus — T-016 planifiée (étape 3.3, 1ʳᵉ moitié) : normalisation du code (espaces, tirets, accents et majuscules indifférents), format clair `SBDATA1` + index JSON + fichiers, tête recadrée en carré de 512 px par le script.
 - 2026-11-24 — codeur — T-016 : pack-lib, pack.mjs, pack-de-test.mjs, pack.ts, prive-exemple, contrôle de la fixture écrits ; tests sans sharp verts (27). **Bloqué** : `npm i -D sharp` refusé par les permissions, donc ni fixture, ni tests d'image, ni `npm run check` complet. À autoriser par l'humain.
 - 2026-11-24 — codeur — T-016 terminée : fixture (9 355 o), dérivation ~86 ms et déchiffrement ~0,5 ms en Node, check vert (444 tests).
+- 2026-11-24 — relecteur — T-016 relue : 🟡 (aucune fuite ; à corriger : validation de `decodePack` et de `pack.json`, refus des codes publiés, code ASCII imposé, LISEZMOI pour non-développeur).
+- 2026-11-24 — Opus — T-016 : E1 à E11 confiés au codeur ; décisions : prix obligatoire au-delà de la 12ᵉ photo, code ASCII imposé (tirets typographiques acceptés comme séparateurs).
