@@ -27,6 +27,7 @@ const EXTENSIONS_BLOQUEES = new Set([
 const RACINE = fileURLToPath(new URL('..', import.meta.url));
 const DOSSIERS_AUTORISES = ['public/icons/', 'src/ui/art/'];
 const CHEMIN_PACK = 'public/pack/pack.bin';
+const CHEMIN_FIXTURE = 'tests/fixtures/pack-test.bin';
 const ENTETE_PACK = 'SBPACK1';
 
 function extension(chemin) {
@@ -39,9 +40,10 @@ function extension(chemin) {
  * @param {string[]} paths chemins Git (séparateur /)
  * @param {Uint8Array | null} packHeader premiers octets de public/pack/pack.bin, ou null s'il n'existe pas
  * @param {(path: string) => string} readText lecture d'un .svg (jamais appelée pour prive/)
+ * @param {Uint8Array | null} [fixtureHeader] premiers octets de tests/fixtures/pack-test.bin, ou null
  * @returns {string[]} messages de violation
  */
-export function findViolations(paths, packHeader, readText) {
+export function findViolations(paths, packHeader, readText, fixtureHeader = null) {
   const violations = [];
   for (const chemin of paths) {
     if (chemin.startsWith('prive/')) {
@@ -77,11 +79,19 @@ export function findViolations(paths, packHeader, readText) {
       violations.push(`${CHEMIN_PACK} : l'en-tête ne commence pas par ${ENTETE_PACK}`);
     }
   }
+  if (fixtureHeader !== null) {
+    const attendu = new TextEncoder().encode(ENTETE_PACK);
+    const ok =
+      fixtureHeader.length >= attendu.length && attendu.every((o, i) => fixtureHeader[i] === o);
+    if (!ok) {
+      violations.push(`${CHEMIN_FIXTURE} : l'en-tête ne commence pas par ${ENTETE_PACK}`);
+    }
+  }
   return violations;
 }
 
-function lireEntetePack() {
-  const complet = join(RACINE, CHEMIN_PACK);
+function lireEntetePack(chemin = CHEMIN_PACK) {
+  const complet = join(RACINE, chemin);
   if (!existsSync(complet)) return null;
   const fd = openSync(complet, 'r');
   try {
@@ -111,7 +121,12 @@ function main() {
     const complet = join(RACINE, p);
     return existsSync(complet) ? readFileSync(complet, 'utf8') : '';
   };
-  const violations = findViolations(paths, lireEntetePack(), readText);
+  const violations = findViolations(
+    paths,
+    lireEntetePack(),
+    readText,
+    lireEntetePack(CHEMIN_FIXTURE),
+  );
   if (violations.length > 0) {
     console.error('Contrôle de confidentialité : ÉCHEC');
     for (const v of violations) console.error(`- ${v}`);

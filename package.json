@@ -10,6 +10,8 @@
     "dev": "vite",
     "dev:https": "vite --mode https",
     "icones": "node scripts/icones.mjs",
+    "pack": "node scripts/pack.mjs",
+    "pack:test": "node scripts/pack-de-test.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
