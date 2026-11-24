@@ -30,7 +30,7 @@ _(aucune)_
 - [ ] Aboiement enregistré (facultatif) — avant le 11/12
 
 ## Prochaines étapes
-- Phase 3 : T-014 (étape 3.2, PWA), à implémenter ; puis 3.3 (pack chiffré).
+- Phase 3 : recette de T-014 sur iPhone (installation, mode avion, version) ; à la publication suivante, vérifier la mise à jour sur le menu (R-104). Puis 3.3 (pack chiffré).
 - Avant l'étape 3.3 : rendre le HTTPS de développement utilisable sur iPhone (le certificat de `plugin-basic-ssl` est refusé par Safari sur une adresse IP ; piste : certificat mkcert installé sur l'iPhone).
 
 ## Contraintes pour la phase 2 (revue de la logique du 2026-11-21)
@@ -123,3 +123,4 @@ _(aucune)_
 - 2026-11-24 — Opus — T-014 : C5 fait (plan.md), C6 reporté dans les contraintes (étape 3.3), C1 à C4 confiés au codeur.
 - 2026-11-24 — codeur — T-014 : corrections de relecture C1 à C4 (porte R-104 testée dans le contrôleur via `__sb`, rechargement conditionné au menu, preview sans réutilisation, §15-6) ; check et e2e OK.
 - 2026-11-24 — Opus — T-014 : C1 à C4 vérifiés (check OK, build sans `__sb`). Recette sur le site publié (HTTPS nécessaire).
+- 2026-11-24 — Opus — T-014 fusionnée (e2e 432 passés) ; v0.6.0 publiée (main poussée, tag v0.6.0) pour la recette en HTTPS.

@@ -1,5 +1,11 @@
 # Journal des versions
 
+## v0.6.0 — 2026-11-24
+- Application installable : icône (tête de chien originale), plein écran, balises pour l'écran d'accueil de l'iPhone.
+- Jouable hors ligne après une première visite (service worker, précache de tout le jeu).
+- Mise à jour appliquée seulement sur le menu, jamais pendant une partie (R-104).
+- Version affichée dans Réglages.
+
 ## v0.5.0 — 2026-11-24
 - Sauvegarde sur l'appareil : jetons, niveau, historique et records survivent à la fermeture de l'app.
 - La partie en cours n'est pas sauvegardée : au retour, menu au même niveau, gain en cours perdu (R-68).
