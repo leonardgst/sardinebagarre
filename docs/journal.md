@@ -122,3 +122,4 @@ _(aucune)_
 - 2026-11-24 — relecteur — T-014 relue : 🟡 approuvée avec réserves (check, e2e complet 5 profils + `pwa` et captures OK ; à corriger : test du branchement R-104 dans le contrôleur, `reuseExistingServer: false` pour la preview ; mineurs : rechargement conditionnel au menu, §14-6 → §15-6, plan.md `autoUpdate`).
 - 2026-11-24 — Opus — T-014 : C5 fait (plan.md), C6 reporté dans les contraintes (étape 3.3), C1 à C4 confiés au codeur.
 - 2026-11-24 — codeur — T-014 : corrections de relecture C1 à C4 (porte R-104 testée dans le contrôleur via `__sb`, rechargement conditionné au menu, preview sans réutilisation, §15-6) ; check et e2e OK.
+- 2026-11-24 — Opus — T-014 : C1 à C4 vérifiés (check OK, build sans `__sb`). Recette sur le site publié (HTTPS nécessaire).

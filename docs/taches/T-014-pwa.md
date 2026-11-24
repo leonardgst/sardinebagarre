@@ -136,3 +136,5 @@ Corrections :
 6. (À reporter dans T-015) Test e2e : `pack/pack.bin` est dans le précache et se charge hors ligne (au-delà de 10 Mo, Workbox l'exclurait sans bruit).
 
 2026-11-24 — Opus — C4 (fiche), C5 et C6 (reporté dans les contraintes du journal) faits. C1 à C4 (code et tests) confiés au codeur.
+
+2026-11-24 — Opus — vérification des corrections C1 à C4 (commit 3fdc5aa) : diff conforme ; `onNeedReload` remplace bien le rechargement automatique du plugin (register.js, événements `controlling` et `activated`), et le rechargement attend le menu ; `npm run check` OK (425), build OK, `__sb` absent de `dist/`. 🟢 Prête pour la recette, qui se fera sur le site publié (le service worker exige HTTPS).
